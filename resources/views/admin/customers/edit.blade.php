@@ -87,6 +87,13 @@
                     @enderror
                 </div>
                 <div class="col-md-12 mb-3">
+                    <label for="gmaps_link" class="form-label">Link Google Maps (Opsional)</label>
+                    <input type="text" class="form-control @error('gmaps_link') is-invalid @enderror" id="gmaps_link" name="gmaps_link" value="{{ old('gmaps_link', $customer->gmaps_link) }}" placeholder="https://maps.google.com/?q=...">
+                    @error('gmaps_link')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="col-md-12 mb-3">
                     <label for="notes" class="form-label">Catatan</label>
                     <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" name="notes" rows="2">{{ old('notes', $customer->notes) }}</textarea>
                     @error('notes')

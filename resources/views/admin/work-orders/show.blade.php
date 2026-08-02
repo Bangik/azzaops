@@ -67,7 +67,14 @@
                 </div>
                 <div class="mb-3">
                     <div class="text-muted small">Lokasi Pengerjaan</div>
-                    <div class="fw-semibold">{{ $workOrder->location }}</div>
+                    <div class="fw-semibold">
+                        {{ $workOrder->location }}
+                        @if($workOrder->gmaps_link)
+                            <a href="{{ $workOrder->gmaps_link }}" target="_blank" class="ms-2 badge text-bg-light border text-decoration-none">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i> Google Maps
+                            </a>
+                        @endif
+                    </div>
                 </div>
                 <div class="mb-0">
                     <div class="text-muted small">Deskripsi / Keluhan</div>

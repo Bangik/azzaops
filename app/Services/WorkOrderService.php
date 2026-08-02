@@ -33,6 +33,7 @@ class WorkOrderService
                 'title' => $data['title'],
                 'description' => $data['description'] ?? null,
                 'location' => $data['location'],
+                'gmaps_link' => $data['gmaps_link'] ?? null,
                 'scheduled_date' => $data['scheduled_date'] ?? null,
                 'priority' => $data['priority'] ?? 'normal',
                 'status' => WorkOrderStatus::Pending,
@@ -134,6 +135,7 @@ class WorkOrderService
                 'title' => $data['title'],
                 'description' => $data['description'] ?? null,
                 'location' => $data['location'],
+                'gmaps_link' => $data['gmaps_link'] ?? null,
                 'scheduled_date' => $data['scheduled_date'] ?? null,
                 'priority' => $data['priority'] ?? 'normal',
             ]);
@@ -266,6 +268,7 @@ class WorkOrderService
             $newWoData['parent_wo_id'] = $workOrder->id;
             $newWoData['customer_id'] = $workOrder->customer_id;
             $newWoData['location'] = $newWoData['location'] ?? $workOrder->location;
+            $newWoData['gmaps_link'] = $newWoData['gmaps_link'] ?? $workOrder->gmaps_link;
 
             return $this->create($newWoData, $createdBy);
         });

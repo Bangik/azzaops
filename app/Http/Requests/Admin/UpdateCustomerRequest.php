@@ -22,6 +22,7 @@ class UpdateCustomerRequest extends FormRequest
             'phone' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'string', 'email', 'max:255'],
             'address' => ['nullable', 'string'],
+            'gmaps_link' => ['nullable', 'string'],
             'city' => ['nullable', 'string', 'max:255'],
             'market' => ['nullable', 'string', 'max:255'],
         ];

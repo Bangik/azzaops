@@ -95,6 +95,14 @@
                 </div>
 
                 <div class="col-md-12 mb-3">
+                    <label for="gmaps_link" class="form-label">Link Google Maps Lokasi (Opsional)</label>
+                    <input type="text" class="form-control @error('gmaps_link') is-invalid @enderror" id="gmaps_link" name="gmaps_link" value="{{ old('gmaps_link', $workOrder->gmaps_link) }}" placeholder="https://maps.google.com/?q=...">
+                    @error('gmaps_link')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-12 mb-3">
                     <label for="description" class="form-label">Deskripsi & Keluhan Detail</label>
                     <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="3">{{ old('description', $workOrder->description) }}</textarea>
                     @error('description')

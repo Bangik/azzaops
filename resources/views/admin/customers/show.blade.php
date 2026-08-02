@@ -57,7 +57,15 @@
                 </table>
                 <div class="mt-3">
                     <strong>Alamat:</strong>
-                    <p class="mb-0 text-muted">{{ $customer->address ?? '-' }}</p>
+                    <p class="mb-0 text-muted">
+                        {{ $customer->address ?? '-' }}
+                        @if($customer->gmaps_link)
+                            <br>
+                            <a href="{{ $customer->gmaps_link }}" target="_blank" class="badge text-bg-light border text-decoration-none mt-1">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i> Google Maps
+                            </a>
+                        @endif
+                    </p>
                 </div>
                 <div class="mt-3">
                     <strong>Catatan:</strong>

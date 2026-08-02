@@ -24,6 +24,7 @@ class WorkOrder extends Model
         'title',
         'description',
         'location',
+        'gmaps_link',
         'scheduled_date',
         'started_at',
         'completed_at',

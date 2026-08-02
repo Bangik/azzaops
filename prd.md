@@ -276,6 +276,7 @@ Data customer, baik perorangan maupun perusahaan.
 | phone_alt | VARCHAR(20) | YES | NULL | Nomor HP alternatif |
 | email | VARCHAR(255) | YES | NULL | Email customer |
 | address | TEXT | YES | NULL | Alamat lengkap |
+| gmaps_link | TEXT | YES | NULL | Link Google Maps alamat customer |
 | city | VARCHAR(100) | YES | NULL | Kota |
 | market | VARCHAR(100) | YES | NULL | Sumber/sales channel (WA, referral, Tokopedia, dll) |
 | notes | TEXT | YES | NULL | Catatan tambahan |
@@ -317,6 +318,7 @@ Tabel utama pekerjaan.
 | title | VARCHAR(255) | NO | | Judul singkat pekerjaan |
 | description | TEXT | YES | NULL | Deskripsi/detail pekerjaan |
 | location | TEXT | NO | | Alamat lokasi pengerjaan |
+| gmaps_link | TEXT | YES | NULL | Link Google Maps lokasi pengerjaan |
 | scheduled_date | DATE | YES | NULL | Tanggal rencana pengerjaan |
 | started_at | TIMESTAMP | YES | NULL | Waktu mulai pengerjaan aktual |
 | completed_at | TIMESTAMP | YES | NULL | Waktu selesai |

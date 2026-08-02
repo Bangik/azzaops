@@ -20,6 +20,7 @@ class Customer extends Model
         'phone_alt',
         'email',
         'address',
+        'gmaps_link',
         'city',
         'market',
         'notes',

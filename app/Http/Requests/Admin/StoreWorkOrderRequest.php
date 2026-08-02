@@ -20,6 +20,7 @@ class StoreWorkOrderRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'location' => ['required', 'string'],
+            'gmaps_link' => ['nullable', 'string'],
             'scheduled_date' => ['nullable', 'date'],
             'priority' => ['required', 'string', 'in:low,normal,high,urgent'],
             'items' => ['nullable', 'array'],
