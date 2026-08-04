@@ -69,7 +69,7 @@
                     <label for="priority" class="form-label">Prioritas</label>
                     <select class="form-select @error('priority') is-invalid @enderror" id="priority" name="priority" required>
                         @foreach(App\Enums\WorkOrderPriority::cases() as $priority)
-                            <option value="{{ $priority->value }}" {{ old('priority', 'normal') == $priority->value ? 'selected' : '' }}>
+                            <option value="{{ $priority->value }}" {{ old('priority', '3') == $priority->value ? 'selected' : '' }}>
                                 {{ $priority->label() }}
                             </option>
                         @endforeach

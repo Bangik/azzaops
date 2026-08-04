@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamp('started_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->string('status', 20)->default('pending');
-            $table->string('priority', 10)->default('normal');
+            $table->string('priority', 10)->default('3');
             $table->decimal('estimated_cost', 15, 2)->nullable();
             $table->decimal('total_cost', 15, 2)->nullable();
             $table->text('notes')->nullable();

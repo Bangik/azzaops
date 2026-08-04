@@ -64,10 +64,26 @@
                 </div>
 
                 <div class="col-md-4 mb-3">
+                    <label for="scheduled_time" class="form-label">Jam Rencana</label>
+                    <input type="time" class="form-control @error('scheduled_time') is-invalid @enderror" id="scheduled_time" name="scheduled_time" value="{{ old('scheduled_time') }}">
+                    @error('scheduled_time')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="job_order" class="form-label">Urutan Pekerjaan</label>
+                    <input type="number" class="form-control @error('job_order') is-invalid @enderror" id="job_order" name="job_order" value="{{ old('job_order') }}" min="0" placeholder="Urutan (contoh: 1)">
+                    @error('job_order')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-4 mb-3">
                     <label for="priority" class="form-label">Prioritas</label>
                     <select class="form-select @error('priority') is-invalid @enderror" id="priority" name="priority" required>
                         @foreach(App\Enums\WorkOrderPriority::cases() as $priority)
-                            <option value="{{ $priority->value }}" {{ old('priority', 'normal') == $priority->value ? 'selected' : '' }}>
+                            <option value="{{ $priority->value }}" {{ old('priority', '3') == $priority->value ? 'selected' : '' }}>
                                 {{ $priority->label() }}
                             </option>
                         @endforeach

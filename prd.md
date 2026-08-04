@@ -320,10 +320,12 @@ Tabel utama pekerjaan.
 | location | TEXT | NO | | Alamat lokasi pengerjaan |
 | gmaps_link | TEXT | YES | NULL | Link Google Maps lokasi pengerjaan |
 | scheduled_date | DATE | YES | NULL | Tanggal rencana pengerjaan |
+| scheduled_time | TIME | YES | NULL | Jam rencana pengerjaan |
+| job_order | INT | YES | NULL | Urutan pengerjaan / urutan pekerjaan |
 | started_at | TIMESTAMP | YES | NULL | Waktu mulai pengerjaan aktual |
 | completed_at | TIMESTAMP | YES | NULL | Waktu selesai |
 | status | ENUM('pending','assigned','in_progress','checking','reported','invoice_sent','negotiating','approved','completed','cancelled') | NO | 'pending' | Status WO |
-| priority | ENUM('low','normal','high','urgent') | NO | 'normal' | Prioritas |
+| priority | ENUM('1','2','3','4') | NO | '3' | Prioritas (1: Urgent, 2: Tinggi, 3: Normal, 4: Rendah) |
 | estimated_cost | DECIMAL(15,2) | YES | NULL | Estimasi biaya |
 | total_cost | DECIMAL(15,2) | YES | NULL | Biaya aktual total |
 | notes | TEXT | YES | NULL | Catatan internal |
@@ -332,7 +334,7 @@ Tabel utama pekerjaan.
 | created_at | TIMESTAMP | NO | CURRENT_TIMESTAMP | |
 | updated_at | TIMESTAMP | NO | CURRENT_TIMESTAMP | |
 
-**Index:** `UNIQUE(wo_number)`, `INDEX(status)`, `INDEX(customer_id)`, `INDEX(scheduled_date)`, `INDEX(parent_wo_id)`  
+**Index:** `UNIQUE(wo_number)`, `INDEX(status)`, `INDEX(customer_id)`, `INDEX(scheduled_date)`, `INDEX(parent_wo_id)`, `INDEX(job_order)`  
 **Foreign Key:** `customer_id → customers(id)`, `service_category_id → service_categories(id)`, `created_by → users(id)`, `parent_wo_id → work_orders(id) ON DELETE SET NULL`
 
 ---
@@ -1231,7 +1233,9 @@ WorkOrder {
   started_at: string | null        // ISO 8601
   completed_at: string | null
   status: string                   // enum work_order_status
-  priority: 'low' | 'normal' | 'high' | 'urgent'
+  priority: '1' | '2' | '3' | '4'  // 1: Urgent, 2: Tinggi, 3: Normal, 4: Rendah
+  scheduled_time: string | null    // HH:mm:ss
+  job_order: number | null         // Urutan pengerjaan
   estimated_cost: number | null
   total_cost: number | null
   notes: string | null

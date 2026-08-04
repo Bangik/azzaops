@@ -58,11 +58,24 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <div class="text-muted small">Tanggal Rencana</div>
-                        <div class="fw-semibold">{{ $workOrder->scheduled_date ? $workOrder->scheduled_date->format('d M Y') : '-' }}</div>
+                        <div class="fw-semibold">
+                            {{ $workOrder->scheduled_date ? $workOrder->scheduled_date->format('d M Y') : '-' }}
+                            @if($workOrder->scheduled_time)
+                                &nbsp;<span class="text-muted small"><i class="bi bi-clock"></i> {{ date('H:i', strtotime($workOrder->scheduled_time)) }}</span>
+                            @endif
+                        </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">Urutan Pekerjaan</div>
+                        <div class="fw-semibold">{{ $workOrder->job_order ?? '-' }}</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
                     <div class="col-md-6">
                         <div class="text-muted small">Dibuat Oleh</div>
                         <div class="fw-semibold">{{ $workOrder->creator->name }} <span class="text-muted small">({{ $workOrder->created_at->format('d/m/Y H:i') }})</span></div>
+                    </div>
+                    <div class="col-md-6">
                     </div>
                 </div>
                 <div class="mb-3">
@@ -132,36 +145,71 @@
         @if($workOrder->reports->count())
         <div class="card mb-3">
             <div class="card-header">
-                <h5 class="mb-0">Laporan Teknisi</h5>
+                <h5 class="mb-0">Laporan Pekerjaan</h5>
             </div>
             <div class="card-body">
                 @foreach($workOrder->reports as $report)
                 <div class="border rounded p-3 mb-3">
-                    <div class="d-flex justify-content-between mb-2">
-                        <div class="fw-semibold">{{ $report->technician->name }}</div>
-                        <div class="text-muted small">{{ $report->submitted_at->format('d/m/Y H:i') }}</div>
+                    <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                        <div>
+                            <span class="fw-semibold text-primary">{{ $report->technician->name }}</span>
+                            <span class="text-muted small"> | {{ $report->submitted_at->format('d/m/Y H:i') }}</span>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-warning btn-action" data-bs-toggle="collapse" data-bs-target="#editReportCollapse-{{ $report->id }}" title="Edit Laporan">
+                            <i class="bi bi-pencil"></i> Edit Laporan
+                        </button>
+                    </div>
+
+                    {{-- Collapse Form Edit Laporan --}}
+                    <div class="collapse mb-3" id="editReportCollapse-{{ $report->id }}">
+                        <form action="{{ route('admin.work-orders.update-report', [$workOrder, $report]) }}" method="POST" class="bg-light p-3 border rounded">
+                            @csrf
+                            @method('PUT')
+                            <div class="mb-3">
+                                <label for="findings-{{ $report->id }}" class="form-label small fw-bold">Temuan Lapangan</label>
+                                <textarea class="form-control form-control-sm" id="findings-{{ $report->id }}" name="findings" rows="3" required>{{ $report->findings }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="work_done-{{ $report->id }}" class="form-label small fw-bold">Pekerjaan yang Dilakukan</label>
+                                <textarea class="form-control form-control-sm" id="work_done-{{ $report->id }}" name="work_done" rows="3" required>{{ $report->work_done }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="recommendations-{{ $report->id }}" class="form-label small fw-bold">Rekomendasi</label>
+                                <textarea class="form-control form-control-sm" id="recommendations-{{ $report->id }}" name="recommendations" rows="3">{{ $report->recommendations }}</textarea>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-sm btn-primary">Simpan Laporan</button>
+                                <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="collapse" data-bs-target="#editReportCollapse-{{ $report->id }}">Batal</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="mb-2">
+                        <div class="text-muted small fw-bold">Temuan</div>
+                        <div class="text-dark bg-light p-2 rounded" style="white-space: pre-line;">{{ $report->findings }}</div>
                     </div>
                     <div class="mb-2">
-                        <div class="text-muted small">Temuan</div>
-                        <div>{{ $report->findings }}</div>
-                    </div>
-                    <div class="mb-2">
-                        <div class="text-muted small">Pekerjaan Dilakukan</div>
-                        <div>{{ $report->work_done }}</div>
+                        <div class="text-muted small fw-bold">Pekerjaan Dilakukan</div>
+                        <div class="text-dark bg-light p-2 rounded" style="white-space: pre-line;">{{ $report->work_done }}</div>
                     </div>
                     @if($report->recommendations)
                     <div class="mb-2">
-                        <div class="text-muted small">Rekomendasi</div>
-                        <div>{{ $report->recommendations }}</div>
+                        <div class="text-muted small fw-bold">Rekomendasi</div>
+                        <div class="text-dark bg-light p-2 rounded" style="white-space: pre-line;">{{ $report->recommendations }}</div>
                     </div>
                     @endif
                     @if($report->photos->count())
-                    <div class="d-flex gap-2 flex-wrap mt-2">
+                    <div class="d-flex gap-3 flex-wrap mt-3">
                         @foreach($report->photos as $photo)
-                        <a href="{{ $photo->photo_url }}" target="_blank" class="border rounded p-1 position-relative" title="{{ $photo->photo_type->label() }}">
-                            <img src="{{ $photo->photo_url }}" alt="{{ $photo->caption ?? $photo->photo_type->label() }}" style="width:80px;height:80px;object-fit:cover;border-radius:4px;">
-                            <span class="badge bg-dark position-absolute bottom-0 start-0 m-1" style="font-size:0.6rem;">{{ $photo->photo_type->label() }}</span>
-                        </a>
+                        <div class="border rounded p-1 d-flex flex-column align-items-center bg-white" style="width: 100px;">
+                            <a href="{{ $photo->photo_url }}" target="_blank" class="position-relative" title="{{ $photo->photo_type->label() }}">
+                                <img src="{{ $photo->photo_url }}" alt="{{ $photo->caption ?? $photo->photo_type->label() }}" style="width:88px;height:88px;object-fit:cover;border-radius:4px;">
+                                <span class="badge bg-dark position-absolute bottom-0 start-0 m-1" style="font-size:0.6rem;">{{ $photo->photo_type->label() }}</span>
+                            </a>
+                            <a href="{{ $photo->photo_url }}" download class="btn btn-sm btn-outline-primary mt-1 w-100 py-0" style="font-size: 0.75rem;">
+                                <i class="bi bi-download"></i> Unduh
+                            </a>
+                        </div>
                         @endforeach
                     </div>
                     @endif
@@ -265,10 +313,22 @@
                         <a href="{{ route('admin.invoices.show', $workOrder->invoice) }}" class="btn btn-outline-primary btn-sm text-start">
                             <i class="bi bi-receipt me-1"></i> Invoice: {{ $workOrder->invoice->invoice_number }}
                         </a>
+                        <a href="{{ route('admin.invoices.pdf', $workOrder->invoice) }}" class="btn btn-outline-success btn-sm text-start">
+                            <i class="bi bi-download me-1"></i> Download Invoice (PDF)
+                        </a>
+                        <a href="{{ route('admin.work-orders.invoice-report-pdf', $workOrder) }}" class="btn btn-outline-success btn-sm text-start">
+                            <i class="bi bi-file-earmark-pdf-fill me-1"></i> Download Invoice + Laporan (PDF)
+                        </a>
                     @else
                         <button class="btn btn-outline-secondary btn-sm text-start" disabled>
                             <i class="bi bi-receipt me-1"></i> Belum ada Invoice
                         </button>
+                    @endif
+
+                    @if($workOrder->reports->count())
+                        <a href="{{ route('admin.work-orders.report-pdf', $workOrder) }}" class="btn btn-outline-success btn-sm text-start">
+                            <i class="bi bi-file-earmark-pdf me-1"></i> Download Laporan Kerja (PDF)
+                        </a>
                     @endif
 
                     @if($workOrder->rab)

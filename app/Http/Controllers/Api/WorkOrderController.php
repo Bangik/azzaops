@@ -41,7 +41,12 @@ class WorkOrderController extends Controller
             $query->whereDate('scheduled_date', $request->date);
         }
 
-        $workOrders = $query->latest()->paginate($request->get('per_page', 15));
+        $workOrders = $query->orderByRaw('CASE WHEN job_order IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('job_order', 'asc')
+            ->orderByRaw('CASE WHEN scheduled_time IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('scheduled_time', 'asc')
+            ->orderBy('id', 'desc')
+            ->paginate($request->get('per_page', 15));
 
         return $this->paginatedResponse($workOrders, 'Daftar work order berhasil diambil');
     }
@@ -56,7 +61,12 @@ class WorkOrderController extends Controller
             $query->whereNotIn('status', [WorkOrderStatus::Completed, WorkOrderStatus::Cancelled]);
         }
 
-        $workOrders = $query->latest()->paginate($request->get('per_page', 15));
+        $workOrders = $query->orderByRaw('CASE WHEN job_order IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('job_order', 'asc')
+            ->orderByRaw('CASE WHEN scheduled_time IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('scheduled_time', 'asc')
+            ->orderBy('id', 'desc')
+            ->paginate($request->get('per_page', 15));
 
         return $this->paginatedResponse($workOrders, 'Daftar work order hari ini berhasil diambil');
     }

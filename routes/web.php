@@ -31,6 +31,9 @@ Route::middleware(['auth', 'role:super_admin,admin,kepala_teknisi'])->prefix('ad
     Route::post('work-orders/{workOrder}/assign', [WorkOrderController::class, 'assign'])->name('work-orders.assign');
     Route::get('work-orders/{workOrder}/continue', [WorkOrderController::class, 'continue'])->name('work-orders.continue');
     Route::post('work-orders/{workOrder}/continue', [WorkOrderController::class, 'storeContinue'])->name('work-orders.store-continue');
+    Route::put('work-orders/{workOrder}/reports/{report}', [WorkOrderController::class, 'updateReport'])->name('work-orders.update-report');
+    Route::get('work-orders/{workOrder}/report/pdf', [WorkOrderController::class, 'downloadReportPdf'])->name('work-orders.report-pdf');
+    Route::get('work-orders/{workOrder}/invoice-report/pdf', [WorkOrderController::class, 'downloadInvoiceReportPdf'])->name('work-orders.invoice-report-pdf');
     Route::resource('invoices', InvoiceController::class);
     Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
     Route::get('invoices/{invoice}/preview', [InvoiceController::class, 'previewPdf'])->name('invoices.preview');

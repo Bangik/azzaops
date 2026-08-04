@@ -73,7 +73,8 @@
                         <th>Tipe</th>
                         <th>Customer</th>
                         <th>Kategori</th>
-                        <th>Tanggal Rencana</th>
+                        <th>Tanggal/Jam Rencana</th>
+                        <th>Urutan</th>
                         <th>Teknisi</th>
                         <th>Prioritas</th>
                         <th>Status</th>
@@ -96,7 +97,13 @@
                             @endif
                         </td>
                         <td>{{ $wo->serviceCategory->name }}</td>
-                        <td>{{ $wo->scheduled_date ? $wo->scheduled_date->format('d/m/Y') : '-' }}</td>
+                        <td>
+                            {{ $wo->scheduled_date ? $wo->scheduled_date->format('d/m/Y') : '-' }}
+                            @if($wo->scheduled_time)
+                                <br><span class="text-muted small"><i class="bi bi-clock"></i> {{ date('H:i', strtotime($wo->scheduled_time)) }}</span>
+                            @endif
+                        </td>
+                        <td>{{ $wo->job_order ?? '-' }}</td>
                         <td>
                             @forelse($wo->assignments as $assign)
                                 <span class="badge bg-secondary mb-1 d-inline-block">{{ $assign->technician->name }}</span>
@@ -132,7 +139,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="9">
+                        <td colspan="10">
                             <div class="empty-state">
                                 <i class="bi bi-clipboard-x"></i>
                                 <h6>Tidak ada data Work Order ditemukan</h6>

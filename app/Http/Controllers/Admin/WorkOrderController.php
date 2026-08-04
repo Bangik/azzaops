@@ -187,7 +187,7 @@ class WorkOrderController extends Controller
             'location' => ['required', 'string'],
             'gmaps_link' => ['nullable', 'string'],
             'scheduled_date' => ['nullable', 'date'],
-            'priority' => ['required', 'string', 'in:low,normal,high,urgent'],
+            'priority' => ['required', 'string', 'in:1,2,3,4'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.description' => ['required', 'string', 'max:255'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
@@ -200,5 +200,43 @@ class WorkOrderController extends Controller
         return redirect()
             ->route('admin.work-orders.show', $newWorkOrder)
             ->with('success', 'Work order lanjutan berhasil dibuat. Biaya pengecekan sebelumnya diubah menjadi Rp 0 (Gratis)');
+    }
+
+    public function updateReport(Request $request, WorkOrder $workOrder, \App\Models\WorkOrderReport $report)
+    {
+        $data = $request->validate([
+            'findings' => ['required', 'string'],
+            'work_done' => ['required', 'string'],
+            'recommendations' => ['nullable', 'string'],
+        ]);
+
+        $report->update($data);
+
+        return redirect()
+            ->route('admin.work-orders.show', $workOrder)
+            ->with('success', 'Laporan teknisi berhasil diperbarui');
+    }
+
+    public function downloadReportPdf(WorkOrder $workOrder, \App\Services\PdfService $pdfService)
+    {
+        $workOrder->load(['customer', 'reports.technician', 'reports.photos']);
+        if ($workOrder->reports->isEmpty()) {
+            return redirect()->back()->with('error', 'Belum ada laporan dari teknisi');
+        }
+        $pdf = $pdfService->generateReportPdf($workOrder);
+        return $pdf->download("laporan-wo-{$workOrder->wo_number}.pdf");
+    }
+
+    public function downloadInvoiceReportPdf(WorkOrder $workOrder, \App\Services\PdfService $pdfService)
+    {
+        $workOrder->load(['customer', 'invoice', 'reports.technician', 'reports.photos']);
+        if (!$workOrder->invoice) {
+            return redirect()->back()->with('error', 'Invoice untuk Work Order ini belum dibuat');
+        }
+        if ($workOrder->reports->isEmpty()) {
+            return redirect()->back()->with('error', 'Laporan pekerjaan dari teknisi belum dibuat');
+        }
+        $pdf = $pdfService->generateInvoiceReportPdf($workOrder);
+        return $pdf->download("invoice-laporan-wo-{$workOrder->wo_number}.pdf");
     }
 }

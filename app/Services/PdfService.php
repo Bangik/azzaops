@@ -31,6 +31,28 @@ class PdfService
         return $pdf;
     }
 
+    public function generateReportPdf(WorkOrder $workOrder)
+    {
+        $workOrder->load(['customer', 'serviceCategory', 'creator', 'assignments.technician', 'reports.technician', 'reports.photos']);
+        $settings = $this->getCompanySettings();
+
+        $pdf = Pdf::loadView('pdf.report', compact('workOrder', 'settings'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf;
+    }
+
+    public function generateInvoiceReportPdf(WorkOrder $workOrder)
+    {
+        $workOrder->load(['customer', 'serviceCategory', 'creator', 'assignments.technician', 'reports.technician', 'reports.photos', 'invoice.items', 'invoice.issuer']);
+        $settings = $this->getCompanySettings();
+
+        $pdf = Pdf::loadView('pdf.invoice_report', compact('workOrder', 'settings'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf;
+    }
+
     private function getCompanySettings(): array
     {
         return [
