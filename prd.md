@@ -672,6 +672,24 @@ Informasi perangkat mobile yang digunakan staff.
 
 ---
 
+#### `app_versions`
+
+Informasi rilis versi aplikasi Android staff.
+
+| Kolom | Tipe | Nullable | Default | Keterangan |
+|-------|------|----------|---------|------------|
+| id | BIGINT UNSIGNED | NO | AUTO_INCREMENT | PK |
+| version_code | INT UNSIGNED | NO | | Nomor versi unik build (misal 1, 2) |
+| version_name | VARCHAR(255) | NO | | Nama rilis versi (misal 1.0.0) |
+| release_notes | TEXT | YES | NULL | Catatan rilis pembaruan |
+| apk_file_path | VARCHAR(255) | NO | | Path internal file APK di storage |
+| created_at | TIMESTAMP | NO | | |
+| updated_at | TIMESTAMP | NO | | |
+
+**Index:** `UNIQUE(version_code)`
+
+---
+
 ---
 
 ### 3.3 Entity Relationship Diagram (Tekstual)
@@ -1038,6 +1056,10 @@ PUT /api/v1/profile/fcm-token
 POST /api/v1/devices
   Request:  { device_id: string, platform: 'android'|'ios', app_version: string, build_number: int, os_version?: string, device_brand?: string, device_model?: string, screen_resolution?: string, network_type?: string, session_id?: string }
   Response: { success: boolean, message: string, data: UserDevice }
+
+GET /api/app-version/latest
+  Request:  - (Public)
+  Response: { version_code: int, version_name: string, release_notes: string|null, download_url: string }
 ```
 
 ### 5.3 Work Orders

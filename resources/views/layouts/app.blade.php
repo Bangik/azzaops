@@ -104,6 +104,12 @@
                     <i class="bi bi-gear me-2"></i>Settings
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('admin.app-versions.*') ? 'active' : '' }}"
+                   href="{{ route('admin.app-versions.index') }}">
+                    <i class="bi bi-cloud-arrow-up me-2"></i>App Version
+                </a>
+            </li>
             @endif
         </ul>
 

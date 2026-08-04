@@ -12,6 +12,9 @@ use App\Http\Controllers\Api\DashboardController;
 Route::prefix('v1')->name('api.')->group(function () {
     // Auth
     Route::post('auth/login', [AuthController::class, 'login'])->name('login');
+    
+    // Public App Version Check
+    Route::get('app-version/latest', [\App\Http\Controllers\Api\AppVersionController::class, 'latest'])->name('app-version.latest');
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout'])->name('logout');
