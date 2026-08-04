@@ -150,12 +150,12 @@
             <div class="card-body">
                 @foreach($workOrder->reports as $report)
                 <div class="border rounded p-3 mb-3">
-                    <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
                         <div>
                             <span class="fw-semibold text-primary">{{ $report->technician->name }}</span>
                             <span class="text-muted small"> | {{ $report->submitted_at->format('d/m/Y H:i') }}</span>
                         </div>
-                        <button type="button" class="btn btn-sm btn-outline-warning btn-action" data-bs-toggle="collapse" data-bs-target="#editReportCollapse-{{ $report->id }}" title="Edit Laporan">
+                        <button type="button" class="btn btn-xs btn-outline-warning" data-bs-toggle="collapse" data-bs-target="#editReportCollapse-{{ $report->id }}" title="Edit Laporan" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
                             <i class="bi bi-pencil"></i> Edit Laporan
                         </button>
                     </div>

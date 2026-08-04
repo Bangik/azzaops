@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Invoice;
 use App\Models\Rab;
 use App\Models\Setting;
+use App\Models\WorkOrder;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class PdfService
