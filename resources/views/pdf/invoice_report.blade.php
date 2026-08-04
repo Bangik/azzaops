@@ -143,9 +143,11 @@
             font-weight: bold;
             color: #475569;
             margin-top: 10px;
+            margin-bottom: 5px;
             font-size: 11px;
             text-transform: uppercase;
             clear: both;
+            display: block;
         }
         .report-value {
             margin-bottom: 10px;
@@ -154,10 +156,11 @@
         .photos-container {
             margin-top: 15px;
             clear: both;
-            overflow: auto;
+            display: block;
         }
         .photo-wrapper {
             display: inline-block;
+            vertical-align: top;
             margin-right: 10px;
             margin-bottom: 10px;
             text-align: center;
