@@ -684,7 +684,7 @@ Informasi rilis versi aplikasi Android staff.
 | version_code | INT UNSIGNED | NO | | Nomor versi unik build (misal 1, 2) |
 | version_name | VARCHAR(255) | NO | | Nama rilis versi (misal 1.0.0) |
 | release_notes | TEXT | YES | NULL | Catatan rilis pembaruan |
-| apk_file_path | VARCHAR(255) | NO | | Path internal file APK di storage |
+| apk_url | VARCHAR(255) | NO | | Link download file APK (Google Drive, dll) |
 | created_at | TIMESTAMP | NO | | |
 | updated_at | TIMESTAMP | NO | | |
 

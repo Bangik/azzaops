@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class AppVersion extends Model
 {
@@ -11,7 +10,7 @@ class AppVersion extends Model
         'version_code',
         'version_name',
         'release_notes',
-        'apk_file_path',
+        'apk_url',
     ];
 
     protected $casts = [
@@ -24,6 +23,6 @@ class AppVersion extends Model
 
     public function getDownloadUrlAttribute(): string
     {
-        return asset(Storage::url($this->apk_file_path));
+        return $this->apk_url;
     }
 }

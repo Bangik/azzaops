@@ -15,16 +15,16 @@
     <div class="col-md-4">
         <div class="card mb-4">
             <div class="card-header">
-                <h5 class="mb-0">Upload Versi APK Baru</h5>
+                <h5 class="mb-0">Rilis Versi APK Baru</h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('admin.app-versions.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.app-versions.store') }}" method="POST">
                     @csrf
                     
                     <div class="mb-3">
-                        <label for="apk_file" class="form-label">File APK (.apk) <span class="text-danger">*</span></label>
-                        <input type="file" name="apk_file" id="apk_file" class="form-control @error('apk_file') is-invalid @enderror" accept=".apk" required>
-                        @error('apk_file')
+                        <label for="apk_url" class="form-label">Link Download APK (Google Drive, dll) <span class="text-danger">*</span></label>
+                        <input type="url" name="apk_url" id="apk_url" class="form-control @error('apk_url') is-invalid @enderror" value="{{ old('apk_url') }}" placeholder="https://drive.google.com/..." required>
+                        @error('apk_url')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -54,7 +54,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-cloud-arrow-up me-1"></i> Upload & Rilis
+                        <i class="bi bi-cloud-arrow-up me-1"></i> Simpan & Rilis
                     </button>
                 </form>
             </div>
@@ -75,7 +75,7 @@
                                 <th>Version Code</th>
                                 <th>Version Name</th>
                                 <th>Release Notes</th>
-                                <th>File Size</th>
+                                <th>Link APK</th>
                                 <th>Tanggal Upload</th>
                                 <th>Aksi</th>
                             </tr>
@@ -91,21 +91,14 @@
                                     </span>
                                 </td>
                                 <td>
-                                    @php
-                                        $filePath = 'public/' . $version->apk_file_path;
-                                        $size = Illuminate\Support\Facades\Storage::exists($filePath) 
-                                            ? round(Illuminate\Support\Facades\Storage::size($filePath) / 1024 / 1024, 2) . ' MB'
-                                            : '-';
-                                    @endphp
-                                    {{ $size }}
+                                    <a href="{{ $version->apk_url }}" target="_blank" class="text-truncate d-inline-block" style="max-width: 200px;" title="{{ $version->apk_url }}">
+                                        <i class="bi bi-link-45deg"></i> Link APK
+                                    </a>
                                 </td>
                                 <td>{{ $version->created_at->format('d M Y H:i') }}</td>
                                 <td>
                                     <div class="d-flex gap-1">
-                                        <a href="{{ $version->download_url }}" class="btn btn-sm btn-outline-success" title="Download APK">
-                                            <i class="bi bi-download"></i>
-                                        </a>
-                                        <form action="{{ route('admin.app-versions.destroy', $version) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus versi ini? File APK juga akan dihapus dari storage.')">
+                                        <form action="{{ route('admin.app-versions.destroy', $version) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus versi ini?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
