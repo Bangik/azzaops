@@ -50,6 +50,7 @@ Route::middleware(['auth', 'role:super_admin,admin,kepala_teknisi'])->prefix('ad
     // Super Admin & Admin only
     Route::middleware('role:super_admin,admin')->group(function () {
         Route::resource('staff', StaffController::class);
+        Route::get('devices', [\App\Http\Controllers\Admin\UserDeviceController::class, 'index'])->name('devices.index');
     });
 
     // Super Admin only

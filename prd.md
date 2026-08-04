@@ -646,12 +646,41 @@ Konfigurasi aplikasi (key-value store).
 
 ---
 
+#### `user_devices`
+
+Informasi perangkat mobile yang digunakan staff.
+
+| Kolom | Tipe | Nullable | Default | Keterangan |
+|-------|------|----------|---------|------------|
+| id | CHAR(36) / UUID | NO | | PK |
+| device_id | VARCHAR(255) | NO | | Unique identifier device, indexed |
+| platform | ENUM('android', 'ios') | NO | | OS Platform |
+| app_version | VARCHAR(255) | NO | | Versi app mobile |
+| build_number | INT UNSIGNED | NO | | Nomor build |
+| os_version | VARCHAR(255) | YES | NULL | Versi OS device |
+| device_brand | VARCHAR(255) | YES | NULL | Brand device (Samsung, Apple, dll) |
+| device_model | VARCHAR(255) | YES | NULL | Model device |
+| screen_resolution | VARCHAR(255) | YES | NULL | Resolusi layar |
+| network_type | VARCHAR(255) | YES | NULL | Jenis jaringan (Wi-Fi, 4G, dll) |
+| session_id | VARCHAR(255) | YES | NULL | ID Sesi login aktif |
+| user_id | BIGINT UNSIGNED | YES | NULL | FK → users.id, indexed |
+| created_at | TIMESTAMP | NO | | |
+| updated_at | TIMESTAMP | NO | | |
+
+**Index:** `INDEX(device_id)`, `INDEX(user_id)`  
+**Foreign Key:** `user_id → users(id) ON DELETE SET NULL`
+
+---
+
+---
+
 ### 3.3 Entity Relationship Diagram (Tekstual)
 
 ```
 users (1) ──────────── (N) work_order_assignments
 users (1) ──────────── (N) work_order_reports
 users (1) ──────────── (N) notifications
+users (1) ──────────── (N) user_devices
 
 customers (1) ──────── (N) work_orders
 customers (1) ──────── (N) invoices
@@ -1005,6 +1034,10 @@ PUT /api/v1/profile/password
 PUT /api/v1/profile/fcm-token
   Request:  { fcm_token: string }
   Response: { message: string }
+
+POST /api/v1/devices
+  Request:  { device_id: string, platform: 'android'|'ios', app_version: string, build_number: int, os_version?: string, device_brand?: string, device_model?: string, screen_resolution?: string, network_type?: string, session_id?: string }
+  Response: { success: boolean, message: string, data: UserDevice }
 ```
 
 ### 5.3 Work Orders

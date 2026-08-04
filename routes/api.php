@@ -55,5 +55,8 @@ Route::prefix('v1')->name('api.')->group(function () {
 
         // Dashboard
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // User Devices
+        Route::post('devices', [\App\Http\Controllers\Api\DeviceController::class, 'upsert'])->name('devices.upsert');
     });
 });

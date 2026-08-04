@@ -89,6 +89,12 @@
                     <i class="bi bi-person-badge me-2"></i>Staff
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('admin.devices.*') ? 'active' : '' }}"
+                   href="{{ route('admin.devices.index') }}">
+                    <i class="bi bi-phone me-2"></i>Device Staff
+                </a>
+            </li>
             @endif
 
             @if(auth()->user()->role->value === 'super_admin')

@@ -67,6 +67,11 @@ class User extends Authenticatable
         return $this->hasMany(Notification::class);
     }
 
+    public function devices(): HasMany
+    {
+        return $this->hasMany(UserDevice::class);
+    }
+
     public function createdWorkOrders(): HasMany
     {
         return $this->hasMany(WorkOrder::class, 'created_by');
