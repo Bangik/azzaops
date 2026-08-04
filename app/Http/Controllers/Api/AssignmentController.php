@@ -17,6 +17,10 @@ class AssignmentController extends Controller
 {
     use ApiResponse;
 
+    public function __construct(
+        private readonly WorkOrderService $workOrderService
+    ) {}
+
     public function index(Request $request)
     {
         $user = $request->user();
@@ -46,8 +50,7 @@ class AssignmentController extends Controller
             return $this->errorResponse('Work order ini tidak dapat ditugaskan', 422);
         }
 
-        $workOrderService = new WorkOrderService();
-        $workOrderService->assign(
+        $this->workOrderService->assign(
             $workOrder,
             $request->technician_ids,
             $user->id
