@@ -92,6 +92,7 @@
             margin-top: 10px;
             font-size: 11px;
             text-transform: uppercase;
+            clear: both;
         }
         .report-value {
             margin-bottom: 10px;
@@ -99,6 +100,8 @@
         }
         .photos-container {
             margin-top: 15px;
+            clear: both;
+            overflow: auto;
         }
         .photo-wrapper {
             display: inline-block;
