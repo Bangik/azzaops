@@ -61,9 +61,9 @@ PT. Azza Karunia Jaya adalah perusahaan jasa instalasi, perawatan, dan servis AC
 
 | Role | Deskripsi | Platform |
 |------|-----------|----------|
-| Super Admin | Full access, manage users & konfigurasi sistem | Web |
-| Admin/CS | Operasional harian: work order, invoice, RAB, keuangan | Web |
-| Kepala Teknisi | Terima work order, assign teknisi, monitor progress | Web + Mobile |
+| Super Admin | Full access, manage users & konfigurasi sistem. Dapat menghapus WO secara permanen. | Web |
+| Admin/CS | Operasional harian: work order, invoice, RAB, keuangan. Sembunyikan menu administrasi. Tidak bisa edit customer di WO. Tidak bisa batalkan/hapus WO. | Web |
+| Kepala Teknisi | Terima/ambil langsung work order, bisa di-assign oleh Admin, monitor progress | Web + Mobile |
 | Teknisi | Terima pekerjaan, submit laporan & foto | Mobile |
 | Finance *(future)* | Akses khusus modul keuangan | Web |
 
@@ -325,7 +325,6 @@ Tabel utama pekerjaan.
 | started_at | TIMESTAMP | YES | NULL | Waktu mulai pengerjaan aktual |
 | completed_at | TIMESTAMP | YES | NULL | Waktu selesai |
 | status | ENUM('pending','assigned','in_progress','checking','reported','invoice_sent','negotiating','approved','completed','cancelled') | NO | 'pending' | Status WO |
-| priority | ENUM('1','2','3','4') | NO | '3' | Prioritas (1: Urgent, 2: Tinggi, 3: Normal, 4: Rendah) |
 | estimated_cost | DECIMAL(15,2) | YES | NULL | Estimasi biaya |
 | total_cost | DECIMAL(15,2) | YES | NULL | Biaya aktual total |
 | notes | TEXT | YES | NULL | Catatan internal |
@@ -1233,7 +1232,6 @@ WorkOrder {
   started_at: string | null        // ISO 8601
   completed_at: string | null
   status: string                   // enum work_order_status
-  priority: '1' | '2' | '3' | '4'  // 1: Urgent, 2: Tinggi, 3: Normal, 4: Rendah
   scheduled_time: string | null    // HH:mm:ss
   job_order: number | null         // Urutan pengerjaan
   estimated_cost: number | null

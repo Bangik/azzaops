@@ -31,7 +31,6 @@ class WorkOrder extends Model
         'started_at',
         'completed_at',
         'status',
-        'priority',
         'estimated_cost',
         'total_cost',
         'notes',
@@ -44,7 +43,6 @@ class WorkOrder extends Model
         return [
             'type' => WorkOrderType::class,
             'status' => WorkOrderStatus::class,
-            'priority' => WorkOrderPriority::class,
             'scheduled_date' => 'date',
             'scheduled_time' => 'string',
             'job_order' => 'integer',

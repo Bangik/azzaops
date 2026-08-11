@@ -19,11 +19,23 @@
             <a href="{{ route('admin.work-orders.edit', $workOrder) }}" class="btn btn-warning">
                 <i class="bi bi-pencil me-1"></i> Edit
             </a>
-            <form action="{{ route('admin.work-orders.destroy', $workOrder) }}" method="POST" onsubmit="return confirmDelete('Yakin ingin membatalkan work order ini?')">
+            @if(auth()->user()->role->value !== 'admin')
+                <form action="{{ route('admin.work-orders.destroy', $workOrder) }}" method="POST" onsubmit="return confirmDelete('Yakin ingin membatalkan work order ini?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="bi bi-x-circle me-1"></i> Batalkan
+                    </button>
+                </form>
+            @endif
+        @endif
+        @if(auth()->user()->role->value === 'super_admin')
+            <form action="{{ route('admin.work-orders.destroy', $workOrder) }}" method="POST" onsubmit="return confirmDelete('Yakin ingin MENGHAPUS work order ini secara permanen?')">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn btn-outline-danger">
-                    <i class="bi bi-x-circle me-1"></i> Batalkan
+                <input type="hidden" name="action" value="delete">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash me-1"></i> Hapus Permanen
                 </button>
             </form>
         @endif
@@ -41,7 +53,6 @@
                 <h5 class="mb-0">Informasi Pekerjaan</h5>
                 <div>
                     <x-status-badge :status="$workOrder->status" />
-                    <span class="badge bg-{{ $workOrder->priority->color() }} ms-1">{{ $workOrder->priority->label() }}</span>
                 </div>
             </div>
             <div class="card-body">

@@ -13,9 +13,8 @@ class UpdateWorkOrderRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'type' => ['required', 'string', 'in:checking,service,installation,maintenance'],
-            'customer_id' => ['required', 'exists:customers,id'],
             'service_category_id' => ['required', 'exists:service_categories,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -24,13 +23,21 @@ class UpdateWorkOrderRequest extends FormRequest
             'scheduled_date' => ['nullable', 'date'],
             'scheduled_time' => ['nullable', 'string'],
             'job_order' => ['nullable', 'integer', 'min:0'],
-            'priority' => ['required', 'string', 'in:1,2,3,4'],
             'items' => ['nullable', 'array'],
             'items.*.description' => ['required_with:items', 'string', 'max:255'],
             'items.*.quantity' => ['required_with:items', 'integer', 'min:1'],
             'items.*.unit' => ['nullable', 'string', 'max:50'],
             'items.*.unit_price' => ['required_with:items', 'numeric', 'min:0'],
         ];
+
+        // admin cannot edit customer, so customer_id is not required from request if role is admin
+        if ($this->user()->role->value === 'admin') {
+            $rules['customer_id'] = ['nullable'];
+        } else {
+            $rules['customer_id'] = ['required', 'exists:customers,id'];
+        }
+
+        return $rules;
     }
 
     public function messages(): array
@@ -41,7 +48,6 @@ class UpdateWorkOrderRequest extends FormRequest
             'service_category_id.required' => 'Kategori layanan wajib dipilih',
             'title.required' => 'Judul pekerjaan wajib diisi',
             'location.required' => 'Lokasi pengerjaan wajib diisi',
-            'priority.required' => 'Prioritas pekerjaan wajib dipilih',
         ];
     }
 }

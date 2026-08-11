@@ -76,7 +76,6 @@
                         <th>Tanggal/Jam Rencana</th>
                         <th>Urutan</th>
                         <th>Teknisi</th>
-                        <th>Prioritas</th>
                         <th>Status</th>
                         <th>Aksi</th>
                     </tr>
@@ -112,9 +111,6 @@
                             @endforelse
                         </td>
                         <td>
-                            <span class="badge bg-{{ $wo->priority->color() }}">{{ $wo->priority->label() }}</span>
-                        </td>
-                        <td>
                             <x-status-badge :status="$wo->status" />
                         </td>
                         <td>
@@ -126,13 +122,25 @@
                                 <a href="{{ route('admin.work-orders.edit', $wo) }}" class="btn btn-sm btn-warning btn-action" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <form action="{{ route('admin.work-orders.destroy', $wo) }}" method="POST" onsubmit="return confirmDelete('Yakin ingin membatalkan work order ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger btn-action" title="Batalkan">
-                                        <i class="bi bi-x-circle"></i>
-                                    </button>
-                                </form>
+                                @if(auth()->user()->role->value !== 'admin')
+                                    <form action="{{ route('admin.work-orders.destroy', $wo) }}" method="POST" onsubmit="return confirmDelete('Yakin ingin membatalkan work order ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger btn-action" title="Batalkan">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    </form>
+                                @endif
+                                @endif
+                                @if(auth()->user()->role->value === 'super_admin')
+                                    <form action="{{ route('admin.work-orders.destroy', $wo) }}" method="POST" onsubmit="return confirmDelete('Yakin ingin MENGHAPUS work order ini secara permanen?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <input type="hidden" name="action" value="delete">
+                                        <button type="submit" class="btn btn-sm btn-danger btn-action" title="Hapus Permanen">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                 @endif
                             </div>
                         </td>

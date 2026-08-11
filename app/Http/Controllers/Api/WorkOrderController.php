@@ -29,7 +29,7 @@ class WorkOrderController extends Controller
         $user = $request->user();
         $query = WorkOrder::with(['customer', 'serviceCategory', 'assignments.technician', 'reports.photos']);
 
-        if ($user->role === UserRole::Teknisi) {
+        if ($user->role === UserRole::Teknisi || $user->role === UserRole::KepalaTeknisi) {
             $query->whereNotIn('status', [WorkOrderStatus::Completed, WorkOrderStatus::Cancelled]);
         }
 
@@ -57,7 +57,7 @@ class WorkOrderController extends Controller
         $query = WorkOrder::with(['customer', 'serviceCategory', 'assignments.technician', 'reports.photos'])
             ->whereDate('scheduled_date', today());
 
-        if ($user->role === UserRole::Teknisi) {
+        if ($user->role === UserRole::Teknisi || $user->role === UserRole::KepalaTeknisi) {
             $query->whereNotIn('status', [WorkOrderStatus::Completed, WorkOrderStatus::Cancelled]);
         }
 
@@ -171,8 +171,8 @@ class WorkOrderController extends Controller
     public function requestTakeover(Request $request, WorkOrder $workOrder)
     {
         $user = $request->user();
-        if ($user->role !== UserRole::Teknisi) {
-            return $this->errorResponse('Hanya teknisi yang dapat mengajukan pengambilalihan pekerjaan', 403);
+        if ($user->role !== UserRole::Teknisi && $user->role !== UserRole::KepalaTeknisi) {
+            return $this->errorResponse('Hanya teknisi atau kepala teknisi yang dapat mengajukan pengambilalihan pekerjaan', 403);
         }
 
         // Ensure the work order is not yet started (status must be pending or assigned)
@@ -290,7 +290,7 @@ class WorkOrderController extends Controller
             WorkOrderAssignment::create([
                 'work_order_id' => $takeover->work_order_id,
                 'technician_id' => $takeover->requested_by,
-                'assigned_by' => $user->role === UserRole::Teknisi ? $takeover->original_technician_id : $user->id,
+                'assigned_by' => ($user->role === UserRole::Teknisi || $user->role === UserRole::KepalaTeknisi) ? $takeover->original_technician_id : $user->id,
                 'status' => AssignmentStatus::Accepted, // Auto accept upon approval
                 'assigned_at' => now(),
                 'accepted_at' => now(),

@@ -35,7 +35,8 @@ class WorkOrderService
                 'location' => $data['location'],
                 'gmaps_link' => $data['gmaps_link'] ?? null,
                 'scheduled_date' => $data['scheduled_date'] ?? null,
-                'priority' => $data['priority'] ?? 'normal',
+                'scheduled_time' => $data['scheduled_time'] ?? null,
+                'job_order' => $data['job_order'] ?? null,
                 'status' => WorkOrderStatus::Pending,
                 'parent_wo_id' => $data['parent_wo_id'] ?? null,
                 'created_by' => $createdBy,
@@ -137,7 +138,8 @@ class WorkOrderService
                 'location' => $data['location'],
                 'gmaps_link' => $data['gmaps_link'] ?? null,
                 'scheduled_date' => $data['scheduled_date'] ?? null,
-                'priority' => $data['priority'] ?? 'normal',
+                'scheduled_time' => $data['scheduled_time'] ?? null,
+                'job_order' => $data['job_order'] ?? null,
             ]);
 
             // Sync items (delete existing and recreate for simplicity)

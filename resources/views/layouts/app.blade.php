@@ -81,7 +81,7 @@
                 </a>
             </li>
 
-            @if(in_array(auth()->user()->role->value, ['super_admin', 'admin']))
+            @if(auth()->user()->role->value === 'super_admin')
             <li class="nav-section-label">Administrasi</li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}"

@@ -50,8 +50,8 @@ Route::middleware(['auth', 'role:super_admin,admin,kepala_teknisi'])->prefix('ad
     Route::get('finance', [FinanceController::class, 'index'])->name('finance.index');
     Route::resource('finance/expenses', FinanceController::class)->names('expenses')->only(['create', 'store', 'edit', 'update', 'destroy']);
 
-    // Super Admin & Admin only
-    Route::middleware('role:super_admin,admin')->group(function () {
+    // Super Admin only (Admin no longer has access to staff and devices as requested)
+    Route::middleware('role:super_admin')->group(function () {
         Route::resource('staff', StaffController::class);
         Route::get('devices', [\App\Http\Controllers\Admin\UserDeviceController::class, 'index'])->name('devices.index');
     });

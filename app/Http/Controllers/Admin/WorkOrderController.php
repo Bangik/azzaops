@@ -112,7 +112,14 @@ class WorkOrderController extends Controller
                 ->with('error', 'Work order yang sudah selesai tidak dapat diedit');
         }
 
-        $this->workOrderService->update($workOrder, $request->validated());
+        $validated = $request->validated();
+
+        // admin cannot edit customer, ensure customer_id is not changed
+        if ($request->user()->role->value === 'admin') {
+            $validated['customer_id'] = $workOrder->customer_id;
+        }
+
+        $this->workOrderService->update($workOrder, $validated);
 
         return redirect()
             ->route('admin.work-orders.show', $workOrder)
@@ -121,6 +128,53 @@ class WorkOrderController extends Controller
 
     public function destroy(WorkOrder $workOrder)
     {
+        $user = request()->user();
+        if ($user->role->value === 'admin') {
+            abort(403, 'Admin tidak memiliki akses untuk membatalkan atau menghapus Work Order.');
+        }
+
+        // if super_admin and user specifically requested absolute delete
+        if ($user->role->value === 'super_admin' && request()->get('action') === 'delete') {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($workOrder) {
+                // Delete related invoices and their items/transactions
+                if ($workOrder->invoice) {
+                    $workOrder->invoice->transactions()->delete();
+                    $workOrder->invoice->items()->delete();
+                    $workOrder->invoice->delete();
+                }
+
+                // Delete related RAB and its items
+                if ($workOrder->rab) {
+                    $workOrder->rab->items()->delete();
+                    $workOrder->rab->delete();
+                }
+
+                // Delete related assignments
+                $workOrder->assignments()->delete();
+
+                // Delete related reports and their photos
+                foreach ($workOrder->reports as $report) {
+                    $report->photos()->delete();
+                    $report->delete();
+                }
+
+                // Delete related takeovers
+                $workOrder->takeovers()->delete();
+
+                // Delete items
+                $workOrder->items()->delete();
+
+                // Nullify parent_wo_id on child work orders to avoid breaking self-referential FK
+                $workOrder->childWorkOrders()->update(['parent_wo_id' => null]);
+
+                $workOrder->delete();
+            });
+
+            return redirect()
+                ->route('admin.work-orders.index')
+                ->with('success', 'Work order berhasil dihapus secara permanen.');
+        }
+
         if (in_array($workOrder->status, [WorkOrderStatus::Completed, WorkOrderStatus::Cancelled], true)) {
             return redirect()
                 ->route('admin.work-orders.index')
@@ -187,7 +241,6 @@ class WorkOrderController extends Controller
             'location' => ['required', 'string'],
             'gmaps_link' => ['nullable', 'string'],
             'scheduled_date' => ['nullable', 'date'],
-            'priority' => ['required', 'string', 'in:1,2,3,4'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.description' => ['required', 'string', 'max:255'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],

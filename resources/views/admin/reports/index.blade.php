@@ -320,11 +320,10 @@
                             <th>Judul Pekerjaan</th>
                             <th>Customer</th>
                             <th>Kategori</th>
-                            <th>Tanggal Rencana</th>
-                            <th>Prioritas</th>
-                            <th>Teknisi</th>
-                            <th>Status</th>
-                            <th class="text-end">Total Nilai</th>
+                             <th>Tanggal Rencana</th>
+                             <th>Teknisi</th>
+                             <th>Status</th>
+                             <th class="text-end">Total Nilai</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -337,10 +336,9 @@
                             </td>
                             <td>{{ $wo->customer->name }}</td>
                             <td>{{ $wo->serviceCategory->name }}</td>
-                            <td>{{ $wo->scheduled_date ? $wo->scheduled_date->format('d/m/Y') : '-' }}</td>
-                            <td><span class="badge bg-{{ $wo->priority->color() }}">{{ $wo->priority->label() }}</span></td>
-                            <td>
-                                @forelse($wo->assignments as $assign)
+                             <td>{{ $wo->scheduled_date ? $wo->scheduled_date->format('d/m/Y') : '-' }}</td>
+                             <td>
+                                 @forelse($wo->assignments as $assign)
                                     <span class="badge bg-secondary mb-1 d-inline-block">{{ $assign->technician->name }}</span>
                                 @empty
                                     <span class="text-muted small">Belum di-assign</span>

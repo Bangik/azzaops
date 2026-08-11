@@ -91,7 +91,7 @@ class User extends Authenticatable
 
     public function scopeTechnicians(Builder $query): Builder
     {
-        return $query->where('role', UserRole::Teknisi)->where('is_active', true);
+        return $query->whereIn('role', [UserRole::Teknisi, UserRole::KepalaTeknisi])->where('is_active', true);
     }
 
     // === Accessors ===

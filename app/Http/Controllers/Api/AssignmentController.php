@@ -26,7 +26,7 @@ class AssignmentController extends Controller
         $user = $request->user();
         $query = WorkOrderAssignment::with(['workOrder.customer', 'workOrder.serviceCategory', 'technician', 'assigner']);
 
-        if ($user->role === UserRole::Teknisi) {
+        if ($user->role === UserRole::Teknisi || $user->role === UserRole::KepalaTeknisi) {
             $query->where('technician_id', $user->id);
         }
 

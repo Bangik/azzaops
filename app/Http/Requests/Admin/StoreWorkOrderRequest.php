@@ -24,7 +24,6 @@ class StoreWorkOrderRequest extends FormRequest
             'scheduled_date' => ['nullable', 'date'],
             'scheduled_time' => ['nullable', 'string'],
             'job_order' => ['nullable', 'integer', 'min:0'],
-            'priority' => ['required', 'string', 'in:1,2,3,4'],
             'items' => ['nullable', 'array'],
             'items.*.description' => ['required_with:items', 'string', 'max:255'],
             'items.*.quantity' => ['required_with:items', 'integer', 'min:1'],
@@ -41,7 +40,6 @@ class StoreWorkOrderRequest extends FormRequest
             'service_category_id.required' => 'Kategori layanan wajib dipilih',
             'title.required' => 'Judul pekerjaan wajib diisi',
             'location.required' => 'Lokasi pengerjaan wajib diisi',
-            'priority.required' => 'Prioritas pekerjaan wajib dipilih',
         ];
     }
 }

@@ -65,20 +65,6 @@
                     @enderror
                 </div>
 
-                <div class="col-md-4 mb-3">
-                    <label for="priority" class="form-label">Prioritas</label>
-                    <select class="form-select @error('priority') is-invalid @enderror" id="priority" name="priority" required>
-                        @foreach(App\Enums\WorkOrderPriority::cases() as $priority)
-                            <option value="{{ $priority->value }}" {{ old('priority', '3') == $priority->value ? 'selected' : '' }}>
-                                {{ $priority->label() }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('priority')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
                 <div class="col-md-12 mb-3">
                     <label for="title" class="form-label">Judul Singkat Pekerjaan Lanjutan</label>
                     <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title', 'Perbaikan lanjutan: ' . $workOrder->title) }}" required>

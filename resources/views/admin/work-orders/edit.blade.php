@@ -14,17 +14,22 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="customer_id" class="form-label">Customer</label>
-                    <select class="form-select @error('customer_id') is-invalid @enderror" id="customer_id" name="customer_id" required>
-                        <option value="">Pilih Customer</option>
-                        @foreach($customers as $customer)
-                            <option value="{{ $customer->id }}" {{ old('customer_id', $workOrder->customer_id) == $customer->id ? 'selected' : '' }}>
-                                {{ $customer->display_name }} ({{ $customer->phone }})
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('customer_id')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    @if(auth()->user()->role->value === 'admin')
+                        <input type="text" class="form-control" value="{{ $workOrder->customer->display_name }} ({{ $workOrder->customer->phone }})" readonly disabled>
+                        <input type="hidden" name="customer_id" value="{{ $workOrder->customer_id }}">
+                    @else
+                        <select class="form-select @error('customer_id') is-invalid @enderror" id="customer_id" name="customer_id" required>
+                            <option value="">Pilih Customer</option>
+                            @foreach($customers as $customer)
+                                <option value="{{ $customer->id }}" {{ old('customer_id', $workOrder->customer_id) == $customer->id ? 'selected' : '' }}>
+                                    {{ $customer->display_name }} ({{ $customer->phone }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('customer_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    @endif
                 </div>
 
                 <div class="col-md-6 mb-3">
@@ -76,20 +81,6 @@
                     <label for="job_order" class="form-label">Urutan Pekerjaan</label>
                     <input type="number" class="form-control @error('job_order') is-invalid @enderror" id="job_order" name="job_order" value="{{ old('job_order', $workOrder->job_order) }}" min="0" placeholder="Urutan (contoh: 1)">
                     @error('job_order')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label for="priority" class="form-label">Prioritas</label>
-                    <select class="form-select @error('priority') is-invalid @enderror" id="priority" name="priority" required>
-                        @foreach(App\Enums\WorkOrderPriority::cases() as $priority)
-                            <option value="{{ $priority->value }}" {{ old('priority', $workOrder->priority->value) == $priority->value ? 'selected' : '' }}>
-                                {{ $priority->label() }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('priority')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
