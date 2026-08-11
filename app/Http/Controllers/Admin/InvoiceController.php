@@ -52,7 +52,8 @@ class InvoiceController extends Controller
 
         $data = $request->validate([
             'due_date' => ['nullable', 'date'],
-            'discount' => ['nullable', 'numeric', 'min:0'],
+            'discount_type' => ['required', 'string', 'in:percent,fixed'],
+            'discount_value' => ['nullable', 'numeric', 'min:0'],
             'tax_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
@@ -82,6 +83,7 @@ class InvoiceController extends Controller
             'paid_amount' => ['required', 'numeric', 'min:1', 'max:' . $invoice->total],
             'payment_date' => ['required', 'date'],
             'payment_method' => ['required', 'string', 'max:100'],
+            'financial_account_id' => ['required', 'exists:financial_accounts,id'],
         ]);
 
         $this->invoiceService->markPaid($invoice, $data, $request->user()->id);

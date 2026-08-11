@@ -63,9 +63,8 @@ class WorkOrderService
             $subtotal = $workOrder->items->sum('total_price');
             $discount = 0;
             $taxPercentage = \App\Models\Setting::get('tax_default', 0);
-            $taxable = max(0, $subtotal - $discount);
-            $taxAmount = round($taxable * $taxPercentage / 100, 2);
-            $total = $taxable + $taxAmount;
+            $taxAmount = round($subtotal * $taxPercentage / 100, 2);
+            $total = max(0, $subtotal + $taxAmount - $discount); // PPN dihitung dari subtotal sebelum diskon, lalu ditambahkan ke total akhir setelah dikurangi diskon
 
             $invCount = \App\Models\Invoice::whereDate('created_at', now())->count() + 1;
             $invoiceNumber = 'INV-' . $dateStr . '-' . str_pad($invCount, 4, '0', STR_PAD_LEFT);
@@ -165,14 +164,22 @@ class WorkOrderService
             $invoice = $workOrder->invoice;
             if ($invoice && $invoice->status === \App\Enums\InvoiceStatus::Draft) {
                 $subtotal = $workOrder->items->sum('total_price');
-                $discount = $invoice->discount;
+                $discountValue = $invoice->discount_value;
+                $discountType = $invoice->discount_type;
+                if ($discountType === 'percent') {
+                    $discount = round($subtotal * $discountValue / 100, 2);
+                } else {
+                    $discount = $discountValue;
+                }
+                $discount = min($subtotal, $discount);
+
                 $taxPercentage = $invoice->tax_percentage;
-                $taxable = max(0, $subtotal - $discount);
-                $taxAmount = round($taxable * $taxPercentage / 100, 2);
-                $total = $taxable + $taxAmount;
+                $taxAmount = round($subtotal * $taxPercentage / 100, 2);
+                $total = max(0, $subtotal + $taxAmount - $discount);
 
                 $invoice->update([
                     'subtotal' => $subtotal,
+                    'discount' => $discount,
                     'tax_amount' => $taxAmount,
                     'total' => $total,
                 ]);

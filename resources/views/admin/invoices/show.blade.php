@@ -58,15 +58,15 @@
                                 <td colspan="4" class="text-end">Subtotal</td>
                                 <td class="text-end">Rp {{ number_format($invoice->subtotal, 0, ',', '.') }}</td>
                             </tr>
-                            @if($invoice->discount > 0)
+                            @if($invoice->discount_value > 0)
                             <tr>
-                                <td colspan="4" class="text-end">Diskon</td>
+                                <td colspan="4" class="text-end">Diskon ({{ $invoice->discount_type === 'percent' ? intval($invoice->discount_value).'%' : 'Potongan Langsung' }})</td>
                                 <td class="text-end">-Rp {{ number_format($invoice->discount, 0, ',', '.') }}</td>
                             </tr>
                             @endif
-                            @if($invoice->tax_amount > 0)
+                            @if($invoice->tax_percentage > 0)
                             <tr>
-                                <td colspan="4" class="text-end">Pajak ({{ intval($invoice->tax_percentage) }}%)</td>
+                                <td colspan="4" class="text-end">PPN ({{ intval($invoice->tax_percentage) }}%)</td>
                                 <td class="text-end">Rp {{ number_format($invoice->tax_amount, 0, ',', '.') }}</td>
                             </tr>
                             @endif
@@ -87,6 +87,7 @@
             <div class="card-body">
                 <div class="mb-2"><span class="text-muted small">Sudah dibayar</span><div class="fw-semibold">Rp {{ number_format($invoice->paid_amount, 0, ',', '.') }}</div></div>
                 <div class="mb-2"><span class="text-muted small">Metode</span><div class="fw-semibold">{{ $invoice->payment_method ?: '-' }}</div></div>
+                <div class="mb-2"><span class="text-muted small">Akun Keuangan</span><div class="fw-semibold">{{ $invoice->financialAccount ? $invoice->financialAccount->name : '-' }}</div></div>
                 <div class="mb-0"><span class="text-muted small">Tanggal bayar</span><div class="fw-semibold">{{ $invoice->payment_date?->format('d/m/Y') ?: '-' }}</div></div>
             </div>
         </div>
@@ -112,6 +113,17 @@
                             <option value="cash">Cash</option>
                             <option value="transfer">Transfer</option>
                             <option value="qris">QRIS</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Akun Keuangan</label>
+                        <select name="financial_account_id" class="form-select" required>
+                            <option value="">Pilih Akun Keuangan</option>
+                            @foreach(\App\Models\FinancialAccount::active()->get() as $account)
+                                <option value="{{ $account->id }}" {{ old('financial_account_id', $invoice->financial_account_id) == $account->id ? 'selected' : '' }}>
+                                    {{ $account->name }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                     <button class="btn btn-success w-100"><i class="bi bi-check2-circle me-1"></i> Tandai Dibayar</button>

@@ -440,7 +440,7 @@ Foto dokumentasi yang dilampirkan pada laporan.
 
 #### `invoices`
 
-Invoice yang digenerate dari work order.
+Tabel invoice tagihan ke customer.
 
 | Kolom | Tipe | Nullable | Default | Keterangan |
 |-------|------|----------|---------|------------|
@@ -448,24 +448,42 @@ Invoice yang digenerate dari work order.
 | invoice_number | VARCHAR(50) | NO | | Nomor invoice unik, format: INV-YYYYMMDD-XXXX |
 | work_order_id | BIGINT UNSIGNED | NO | | FK → work_orders.id |
 | customer_id | BIGINT UNSIGNED | NO | | FK → customers.id |
-| subtotal | DECIMAL(15,2) | NO | 0 | Total sebelum pajak/diskon |
-| discount | DECIMAL(15,2) | NO | 0 | Potongan harga |
-| tax_percentage | DECIMAL(5,2) | NO | 0 | Persentase pajak (misal 11 untuk PPN 11%) |
-| tax_amount | DECIMAL(15,2) | NO | 0 | Nominal pajak |
-| total | DECIMAL(15,2) | NO | 0 | Grand total (subtotal - discount + tax) |
+| financial_account_id | BIGINT UNSIGNED | YES | NULL | FK → financial_accounts.id |
+| subtotal | DECIMAL(15,2) | NO | 0 | Total pokok sebelum diskon |
+| discount | DECIMAL(15,2) | NO | 0 | Nominal diskon final |
+| discount_type | VARCHAR(10) | NO | 'fixed' | Tipe diskon: 'percent' atau 'fixed' |
+| discount_value | DECIMAL(15,2) | NO | 0 | Nilai input diskon |
+| tax_percentage | DECIMAL(5,2) | NO | 0 | Persentase PPN |
+| tax_amount | DECIMAL(15,2) | NO | 0 | Nominal PPN (memotong pokok) |
+| total | DECIMAL(15,2) | NO | 0 | Grand total |
 | status | ENUM('draft','sent','paid','cancelled') | NO | 'draft' | Status invoice |
 | payment_status | ENUM('unpaid','partial','paid') | NO | 'unpaid' | Status pembayaran |
-| paid_amount | DECIMAL(15,2) | NO | 0 | Jumlah yang sudah dibayar |
-| payment_date | DATE | YES | NULL | Tanggal pembayaran (lunas) |
-| payment_method | VARCHAR(100) | YES | NULL | Metode pembayaran (transfer, cash, dll) |
-| due_date | DATE | YES | NULL | Jatuh tempo |
-| notes | TEXT | YES | NULL | Catatan di invoice |
+| paid_amount | DECIMAL(15,2) | NO | 0 | Jumlah yang telah dibayar |
+| payment_date | DATE | YES | NULL | Tanggal pembayaran terakhir |
+| payment_method | VARCHAR(100) | YES | NULL | Metode pembayaran (cash, transfer, dll) |
+| due_date | DATE | YES | NULL | Tanggal jatuh tempo |
+| notes | TEXT | YES | NULL | Catatan tambahan |
 | issued_by | BIGINT UNSIGNED | NO | | FK → users.id |
 | created_at | TIMESTAMP | NO | CURRENT_TIMESTAMP | |
 | updated_at | TIMESTAMP | NO | CURRENT_TIMESTAMP | |
 
-**Index:** `UNIQUE(invoice_number)`, `INDEX(work_order_id)`, `INDEX(customer_id)`, `INDEX(status)`  
-**Foreign Key:** `work_order_id → work_orders(id)`, `customer_id → customers(id)`, `issued_by → users(id)`
+**Foreign Key:** `work_order_id → work_orders(id)`, `customer_id → customers(id)`, `issued_by → users(id)`, `financial_account_id → financial_accounts(id)`
+
+---
+
+#### `financial_accounts`
+
+Tabel akun keuangan perusahaan.
+
+| Kolom | Tipe | Nullable | Default | Keterangan |
+|-------|------|----------|---------|------------|
+| id | BIGINT UNSIGNED | NO | AUTO_INCREMENT | PK |
+| name | VARCHAR(100) | NO | | Nama akun (Giro, Rekening, Cash, Direksi, dll) |
+| code | VARCHAR(50) | NO | | Kode unik akun |
+| description | TEXT | YES | NULL | Keterangan |
+| is_active | TINYINT(1) | NO | 1 | Status aktif |
+| created_at | TIMESTAMP | NO | CURRENT_TIMESTAMP | |
+| updated_at | TIMESTAMP | NO | CURRENT_TIMESTAMP | |
 
 ---
 

@@ -331,9 +331,9 @@
                             <i class="bi bi-file-earmark-pdf-fill me-1"></i> Download Invoice + Laporan (PDF)
                         </a>
                     @else
-                        <button class="btn btn-outline-secondary btn-sm text-start" disabled>
-                            <i class="bi bi-receipt me-1"></i> Belum ada Invoice
-                        </button>
+                        <a href="{{ route('admin.invoices.create', ['work_order_id' => $workOrder->id]) }}" class="btn btn-primary btn-sm text-start">
+                            <i class="bi bi-receipt me-1"></i> Generate Invoice Baru
+                        </a>
                     @endif
 
                     @if($workOrder->reports->count())

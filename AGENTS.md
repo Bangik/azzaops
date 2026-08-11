@@ -103,6 +103,7 @@ azzaops/
 │   │   ├── WorkOrderReportPhoto.php
 │   │   ├── Invoice.php
 │   │   ├── InvoiceItem.php
+│   │   ├── FinancialAccount.php
 │   │   ├── Rab.php
 │   │   ├── RabItem.php
 │   │   ├── FinancialTransaction.php
@@ -293,8 +294,9 @@ Referensi lengkap ada di `azzaops-prd.md`. Berikut ringkasan tabel dan relasi:
 | `work_order_assignments`   | Penugasan teknisi ke work order           |
 | `work_order_reports`       | Laporan pengerjaan dari teknisi           |
 | `work_order_report_photos` | Foto lampiran laporan                     |
-| `invoices`                 | Invoice / tagihan ke customer             |
+| `invoices`                 | Invoice / tagihan ke customer (include discount type, value, and PPN) |
 | `invoice_items`            | Item dalam invoice                        |
+| `financial_accounts`       | Akun keuangan (Giro, Rekening, Cash, Direksi) |
 | `rabs`                     | Rencana Anggaran Biaya (untuk instalasi)  |
 | `rab_items`                | Item dalam RAB                            |
 | `financial_transactions`   | Transaksi keuangan (pemasukan/pengeluaran)|

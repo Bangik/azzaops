@@ -186,7 +186,7 @@
                 <div class="info-block">
                     <strong>No. WO:</strong> {{ $invoice->workOrder->wo_number }}<br>
                     <strong>Pekerjaan:</strong> {{ $invoice->workOrder->title }}<br>
-                    <strong>Tipe:</strong> {{ $invoice->workOrder->type->label() }}<br>
+                    <strong>Tipe:</strong> {{ $invoice->workOrder->type->name }}<br>
                     <strong>Teknisi:</strong> 
                     @foreach($invoice->workOrder->assignments as $assignment)
                         {{ $assignment->technician->name }}{{ !$loop->last ? ', ' : '' }}
@@ -238,15 +238,15 @@
                 <td class="label">Subtotal</td>
                 <td class="value">Rp {{ number_format($invoice->subtotal, 0, ',', '.') }}</td>
             </tr>
-            @if($invoice->discount > 0)
+            @if($invoice->discount_value > 0)
             <tr>
-                <td class="label">Diskon</td>
+                <td class="label">Diskon ({{ $invoice->discount_type === 'percent' ? intval($invoice->discount_value).'%' : '' }})</td>
                 <td class="value">-Rp {{ number_format($invoice->discount, 0, ',', '.') }}</td>
             </tr>
             @endif
-            @if($invoice->tax_amount > 0)
+            @if($invoice->tax_percentage > 0)
             <tr>
-                <td class="label">Pajak ({{ intval($invoice->tax_percentage) }}%)</td>
+                <td class="label">PPN ({{ intval($invoice->tax_percentage) }}%)</td>
                 <td class="value">Rp {{ number_format($invoice->tax_amount, 0, ',', '.') }}</td>
             </tr>
             @endif

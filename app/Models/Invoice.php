@@ -17,8 +17,11 @@ class Invoice extends Model
         'invoice_number',
         'work_order_id',
         'customer_id',
+        'financial_account_id',
         'subtotal',
         'discount',
+        'discount_type',
+        'discount_value',
         'tax_percentage',
         'tax_amount',
         'total',
@@ -37,6 +40,7 @@ class Invoice extends Model
         return [
             'subtotal' => 'decimal:2',
             'discount' => 'decimal:2',
+            'discount_value' => 'decimal:2',
             'tax_percentage' => 'decimal:2',
             'tax_amount' => 'decimal:2',
             'total' => 'decimal:2',
@@ -49,6 +53,11 @@ class Invoice extends Model
     }
 
     // === Relationships ===
+
+    public function financialAccount(): BelongsTo
+    {
+        return $this->belongsTo(FinancialAccount::class);
+    }
 
     public function workOrder(): BelongsTo
     {

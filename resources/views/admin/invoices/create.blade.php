@@ -18,16 +18,23 @@
             <input type="hidden" name="work_order_id" value="{{ $workOrder->id }}">
 
             <div class="row mb-3">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label">Jatuh Tempo</label>
                     <input type="text" name="due_date" class="form-control datepicker" value="{{ old('due_date') }}">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Diskon (Rp)</label>
-                    <input type="number" name="discount" class="form-control" value="{{ old('discount', 0) }}" min="0">
+                <div class="col-md-3">
+                    <label class="form-label">Tipe Diskon</label>
+                    <select name="discount_type" class="form-select">
+                        <option value="fixed" {{ old('discount_type') == 'fixed' ? 'selected' : '' }}>Potongan Langsung (Rp)</option>
+                        <option value="percent" {{ old('discount_type') == 'percent' ? 'selected' : '' }}>Persen (%)</option>
+                    </select>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Pajak (%)</label>
+                <div class="col-md-3">
+                    <label class="form-label">Nilai Diskon</label>
+                    <input type="number" name="discount_value" class="form-control" value="{{ old('discount_value', 0) }}" min="0" step="0.01">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">PPN (%)</label>
                     <input type="number" name="tax_percentage" class="form-control" value="{{ old('tax_percentage', 0) }}" min="0" max="100" step="0.01">
                 </div>
             </div>

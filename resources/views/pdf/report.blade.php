@@ -158,7 +158,7 @@
                 <div class="doc-details">
                     <strong>No. WO:</strong> {{ $workOrder->wo_number }}<br>
                     <strong>Tanggal:</strong> {{ $workOrder->scheduled_date ? $workOrder->scheduled_date->format('d/m/Y') : '-' }}<br>
-                    <strong>Tipe:</strong> {{ $workOrder->type->label() }}
+                    <strong>Tipe:</strong> {{ $workOrder->type->name }}
                 </div>
             </td>
         </tr>

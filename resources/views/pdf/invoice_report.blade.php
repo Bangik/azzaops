@@ -247,7 +247,7 @@
                 <div class="info-block">
                     <strong>No. WO:</strong> {{ $workOrder->wo_number }}<br>
                     <strong>Pekerjaan:</strong> {{ $workOrder->title }}<br>
-                    <strong>Tipe:</strong> {{ $workOrder->type->label() }}<br>
+                    <strong>Tipe:</strong> {{ $workOrder->type->name }}<br>
                     <strong>Teknisi:</strong> 
                     @foreach($workOrder->assignments as $assignment)
                         {{ $assignment->technician->name }}{{ !$loop->last ? ', ' : '' }}
@@ -296,15 +296,15 @@
                 <td class="label">Subtotal</td>
                 <td class="value">Rp {{ number_format($workOrder->invoice->subtotal, 0, ',', '.') }}</td>
             </tr>
-            @if($workOrder->invoice->discount > 0)
+            @if($workOrder->invoice->discount_value > 0)
             <tr>
-                <td class="label">Diskon</td>
+                <td class="label">Diskon ({{ $workOrder->invoice->discount_type === 'percent' ? intval($workOrder->invoice->discount_value).'%' : '' }})</td>
                 <td class="value">-Rp {{ number_format($workOrder->invoice->discount, 0, ',', '.') }}</td>
             </tr>
             @endif
-            @if($workOrder->invoice->tax_amount > 0)
+            @if($workOrder->invoice->tax_percentage > 0)
             <tr>
-                <td class="label">Pajak ({{ intval($workOrder->invoice->tax_percentage) }}%)</td>
+                <td class="label">PPN ({{ intval($workOrder->invoice->tax_percentage) }}%)</td>
                 <td class="value">Rp {{ number_format($workOrder->invoice->tax_amount, 0, ',', '.') }}</td>
             </tr>
             @endif
@@ -340,7 +340,7 @@
                 <div class="doc-details">
                     <strong>No. WO:</strong> {{ $workOrder->wo_number }}<br>
                     <strong>Tanggal:</strong> {{ $workOrder->scheduled_date ? $workOrder->scheduled_date->format('d/m/Y') : '-' }}<br>
-                    <strong>Tipe:</strong> {{ $workOrder->type->label() }}
+                    <strong>Tipe:</strong> {{ $workOrder->type->name }}
                 </div>
             </td>
         </tr>

@@ -118,6 +118,11 @@
                                 <a href="{{ route('admin.work-orders.show', $wo) }}" class="btn btn-sm btn-info text-white btn-action" title="Detail">
                                     <i class="bi bi-eye"></i>
                                 </a>
+                                @if(!$wo->invoice)
+                                    <a href="{{ route('admin.invoices.create', ['work_order_id' => $wo->id]) }}" class="btn btn-sm btn-primary btn-action" title="Generate Invoice">
+                                        <i class="bi bi-receipt"></i>
+                                    </a>
+                                @endif
                                 @if($wo->status !== App\Enums\WorkOrderStatus::Completed)
                                 <a href="{{ route('admin.work-orders.edit', $wo) }}" class="btn btn-sm btn-warning btn-action" title="Edit">
                                     <i class="bi bi-pencil"></i>

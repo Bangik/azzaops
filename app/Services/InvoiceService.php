@@ -29,11 +29,21 @@ class InvoiceService
             ])->toArray();
 
             $subtotal = collect($items)->sum(fn ($i) => ($i['quantity'] ?? 1) * ($i['unit_price'] ?? 0));
-            $discount = (float) ($data['discount'] ?? 0);
+            
+            // Calculate Discount
+            $discountValue = (float) ($data['discount_value'] ?? 0);
+            $discountType = $data['discount_type'] ?? 'fixed';
+            if ($discountType === 'percent') {
+                $discount = round($subtotal * $discountValue / 100, 2);
+            } else {
+                $discount = $discountValue;
+            }
+            $discount = min($subtotal, $discount);
+
+            // Calculate Tax (PPN ditambahkan ke total pokok, dihitung dari subtotal sebelum dikurangi diskon)
             $taxPercentage = (float) ($data['tax_percentage'] ?? Setting::get('tax_default', 0));
-            $taxable = max(0, $subtotal - $discount);
-            $taxAmount = round($taxable * $taxPercentage / 100, 2);
-            $total = $taxable + $taxAmount;
+            $taxAmount = round($subtotal * $taxPercentage / 100, 2);
+            $total = max(0, $subtotal + $taxAmount - $discount);
 
             $dateStr = now()->format('Ymd');
             $count = Invoice::whereDate('created_at', now())->count() + 1;
@@ -45,6 +55,8 @@ class InvoiceService
                 'customer_id' => $workOrder->customer_id,
                 'subtotal' => $subtotal,
                 'discount' => $discount,
+                'discount_type' => $discountType,
+                'discount_value' => $discountValue,
                 'tax_percentage' => $taxPercentage,
                 'tax_amount' => $taxAmount,
                 'total' => $total,
@@ -93,6 +105,7 @@ class InvoiceService
                 'paid_amount' => $paidAmount,
                 'payment_date' => $data['payment_date'] ?? now()->toDateString(),
                 'payment_method' => $data['payment_method'] ?? null,
+                'financial_account_id' => $data['financial_account_id'] ?? null,
             ]);
 
             // Avoid duplicate income for same invoice full payment
