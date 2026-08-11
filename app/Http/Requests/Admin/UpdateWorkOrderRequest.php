@@ -14,7 +14,7 @@ class UpdateWorkOrderRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'type' => ['required', 'string', 'in:checking,service,installation,maintenance'],
+            'work_order_type_id' => ['required', 'exists:work_order_types,id'],
             'service_category_id' => ['required', 'exists:service_categories,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -43,7 +43,7 @@ class UpdateWorkOrderRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'type.required' => 'Tipe pekerjaan wajib dipilih',
+            'work_order_type_id.required' => 'Tipe pekerjaan wajib dipilih',
             'customer_id.required' => 'Customer wajib dipilih',
             'service_category_id.required' => 'Kategori layanan wajib dipilih',
             'title.required' => 'Judul pekerjaan wajib diisi',

@@ -46,13 +46,13 @@
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <label for="type" class="form-label">Tipe Pekerjaan Lanjutan</label>
-                    <select class="form-select @error('type') is-invalid @enderror" id="type" name="type" required>
-                        <option value="service" {{ old('type') == 'service' ? 'selected' : '' }}>Servis / Perbaikan</option>
-                        <option value="installation" {{ old('type') == 'installation' ? 'selected' : '' }}>Instalasi Baru</option>
-                        <option value="maintenance" {{ old('type') == 'maintenance' ? 'selected' : '' }}>Perawatan Berkala</option>
+                    <label for="work_order_type_id" class="form-label">Tipe Pekerjaan Lanjutan</label>
+                    <select class="form-select @error('work_order_type_id') is-invalid @enderror" id="work_order_type_id" name="work_order_type_id" required>
+                        @foreach($types as $type)
+                            <option value="{{ $type->id }}" {{ old('work_order_type_id') == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
+                        @endforeach
                     </select>
-                    @error('type')
+                    @error('work_order_type_id')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>

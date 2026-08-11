@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\WorkOrderPriority;
 use App\Enums\WorkOrderStatus;
-use App\Enums\WorkOrderType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,7 +17,7 @@ class WorkOrder extends Model
 
     protected $fillable = [
         'wo_number',
-        'type',
+        'work_order_type_id',
         'customer_id',
         'service_category_id',
         'title',
@@ -41,7 +40,6 @@ class WorkOrder extends Model
     protected function casts(): array
     {
         return [
-            'type' => WorkOrderType::class,
             'status' => WorkOrderStatus::class,
             'scheduled_date' => 'date',
             'scheduled_time' => 'string',
@@ -54,6 +52,11 @@ class WorkOrder extends Model
     }
 
     // === Relationships ===
+
+    public function type(): BelongsTo
+    {
+        return $this->belongsTo(WorkOrderType::class, 'work_order_type_id');
+    }
 
     public function customer(): BelongsTo
     {
@@ -122,9 +125,9 @@ class WorkOrder extends Model
         return $query->where('status', $status);
     }
 
-    public function scopeByType(Builder $query, WorkOrderType $type): Builder
+    public function scopeByType(Builder $query, int $typeId): Builder
     {
-        return $query->where('type', $type);
+        return $query->where('work_order_type_id', $typeId);
     }
 
     public function scopeForDate(Builder $query, string $date): Builder

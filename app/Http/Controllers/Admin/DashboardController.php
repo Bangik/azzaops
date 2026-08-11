@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\TransactionType;
 use App\Enums\WorkOrderStatus;
-use App\Enums\WorkOrderType;
 use App\Http\Controllers\Controller;
 use App\Models\FinancialTransaction;
 use App\Models\WorkOrder;
@@ -47,16 +46,17 @@ class DashboardController extends Controller
         // 3. Work Order types distribution (current month)
         $typeLabels = [];
         $typeValues = [];
-        foreach (WorkOrderType::cases() as $type) {
-            $typeLabels[] = $type->label();
-            $typeValues[] = WorkOrder::where('type', $type->value)
+        $dbTypes = \App\Models\WorkOrderType::orderBy('name')->get();
+        foreach ($dbTypes as $type) {
+            $typeLabels[] = $type->name;
+            $typeValues[] = WorkOrder::where('work_order_type_id', $type->id)
                 ->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
                 ->count();
         }
 
         // 4. Work Orders requiring attention (pending / reported)
-        $recentActions = WorkOrder::with(['customer', 'serviceCategory'])
+        $recentActions = WorkOrder::with(['customer', 'serviceCategory', 'type'])
             ->whereIn('status', [WorkOrderStatus::Pending, WorkOrderStatus::Reported])
             ->latest()
             ->limit(5)

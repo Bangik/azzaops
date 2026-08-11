@@ -48,15 +48,15 @@
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <label for="type" class="form-label">Tipe Pekerjaan</label>
-                    <select class="form-select @error('type') is-invalid @enderror" id="type" name="type" required>
-                        @foreach(App\Enums\WorkOrderType::cases() as $type)
-                            <option value="{{ $type->value }}" {{ old('type', $workOrder->type->value) == $type->value ? 'selected' : '' }}>
-                                {{ $type->label() }}
+                    <label for="work_order_type_id" class="form-label">Tipe Pekerjaan</label>
+                    <select class="form-select @error('work_order_type_id') is-invalid @enderror" id="work_order_type_id" name="work_order_type_id" required>
+                        @foreach($types as $type)
+                            <option value="{{ $type->id }}" {{ old('work_order_type_id', $workOrder->work_order_type_id) == $type->id ? 'selected' : '' }}>
+                                {{ $type->name }}
                             </option>
                         @endforeach
                     </select>
-                    @error('type')
+                    @error('work_order_type_id')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>

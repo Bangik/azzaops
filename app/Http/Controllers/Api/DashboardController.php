@@ -49,7 +49,7 @@ class DashboardController extends Controller
             $recentWorkOrders = WorkOrder::whereHas('assignments', function ($q) use ($user) {
                     $q->where('technician_id', $user->id);
                 })
-                ->with(['customer', 'serviceCategory'])
+                ->with(['customer', 'serviceCategory', 'type'])
                 ->orderBy('created_at', 'desc')
                 ->limit(5)
                 ->get();
@@ -68,7 +68,7 @@ class DashboardController extends Controller
             $totalCompleted = WorkOrder::where('status', WorkOrderStatus::Completed)->count();
 
             // Recent work orders overall
-            $recentWorkOrders = WorkOrder::with(['customer', 'serviceCategory'])
+            $recentWorkOrders = WorkOrder::with(['customer', 'serviceCategory', 'type'])
                 ->orderBy('created_at', 'desc')
                 ->limit(5)
                 ->get();

@@ -23,15 +23,15 @@ class WorkOrderController extends Controller
 
     public function index(Request $request)
     {
-        $query = WorkOrder::with(['customer', 'serviceCategory', 'assignments.technician'])
+        $query = WorkOrder::with(['customer', 'serviceCategory', 'type', 'assignments.technician'])
             ->latest();
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
+        if ($request->filled('work_order_type_id')) {
+            $query->where('work_order_type_id', $request->work_order_type_id);
         }
 
         if ($request->filled('q')) {
@@ -45,16 +45,18 @@ class WorkOrderController extends Controller
         }
 
         $workOrders = $query->paginate(15)->withQueryString();
+        $types = \App\Models\WorkOrderType::active()->orderBy('name')->get();
 
-        return view('admin.work-orders.index', compact('workOrders'));
+        return view('admin.work-orders.index', compact('workOrders', 'types'));
     }
 
     public function create()
     {
         $customers = Customer::orderBy('name')->get();
         $categories = ServiceCategory::active()->orderBy('name')->get();
+        $types = \App\Models\WorkOrderType::active()->orderBy('name')->get();
 
-        return view('admin.work-orders.create', compact('customers', 'categories'));
+        return view('admin.work-orders.create', compact('customers', 'categories', 'types'));
     }
 
     public function store(StoreWorkOrderRequest $request)
@@ -100,8 +102,9 @@ class WorkOrderController extends Controller
         $workOrder->load('items');
         $customers = Customer::orderBy('name')->get();
         $categories = ServiceCategory::active()->orderBy('name')->get();
+        $types = \App\Models\WorkOrderType::active()->orderBy('name')->get();
 
-        return view('admin.work-orders.edit', compact('workOrder', 'customers', 'categories'));
+        return view('admin.work-orders.edit', compact('workOrder', 'customers', 'categories', 'types'));
     }
 
     public function update(UpdateWorkOrderRequest $request, WorkOrder $workOrder)
@@ -214,27 +217,28 @@ class WorkOrderController extends Controller
 
     public function continue(WorkOrder $workOrder)
     {
-        if ($workOrder->type !== \App\Enums\WorkOrderType::Checking) {
+        if ($workOrder->type->code !== 'checking') {
             return redirect()
                 ->route('admin.work-orders.show', $workOrder)
                 ->with('error', 'Hanya work order pengecekan yang dapat dilanjutkan');
         }
 
         $categories = ServiceCategory::active()->orderBy('name')->get();
+        $types = \App\Models\WorkOrderType::active()->where('code', '!=', 'checking')->orderBy('name')->get();
 
-        return view('admin.work-orders.continue', compact('workOrder', 'categories'));
+        return view('admin.work-orders.continue', compact('workOrder', 'categories', 'types'));
     }
 
     public function storeContinue(Request $request, WorkOrder $workOrder)
     {
-        if ($workOrder->type !== \App\Enums\WorkOrderType::Checking) {
+        if ($workOrder->type->code !== 'checking') {
             return redirect()
                 ->route('admin.work-orders.show', $workOrder)
                 ->with('error', 'Hanya work order pengecekan yang dapat dilanjutkan');
         }
 
         $data = $request->validate([
-            'type' => ['required', 'string', 'in:service,installation,maintenance'],
+            'work_order_type_id' => ['required', 'exists:work_order_types,id'],
             'service_category_id' => ['required', 'exists:service_categories,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],

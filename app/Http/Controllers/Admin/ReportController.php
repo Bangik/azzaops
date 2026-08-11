@@ -76,7 +76,7 @@ class ReportController extends Controller
 
             case 'wo':
             default:
-                $query = WorkOrder::with(['customer', 'serviceCategory', 'assignments.technician'])
+                $query = WorkOrder::with(['customer', 'serviceCategory', 'type', 'assignments.technician'])
                     ->whereBetween('scheduled_date', [$from, $to]);
 
                 if ($techId) {

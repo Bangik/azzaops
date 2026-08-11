@@ -312,7 +312,7 @@ Tabel utama pekerjaan.
 |-------|------|----------|---------|------------|
 | id | BIGINT UNSIGNED | NO | AUTO_INCREMENT | PK |
 | wo_number | VARCHAR(50) | NO | | Nomor WO unik, format: WO-YYYYMMDD-XXXX |
-| type | ENUM('checking','service','installation','maintenance') | NO | | Tipe pekerjaan |
+| work_order_type_id | BIGINT UNSIGNED | NO | | FK → work_order_types.id |
 | customer_id | BIGINT UNSIGNED | NO | | FK → customers.id |
 | service_category_id | BIGINT UNSIGNED | NO | | FK → service_categories.id |
 | title | VARCHAR(255) | NO | | Judul singkat pekerjaan |
@@ -334,7 +334,23 @@ Tabel utama pekerjaan.
 | updated_at | TIMESTAMP | NO | CURRENT_TIMESTAMP | |
 
 **Index:** `UNIQUE(wo_number)`, `INDEX(status)`, `INDEX(customer_id)`, `INDEX(scheduled_date)`, `INDEX(parent_wo_id)`, `INDEX(job_order)`  
-**Foreign Key:** `customer_id → customers(id)`, `service_category_id → service_categories(id)`, `created_by → users(id)`, `parent_wo_id → work_orders(id) ON DELETE SET NULL`
+**Foreign Key:** `customer_id → customers(id)`, `service_category_id → service_categories(id)`, `created_by → users(id)`, `parent_wo_id → work_orders(id) ON DELETE SET NULL`, `work_order_type_id → work_order_types(id)`
+
+---
+
+#### `work_order_types`
+
+Daftar tipe pekerjaan dinamis.
+
+| Kolom | Tipe | Nullable | Default | Keterangan |
+|-------|------|----------|---------|------------|
+| id | BIGINT UNSIGNED | NO | AUTO_INCREMENT | PK |
+| name | VARCHAR(50) | NO | | Nama tipe pekerjaan (misal: Pengecekan, Servis) |
+| code | VARCHAR(50) | NO | | Kode unik tipe (misal: checking, service) |
+| description | TEXT | YES | NULL | Deskripsi tipe |
+| is_active | TINYINT(1) | NO | 1 | Status keaktifan tipe |
+| created_at | TIMESTAMP | NO | CURRENT_TIMESTAMP | |
+| updated_at | TIMESTAMP | NO | CURRENT_TIMESTAMP | |
 
 ---
 
@@ -1222,7 +1238,7 @@ User {
 WorkOrder {
   id: int
   wo_number: string
-  type: 'checking' | 'service' | 'installation' | 'maintenance'
+  type: WorkOrderType
   customer: Customer
   service_category: ServiceCategory
   title: string
@@ -1244,6 +1260,14 @@ WorkOrder {
   created_at: string
 }
 
+// WorkOrderType
+WorkOrderType {
+  id: int
+  name: string
+  code: string
+  description: string | null
+  is_active: boolean
+}
 // Customer
 Customer {
   id: int

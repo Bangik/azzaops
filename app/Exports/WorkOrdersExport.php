@@ -18,7 +18,7 @@ class WorkOrdersExport implements FromQuery, WithHeadings, WithMapping
 
     public function query()
     {
-        $query = WorkOrder::with(['customer', 'serviceCategory', 'assignments.technician'])
+        $query = WorkOrder::with(['customer', 'serviceCategory', 'type', 'assignments.technician'])
             ->whereBetween('scheduled_date', [$this->from, $this->to]);
 
         if ($this->technicianId) {
@@ -58,7 +58,7 @@ class WorkOrdersExport implements FromQuery, WithHeadings, WithMapping
         return [
             $row->wo_number,
             $row->title,
-            $row->type->label(),
+            $row->type->name,
             $row->serviceCategory->name,
             $row->customer->name,
             $row->customer->company_name ?? '-',

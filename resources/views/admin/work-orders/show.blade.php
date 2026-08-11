@@ -10,7 +10,7 @@
         <p class="text-muted mb-0">{{ $workOrder->title }}</p>
     </div>
     <div class="d-flex gap-2">
-        @if($workOrder->type === App\Enums\WorkOrderType::Checking && $workOrder->status !== App\Enums\WorkOrderStatus::Completed && $workOrder->status !== App\Enums\WorkOrderStatus::Cancelled)
+        @if($workOrder->type->code === 'checking' && $workOrder->status !== App\Enums\WorkOrderStatus::Completed && $workOrder->status !== App\Enums\WorkOrderStatus::Cancelled)
             <a href="{{ route('admin.work-orders.continue', $workOrder) }}" class="btn btn-success">
                 <i class="bi bi-arrow-right-circle me-1"></i> Lanjutkan Pekerjaan
             </a>
@@ -59,7 +59,7 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <div class="text-muted small">Tipe Pekerjaan</div>
-                        <div class="fw-semibold">{{ $workOrder->type->label() }}</div>
+                        <div class="fw-semibold">{{ $workOrder->type->name }}</div>
                     </div>
                     <div class="col-md-6">
                         <div class="text-muted small">Kategori Layanan</div>

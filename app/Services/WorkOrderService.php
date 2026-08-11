@@ -27,7 +27,7 @@ class WorkOrderService
 
             $workOrder = WorkOrder::create([
                 'wo_number' => $woNumber,
-                'type' => $data['type'],
+                'work_order_type_id' => $data['work_order_type_id'] ?? $data['type'] ?? 1,
                 'customer_id' => $data['customer_id'],
                 'service_category_id' => $data['service_category_id'],
                 'title' => $data['title'],
@@ -130,7 +130,7 @@ class WorkOrderService
     {
         return DB::transaction(function () use ($workOrder, $data) {
             $workOrder->update([
-                'type' => $data['type'],
+                'work_order_type_id' => $data['work_order_type_id'] ?? $workOrder->work_order_type_id,
                 'customer_id' => $data['customer_id'],
                 'service_category_id' => $data['service_category_id'],
                 'title' => $data['title'],

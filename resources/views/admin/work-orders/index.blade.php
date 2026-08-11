@@ -38,12 +38,12 @@
             </select>
         </div>
         <div class="col-md-3">
-            <label for="type" class="form-label small">Tipe</label>
-            <select class="form-select form-select-sm" id="type" name="type">
+            <label for="work_order_type_id" class="form-label">Tipe</label>
+            <select class="form-select form-select-sm" id="work_order_type_id" name="work_order_type_id">
                 <option value="">Semua Tipe</option>
-                @foreach(App\Enums\WorkOrderType::cases() as $type)
-                    <option value="{{ $type->value }}" {{ request('type') == $type->value ? 'selected' : '' }}>
-                        {{ $type->label() }}
+                @foreach($types as $type)
+                    <option value="{{ $type->id }}" {{ request('work_order_type_id') == $type->id ? 'selected' : '' }}>
+                        {{ $type->name }}
                     </option>
                 @endforeach
             </select>
@@ -88,7 +88,7 @@
                                 {{ $wo->wo_number }}
                             </a>
                         </td>
-                        <td>{{ $wo->type->label() }}</td>
+                        <td>{{ $wo->type->name }}</td>
                         <td>
                             <div class="fw-semibold">{{ $wo->customer->name }}</div>
                             @if($wo->customer->company_name)

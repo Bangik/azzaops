@@ -62,6 +62,7 @@ azzaops/
 │   │   │   │   ├── CustomerController.php
 │   │   │   │   ├── StaffController.php
 │   │   │   │   ├── ServiceCategoryController.php
+│   │   │   │   ├── WorkOrderTypeController.php
 │   │   │   │   ├── WorkOrderController.php
 │   │   │   │   ├── InvoiceController.php
 │   │   │   │   ├── RabController.php
@@ -94,6 +95,7 @@ azzaops/
 │   │   ├── User.php
 │   │   ├── Customer.php
 │   │   ├── ServiceCategory.php
+│   │   ├── WorkOrderType.php
 │   │   ├── WorkOrder.php
 │   │   ├── WorkOrderItem.php
 │   │   ├── WorkOrderAssignment.php
@@ -437,6 +439,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('customers', CustomerController::class);
     Route::resource('staff', StaffController::class);
     Route::resource('service-categories', ServiceCategoryController::class);
+    Route::resource('work-order-types', WorkOrderTypeController::class);
     Route::resource('work-orders', WorkOrderController::class);
     Route::post('work-orders/{workOrder}/assign', [WorkOrderController::class, 'assign'])->name('work-orders.assign');
     Route::resource('invoices', InvoiceController::class);

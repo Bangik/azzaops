@@ -27,6 +27,7 @@ Route::middleware(['auth', 'role:super_admin,admin,kepala_teknisi'])->prefix('ad
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('customers', CustomerController::class);
     Route::resource('service-categories', ServiceCategoryController::class);
+    Route::resource('work-order-types', \App\Http\Controllers\Admin\WorkOrderTypeController::class);
     Route::resource('work-orders', WorkOrderController::class);
     Route::post('work-orders/{workOrder}/assign', [WorkOrderController::class, 'assign'])->name('work-orders.assign');
     Route::get('work-orders/{workOrder}/continue', [WorkOrderController::class, 'continue'])->name('work-orders.continue');

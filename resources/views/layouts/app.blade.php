@@ -61,6 +61,12 @@
                     <i class="bi bi-tags me-2"></i>Kategori Jasa
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('admin.work-order-types.*') ? 'active' : '' }}"
+                   href="{{ route('admin.work-order-types.index') }}">
+                    <i class="bi bi-gear-wide-connected me-2"></i>Tipe Pekerjaan
+                </a>
+            </li>
             <li class="nav-section-label">Transaksi</li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.invoices.*') ? 'active' : '' }}"

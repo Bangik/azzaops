@@ -27,7 +27,7 @@ class WorkOrderController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $query = WorkOrder::with(['customer', 'serviceCategory', 'assignments.technician', 'reports.photos']);
+        $query = WorkOrder::with(['customer', 'serviceCategory', 'type', 'assignments.technician', 'reports.photos']);
 
         if ($user->role === UserRole::Teknisi || $user->role === UserRole::KepalaTeknisi) {
             $query->whereNotIn('status', [WorkOrderStatus::Completed, WorkOrderStatus::Cancelled]);
@@ -54,7 +54,7 @@ class WorkOrderController extends Controller
     public function today(Request $request)
     {
         $user = $request->user();
-        $query = WorkOrder::with(['customer', 'serviceCategory', 'assignments.technician', 'reports.photos'])
+        $query = WorkOrder::with(['customer', 'serviceCategory', 'type', 'assignments.technician', 'reports.photos'])
             ->whereDate('scheduled_date', today());
 
         if ($user->role === UserRole::Teknisi || $user->role === UserRole::KepalaTeknisi) {
@@ -76,6 +76,7 @@ class WorkOrderController extends Controller
         $workOrder->load([
             'customer',
             'serviceCategory',
+            'type',
             'creator',
             'items',
             'assignments.technician',
@@ -161,6 +162,7 @@ class WorkOrderController extends Controller
         return $this->successResponse($workOrder->load([
             'customer',
             'serviceCategory',
+            'type',
             'creator',
             'items',
             'assignments.technician',
