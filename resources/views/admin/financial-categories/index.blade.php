@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'Kategori Pengeluaran')
-@section('page-title', 'Kategori Pengeluaran')
+@section('title', 'Kategori ' . ucfirst($categoryLabel))
+@section('page-title', 'Kategori ' . ucfirst($categoryLabel))
 
 @section('content')
     <div class="page-header">
         <div>
-            <h1 class="page-title">Kategori Pengeluaran</h1>
-            <p class="text-muted mb-0">Kelola kategori yang tersedia saat mencatat pengeluaran operasional.</p>
+            <h1 class="page-title">Kategori {{ ucfirst($categoryLabel) }}</h1>
+            <p class="text-muted mb-0">Kelola kategori yang tersedia saat mencatat {{ $categoryLabel }}.</p>
         </div>
-        <a href="{{ route('admin.financial-categories.create') }}" class="btn btn-primary">
+        <a href="{{ route("admin.{$routePrefix}.create") }}" class="btn btn-primary">
             <i class="bi bi-plus-lg me-1"></i> Tambah Kategori
         </a>
     </div>
@@ -42,12 +42,11 @@
                                 </td>
                                 <td>
                                     <div class="d-flex gap-1">
-                                        <a href="{{ route('admin.financial-categories.edit', $category) }}"
+                                        <a href="{{ route("admin.{$routePrefix}.edit", $category) }}"
                                             class="btn btn-sm btn-warning btn-action" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <form action="{{ route('admin.financial-categories.destroy', $category) }}"
-                                            method="POST"
+                                        <form action="{{ route("admin.{$routePrefix}.destroy", $category) }}" method="POST"
                                             onsubmit="return confirmDelete('Yakin ingin menghapus kategori ini?')">
                                             @csrf
                                             @method('DELETE')
@@ -60,7 +59,8 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center text-muted py-4">Belum ada kategori pengeluaran</td>
+                                <td colspan="4" class="text-center text-muted py-4">Belum ada kategori
+                                    {{ $categoryLabel }}</td>
                             </tr>
                         @endforelse
                     </tbody>

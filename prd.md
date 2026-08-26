@@ -82,6 +82,7 @@ PT. Azza Karunia Jaya adalah perusahaan jasa instalasi, perawatan, dan servis AC
 | SA-04 | Sebagai Super Admin, saya dapat melihat seluruh data dan dashboard yang sama dengan Admin                                              | Must     |
 | SA-05 | Sebagai Super Admin, saya dapat melihat audit log aktivitas user                                                                       | Should   |
 | SA-06 | Sebagai Super Admin, saya dapat mengelola kategori pengeluaran (tambah, edit, aktifkan/nonaktifkan, hapus) untuk pencatatan keuangan   | Must     |
+| SA-07 | Sebagai Super Admin, saya dapat mengelola kategori pemasukan (tambah, edit, aktifkan/nonaktifkan, hapus) untuk pencatatan keuangan     | Must     |
 
 ### 2.2 Admin/CS
 
@@ -117,12 +118,13 @@ PT. Azza Karunia Jaya adalah perusahaan jasa instalasi, perawatan, dan servis AC
 
 **Keuangan:**
 
-| ID    | User Story                                                                                  | Priority |
-| ----- | ------------------------------------------------------------------------------------------- | -------- |
-| AD-16 | Sebagai Admin, saya dapat melihat dashboard keuangan (pemasukan, pengeluaran, neraca saldo) | Must     |
-| AD-17 | Sebagai Admin, saya dapat menginput pengeluaran operasional (beli material, transport, dll) | Must     |
-| AD-18 | Sebagai Admin, saya dapat melihat laporan keuangan per periode (harian, mingguan, bulanan)  | Must     |
-| AD-19 | Sebagai Admin, saya dapat melihat cost percentage per pekerjaan                             | Should   |
+| ID    | User Story                                                                                                                      | Priority |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| AD-16 | Sebagai Admin, saya dapat melihat dashboard keuangan (pemasukan, pengeluaran, neraca saldo)                                     | Must     |
+| AD-17 | Sebagai Admin, saya dapat menginput pengeluaran operasional (beli material, transport, dll)                                     | Must     |
+| AD-18 | Sebagai Admin, saya dapat melihat laporan keuangan per periode (harian, mingguan, bulanan)                                      | Must     |
+| AD-19 | Sebagai Admin, saya dapat melihat cost percentage per pekerjaan                                                                 | Should   |
+| AD-22 | Sebagai Admin, saya dapat mencatat pemasukan di luar work order dengan kategori, nominal, tanggal, dan nomor referensi opsional | Must     |
 
 **Dashboard:**
 
@@ -577,7 +579,7 @@ Kategori untuk transaksi keuangan.
 **Seed data income:** Pembayaran Jasa, Pembayaran Material  
 **Seed data expense:** Pembelian Material, Transport, Gaji, Operasional Kantor, Lain-lain
 
-Kategori bertipe `expense` dapat dikelola melalui CRUD master kategori pengeluaran oleh Super Admin. Kategori nonaktif tidak ditampilkan pada form pencatatan pengeluaran. Kategori yang sudah digunakan pada pengeluaran atau transaksi tidak dapat dihapus, tetapi dapat dinonaktifkan.
+Kategori bertipe `expense` dan `income` dapat dikelola melalui CRUD master kategori keuangan oleh Super Admin. Kategori nonaktif tidak ditampilkan pada form pencatatan terkait. Kategori yang sudah digunakan pada pengeluaran atau transaksi tidak dapat dihapus, tetapi dapat dinonaktifkan.
 
 ---
 
@@ -602,6 +604,8 @@ Catatan pemasukan dan pengeluaran.
 
 **Index:** `INDEX(type)`, `INDEX(transaction_date)`, `INDEX(invoice_id)`, `INDEX(expense_id)`  
 **Foreign Key:** `category_id → financial_categories(id)`, `invoice_id → invoices(id) ON DELETE SET NULL`, `expense_id → expenses(id) ON DELETE SET NULL`, `recorded_by → users(id)`
+
+Pemasukan dari invoice/work order mengisi `invoice_id`, sedangkan pemasukan di luar work order disimpan sebagai transaksi bertipe `income` dengan `invoice_id` bernilai `NULL`. Pemasukan manual wajib menggunakan kategori aktif bertipe `income`.
 
 ---
 
@@ -1017,7 +1021,14 @@ Customer ──WA──▶ Admin/CS
 
 1. **Pemasukan otomatis:** Setiap kali Admin menandai invoice sebagai `paid` (atau `partial`), sistem otomatis membuat record di `financial_transactions` dengan tipe `income`. Amount diambil dari jumlah yang dibayar. Jika pembayaran bertahap, setiap pembayaran menghasilkan 1 record transaksi.
 
-2. **Pengeluaran manual:** Admin menginput pengeluaran melalui modul Keuangan:
+2. **Pemasukan manual di luar work order:** Admin dapat mencatat pemasukan yang tidak berasal dari invoice melalui modul Keuangan:
+
+- Pilih kategori aktif bertipe `income`
+- Isi deskripsi, nominal, dan tanggal transaksi
+- Isi nomor referensi secara opsional (misalnya nomor bukti transfer)
+- Sistem membuat record `financial_transactions` bertipe `income` tanpa `invoice_id`
+
+3. **Pengeluaran manual:** Admin menginput pengeluaran melalui modul Keuangan:
     - Pilih kategori (Material, Transport, Operasional, dll)
     - Isi nominal, tanggal, deskripsi
 
@@ -1026,7 +1037,7 @@ Customer ──WA──▶ Admin/CS
     - Opsional: upload foto struk/nota
     - Sistem otomatis membuat record di `financial_transactions` dengan tipe `expense`
 
-3. **Neraca Saldo:**
+4. **Neraca Saldo:**
 
     ```
     Neraca Saldo = SUM(income transactions) - SUM(expense transactions)
@@ -1034,7 +1045,7 @@ Customer ──WA──▶ Admin/CS
 
     dalam periode yang dipilih.
 
-4. **Cost Percentage (per periode):**
+5. **Cost Percentage (per periode):**
 
     ```
     Cost % = (Total Pengeluaran / Total Pemasukan) × 100%
@@ -1042,13 +1053,13 @@ Customer ──WA──▶ Admin/CS
 
     Contoh: Bulan ini pemasukan Rp 50.000.000, pengeluaran Rp 20.000.000 → Cost % = 40%.
 
-5. **Cost Percentage per Work Order (opsional):**
+6. **Cost Percentage per Work Order (opsional):**
 
     ```
     Cost % per WO = (SUM expenses linked to WO / invoice total WO) × 100%
     ```
 
-6. **Laporan keuangan per periode:** Admin bisa filter laporan berdasarkan:
+7. **Laporan keuangan per periode:** Admin bisa filter laporan berdasarkan:
     - Hari ini
     - Minggu ini
     - Bulan ini
@@ -1508,8 +1519,10 @@ Pagination {
 
 **Pemasukan:**
 
-- List semua pemasukan (otomatis dari invoice yang dibayar)
-- Detail: invoice number, customer, tanggal, amount
+- List semua pemasukan, baik dari invoice/work order maupun pemasukan manual di luar work order
+- Tambah pemasukan di luar work order: kategori income aktif, deskripsi, nominal, tanggal, dan nomor referensi (opsional)
+- Pemasukan manual tidak memiliki invoice/work order dan ditandai sebagai pemasukan di luar WO
+- Detail pemasukan dari invoice: invoice number, customer, tanggal, amount
 - Filter by tanggal, customer
 
 **Pengeluaran:**
@@ -1524,6 +1537,13 @@ Pagination {
 - Aktivasi / nonaktifkan kategori
 - Kategori aktif tersedia pada form tambah/edit pengeluaran
 - Kategori yang sudah digunakan tidak dapat dihapus
+
+**Kategori Pemasukan (Super Admin):**
+
+- CRUD kategori pemasukan bertipe `income`
+- Aktivasi / nonaktifkan kategori
+- Kategori aktif tersedia pada form tambah pemasukan di luar work order
+- Kategori yang sudah digunakan pada transaksi tidak dapat dihapus
 
 **Laporan Keuangan:**
 
@@ -1966,6 +1986,7 @@ azzaops_mobile/
 - [ ] CRUD Customer
 - [ ] CRUD Kategori Jasa
 - [ ] CRUD Kategori Pengeluaran (Super Admin)
+- [ ] CRUD Kategori Pemasukan (Super Admin)
 - [ ] Kolom PIC teks bebas pada pengeluaran
 - [ ] Work Order: create, list, detail, update status
 - [ ] Assignment: assign teknisi (web)
@@ -1984,7 +2005,7 @@ azzaops_mobile/
 
 ### Phase 3 — Keuangan & Polish (2-3 minggu)
 
-- [ ] Modul keuangan: pemasukan otomatis, pengeluaran manual
+- [ ] Modul keuangan: pemasukan otomatis, pemasukan di luar WO, pengeluaran manual
 - [ ] Laporan keuangan: neraca saldo, cost percentage, grafik
 - [ ] Dashboard statistik lengkap (web + mobile)
 - [ ] Settings management

@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Kategori Pengeluaran')
-@section('page-title', 'Edit Kategori Pengeluaran')
+@section('title', 'Edit Kategori ' . ucfirst($categoryLabel))
+@section('page-title', 'Edit Kategori ' . ucfirst($categoryLabel))
 
 @section('content')
     <div class="card">
         <div class="card-body">
-            <form action="{{ route('admin.financial-categories.update', $financialCategory) }}" method="POST">
+            <form action="{{ route("admin.{$routePrefix}.update", $financialCategory) }}" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="mb-3">
-                    <label for="name" class="form-label">Nama Kategori</label>
+                    <label for="name" class="form-label">Nama Kategori {{ ucfirst($categoryLabel) }}</label>
                     <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
                         name="name" value="{{ old('name', $financialCategory->name) }}" required>
                     @error('name')
@@ -31,7 +31,7 @@
                     <label class="form-check-label" for="is_active">Status Aktif</label>
                 </div>
                 <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                <a href="{{ route('admin.financial-categories.index') }}" class="btn btn-secondary">Batal</a>
+                <a href="{{ route("admin.{$routePrefix}.index") }}" class="btn btn-secondary">Batal</a>
             </form>
         </div>
     </div>

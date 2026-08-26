@@ -50,6 +50,8 @@ Route::middleware(['auth', 'role:super_admin,admin,kepala_teknisi'])->prefix('ad
     Route::get('reports/export', [\App\Http\Controllers\Admin\ReportController::class, 'export'])->name('reports.export');
 
     Route::get('finance', [FinanceController::class, 'index'])->name('finance.index');
+    Route::get('finance/incomes/create', [FinanceController::class, 'createIncome'])->name('incomes.create');
+    Route::post('finance/incomes', [FinanceController::class, 'storeIncome'])->name('incomes.store');
     Route::resource('finance/expenses', FinanceController::class)->names('expenses')->only(['create', 'store', 'edit', 'update', 'destroy']);
 
     // Super Admin only (Admin no longer has access to staff and devices as requested)
@@ -62,6 +64,9 @@ Route::middleware(['auth', 'role:super_admin,admin,kepala_teknisi'])->prefix('ad
     Route::middleware('role:super_admin')->group(function () {
         Route::resource('financial-accounts', \App\Http\Controllers\Admin\FinancialAccountController::class);
         Route::resource('financial-categories', FinancialCategoryController::class)->except(['show']);
+        Route::resource('income-categories', FinancialCategoryController::class)
+            ->parameters(['income-categories' => 'financialCategory'])
+            ->except(['show']);
         Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
         Route::resource('app-versions', \App\Http\Controllers\Admin\AppVersionController::class)->only(['index', 'store', 'destroy']);

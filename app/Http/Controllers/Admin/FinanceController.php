@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreExpenseRequest;
+use App\Http\Requests\Admin\StoreIncomeRequest;
 use App\Http\Requests\Admin\UpdateExpenseRequest;
 use App\Models\Expense;
 use App\Models\FinancialCategory;
@@ -47,6 +48,22 @@ class FinanceController extends Controller
         $workOrders = WorkOrder::latest()->limit(100)->get(['id', 'wo_number', 'title']);
 
         return view('admin.finance.create', compact('categories', 'workOrders'));
+    }
+
+    public function createIncome()
+    {
+        $categories = FinancialCategory::income()->active()->orderBy('name')->get();
+
+        return view('admin.finance.income-create', compact('categories'));
+    }
+
+    public function storeIncome(StoreIncomeRequest $request)
+    {
+        $this->financeService->createIncome($request->validated(), $request->user()->id);
+
+        return redirect()
+            ->route('admin.finance.index')
+            ->with('success', 'Pemasukan berhasil dicatat');
     }
 
     public function store(StoreExpenseRequest $request)

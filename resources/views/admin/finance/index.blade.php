@@ -13,6 +13,9 @@
             <a href="{{ route('admin.reports.index', ['type' => 'finance']) }}" class="btn btn-outline-primary">
                 <i class="bi bi-file-earmark-spreadsheet me-1"></i> Laporan Keuangan
             </a>
+            <a href="{{ route('admin.incomes.create') }}" class="btn btn-success">
+                <i class="bi bi-plus-lg me-1"></i> Catat Pemasukan
+            </a>
             <a href="{{ route('admin.expenses.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-1"></i> Catat Pengeluaran
             </a>
@@ -119,7 +122,7 @@
                                 <tr>
                                     <th>Tanggal</th>
                                     <th>Kategori</th>
-                                    <th>Deskripsi / PIC</th>
+                                    <th>Deskripsi / Sumber</th>
                                     <th class="text-end">Nominal</th>
                                 </tr>
                             </thead>
@@ -138,6 +141,8 @@
                                             @if ($t->invoice)
                                                 <small class="text-muted">Invoice: <a
                                                         href="{{ route('admin.invoices.show', $t->invoice) }}">{{ $t->invoice->invoice_number }}</a></small>
+                                            @elseif ($t->type->value === 'income')
+                                                <small class="text-muted">Pemasukan di luar WO</small>
                                             @endif
                                         </td>
                                         <td

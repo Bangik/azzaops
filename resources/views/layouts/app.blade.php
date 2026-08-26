@@ -115,6 +115,12 @@
                         <i class="bi bi-tags me-2"></i>Kategori Pengeluaran
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.income-categories.*') ? 'active' : '' }}"
+                        href="{{ route('admin.income-categories.index') }}">
+                        <i class="bi bi-tags me-2"></i>Kategori Pemasukan
+                    </a>
+                </li>
             @endif
 
             @if (auth()->user()->role->value === 'super_admin')

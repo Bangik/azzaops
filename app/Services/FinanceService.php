@@ -73,6 +73,19 @@ class FinanceService
         });
     }
 
+    public function createIncome(array $data, int $recordedBy): FinancialTransaction
+    {
+        return DB::transaction(fn() => FinancialTransaction::create([
+            'type' => TransactionType::Income,
+            'category_id' => $data['category_id'],
+            'amount' => $data['amount'],
+            'transaction_date' => $data['transaction_date'],
+            'description' => $data['description'],
+            'reference_number' => $data['reference_number'] ?? null,
+            'recorded_by' => $recordedBy,
+        ]));
+    }
+
     public function updateExpense(Expense $expense, array $data): Expense
     {
         return DB::transaction(function () use ($expense, $data) {
