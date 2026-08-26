@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\WorkOrderController;
 use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\RabController;
 use App\Http\Controllers\Admin\FinanceController;
+use App\Http\Controllers\Admin\FinancialCategoryController;
 use App\Http\Controllers\Admin\SettingController;
 
 // Auth routes (no Breeze, manual)
@@ -20,7 +21,7 @@ Route::middleware('guest')->group(function () {
 Route::post('logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
 
 // Redirect root to dashboard
-Route::get('/', fn () => redirect()->route('admin.dashboard'));
+Route::get('/', fn() => redirect()->route('admin.dashboard'));
 
 // Admin routes
 Route::middleware(['auth', 'role:super_admin,admin,kepala_teknisi'])->prefix('admin')->name('admin.')->group(function () {
@@ -60,6 +61,7 @@ Route::middleware(['auth', 'role:super_admin,admin,kepala_teknisi'])->prefix('ad
     // Super Admin only
     Route::middleware('role:super_admin')->group(function () {
         Route::resource('financial-accounts', \App\Http\Controllers\Admin\FinancialAccountController::class);
+        Route::resource('financial-categories', FinancialCategoryController::class)->except(['show']);
         Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
         Route::resource('app-versions', \App\Http\Controllers\Admin\AppVersionController::class)->only(['index', 'store', 'destroy']);

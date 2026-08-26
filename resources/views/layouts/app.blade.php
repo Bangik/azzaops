@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,6 +20,7 @@
 
     @stack('styles')
 </head>
+
 <body>
 
     {{-- Mobile sidebar toggle --}}
@@ -39,89 +41,95 @@
             <li class="nav-section-label">Operasional</li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
-                   href="{{ route('admin.dashboard') }}">
+                    href="{{ route('admin.dashboard') }}">
                     <i class="bi bi-speedometer2 me-2"></i>Dashboard
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.work-orders.*') ? 'active' : '' }}"
-                   href="{{ route('admin.work-orders.index') }}">
+                    href="{{ route('admin.work-orders.index') }}">
                     <i class="bi bi-clipboard-check me-2"></i>Work Order
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}"
-                   href="{{ route('admin.customers.index') }}">
+                    href="{{ route('admin.customers.index') }}">
                     <i class="bi bi-people me-2"></i>Customer
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.service-categories.*') ? 'active' : '' }}"
-                   href="{{ route('admin.service-categories.index') }}">
+                    href="{{ route('admin.service-categories.index') }}">
                     <i class="bi bi-tags me-2"></i>Kategori Jasa
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.work-order-types.*') ? 'active' : '' }}"
-                   href="{{ route('admin.work-order-types.index') }}">
+                    href="{{ route('admin.work-order-types.index') }}">
                     <i class="bi bi-gear-wide-connected me-2"></i>Tipe Pekerjaan
                 </a>
             </li>
             <li class="nav-section-label">Transaksi</li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.invoices.*') ? 'active' : '' }}"
-                   href="{{ route('admin.invoices.index') }}">
+                    href="{{ route('admin.invoices.index') }}">
                     <i class="bi bi-receipt me-2"></i>Invoice
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.rab.*') ? 'active' : '' }}"
-                   href="{{ route('admin.rab.index') }}">
+                    href="{{ route('admin.rab.index') }}">
                     <i class="bi bi-calculator me-2"></i>RAB
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.finance.*') ? 'active' : '' }}"
-                   href="{{ route('admin.finance.index') }}">
+                    href="{{ route('admin.finance.index') }}">
                     <i class="bi bi-cash-stack me-2"></i>Keuangan
                 </a>
             </li>
 
-            @if(auth()->user()->role->value === 'super_admin')
-            <li class="nav-section-label">Administrasi</li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}"
-                   href="{{ route('admin.staff.index') }}">
-                    <i class="bi bi-person-badge me-2"></i>Staff
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.devices.*') ? 'active' : '' }}"
-                   href="{{ route('admin.devices.index') }}">
-                    <i class="bi bi-phone me-2"></i>Device Staff
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.financial-accounts.*') ? 'active' : '' }}"
-                   href="{{ route('admin.financial-accounts.index') }}">
-                    <i class="bi bi-bank me-2"></i>Akun Keuangan
-                </a>
-            </li>
+            @if (auth()->user()->role->value === 'super_admin')
+                <li class="nav-section-label">Administrasi</li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}"
+                        href="{{ route('admin.staff.index') }}">
+                        <i class="bi bi-person-badge me-2"></i>Staff
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.devices.*') ? 'active' : '' }}"
+                        href="{{ route('admin.devices.index') }}">
+                        <i class="bi bi-phone me-2"></i>Device Staff
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.financial-accounts.*') ? 'active' : '' }}"
+                        href="{{ route('admin.financial-accounts.index') }}">
+                        <i class="bi bi-bank me-2"></i>Akun Keuangan
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.financial-categories.*') ? 'active' : '' }}"
+                        href="{{ route('admin.financial-categories.index') }}">
+                        <i class="bi bi-tags me-2"></i>Kategori Pengeluaran
+                    </a>
+                </li>
             @endif
 
-            @if(auth()->user()->role->value === 'super_admin')
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}"
-                   href="{{ route('admin.settings.index') }}">
-                    <i class="bi bi-gear me-2"></i>Settings
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.app-versions.*') ? 'active' : '' }}"
-                   href="{{ route('admin.app-versions.index') }}">
-                    <i class="bi bi-cloud-arrow-up me-2"></i>App Version
-                </a>
-            </li>
+            @if (auth()->user()->role->value === 'super_admin')
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}"
+                        href="{{ route('admin.settings.index') }}">
+                        <i class="bi bi-gear me-2"></i>Settings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.app-versions.*') ? 'active' : '' }}"
+                        href="{{ route('admin.app-versions.index') }}">
+                        <i class="bi bi-cloud-arrow-up me-2"></i>App Version
+                    </a>
+                </li>
             @endif
         </ul>
 
@@ -151,12 +159,13 @@
         <nav class="navbar navbar-expand navbar-light bg-white border-bottom px-4 py-2">
             <div>
                 <h5 class="mb-0 ms-md-0 ms-4">@yield('page-title')</h5>
-                <div class="text-muted small ms-md-0 ms-4">Sistem operasional lapangan yang lebih rapi dan terukur</div>
+                <div class="text-muted small ms-md-0 ms-4">Sistem operasional lapangan yang lebih rapi dan terukur
+                </div>
             </div>
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
-                       data-bs-toggle="dropdown">
+                        data-bs-toggle="dropdown">
                         <i class="bi bi-person-circle me-1"></i>
                         {{ auth()->user()->name }}
                         <span class="badge bg-primary ms-2">{{ auth()->user()->role->label() }}</span>
@@ -208,4 +217,5 @@
 
     @stack('scripts')
 </body>
+
 </html>
