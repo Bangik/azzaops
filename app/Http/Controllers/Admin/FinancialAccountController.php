@@ -62,7 +62,11 @@ class FinancialAccountController extends Controller
 
     public function destroy(FinancialAccount $financialAccount)
     {
-        if ($financialAccount->invoices()->exists()) {
+        if (
+            $financialAccount->invoices()->exists()
+            || $financialAccount->transactions()->exists()
+            || $financialAccount->expenses()->exists()
+        ) {
             return redirect()
                 ->route('admin.financial-accounts.index')
                 ->with('error', 'Akun keuangan tidak dapat dihapus karena masih digunakan pada invoice');

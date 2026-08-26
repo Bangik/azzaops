@@ -121,7 +121,7 @@
                             <thead>
                                 <tr>
                                     <th>Tanggal</th>
-                                    <th>Kategori</th>
+                                    <th>Kategori / Akun</th>
                                     <th>Deskripsi / Sumber</th>
                                     <th class="text-end">Nominal</th>
                                 </tr>
@@ -135,6 +135,10 @@
                                                 class="badge {{ $t->type->value === 'income' ? 'bg-success' : 'bg-danger' }}">
                                                 {{ $t->category ? $t->category->name : ($t->type->value === 'income' ? 'Pembayaran Jasa' : 'Lain-lain') }}
                                             </span>
+                                            @if ($t->financialAccount)
+                                                <div><small class="text-muted">{{ $t->financialAccount->name }}</small>
+                                                </div>
+                                            @endif
                                         </td>
                                         <td>
                                             <div>{{ $t->description }}</div>
@@ -191,6 +195,9 @@
                                             <div class="fw-semibold">{{ $e->description }}</div>
                                             @if ($e->pic)
                                                 <small class="text-muted">PIC: {{ $e->pic }}</small>
+                                            @endif
+                                            @if ($e->financialAccount)
+                                                <small class="text-muted">Akun: {{ $e->financialAccount->name }}</small>
                                             @endif
                                             <small class="text-muted">{{ $e->category->name }}</small>
                                             @if ($e->receipt_photo)

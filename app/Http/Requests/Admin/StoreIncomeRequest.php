@@ -19,6 +19,10 @@ class StoreIncomeRequest extends FormRequest
         'required',
         Rule::exists('financial_categories', 'id')->where('type', 'income')->where('is_active', true),
       ],
+      'financial_account_id' => [
+        'nullable',
+        Rule::exists('financial_accounts', 'id')->where('is_active', true),
+      ],
       'description' => ['required', 'string', 'max:255'],
       'amount' => ['required', 'numeric', 'min:1'],
       'transaction_date' => ['required', 'date'],

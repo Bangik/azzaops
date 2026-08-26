@@ -48,6 +48,7 @@ class FinanceService
 
             $expense = Expense::create([
                 'category_id' => $data['category_id'],
+                'financial_account_id' => $data['financial_account_id'] ?? null,
                 'work_order_id' => $data['work_order_id'] ?? null,
                 'description' => $data['description'],
                 'pic' => $data['pic'] ?? null,
@@ -62,6 +63,7 @@ class FinanceService
             FinancialTransaction::create([
                 'type' => TransactionType::Expense,
                 'category_id' => $data['category_id'],
+                'financial_account_id' => $data['financial_account_id'] ?? null,
                 'expense_id' => $expense->id,
                 'amount' => $data['amount'],
                 'transaction_date' => $data['expense_date'],
@@ -78,6 +80,7 @@ class FinanceService
         return DB::transaction(fn() => FinancialTransaction::create([
             'type' => TransactionType::Income,
             'category_id' => $data['category_id'],
+            'financial_account_id' => $data['financial_account_id'] ?? null,
             'amount' => $data['amount'],
             'transaction_date' => $data['transaction_date'],
             'description' => $data['description'],
@@ -103,6 +106,7 @@ class FinanceService
 
             $expense->update([
                 'category_id' => $data['category_id'],
+                'financial_account_id' => $data['financial_account_id'] ?? null,
                 'work_order_id' => $data['work_order_id'] ?? null,
                 'description' => $data['description'],
                 'pic' => $data['pic'] ?? null,
@@ -115,6 +119,7 @@ class FinanceService
             // Update transaction record
             $expense->transaction()->update([
                 'category_id' => $data['category_id'],
+                'financial_account_id' => $data['financial_account_id'] ?? null,
                 'amount' => $data['amount'],
                 'transaction_date' => $data['expense_date'],
                 'description' => $data['description'],

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateExpenseRequest extends FormRequest
 {
@@ -15,6 +16,10 @@ class UpdateExpenseRequest extends FormRequest
     {
         return [
             'category_id' => ['required', 'exists:financial_categories,id'],
+            'financial_account_id' => [
+                'nullable',
+                Rule::exists('financial_accounts', 'id')->where('is_active', true),
+            ],
             'work_order_id' => ['nullable', 'exists:work_orders,id'],
             'description' => ['required', 'string', 'max:255'],
             'pic' => ['nullable', 'string', 'max:255'],

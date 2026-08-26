@@ -21,15 +21,15 @@ class InvoiceService
     public function createFromWorkOrder(WorkOrder $workOrder, array $data, int $issuedBy): Invoice
     {
         return DB::transaction(function () use ($workOrder, $data, $issuedBy) {
-            $items = $data['items'] ?? $workOrder->items->map(fn ($i) => [
+            $items = $data['items'] ?? $workOrder->items->map(fn($i) => [
                 'description' => $i->description,
                 'quantity' => $i->quantity,
                 'unit' => $i->unit,
                 'unit_price' => $i->unit_price,
             ])->toArray();
 
-            $subtotal = collect($items)->sum(fn ($i) => ($i['quantity'] ?? 1) * ($i['unit_price'] ?? 0));
-            
+            $subtotal = collect($items)->sum(fn($i) => ($i['quantity'] ?? 1) * ($i['unit_price'] ?? 0));
+
             // Calculate Discount
             $discountValue = (float) ($data['discount_value'] ?? 0);
             $discountType = $data['discount_type'] ?? 'fixed';
@@ -122,6 +122,7 @@ class InvoiceService
                 FinancialTransaction::create([
                     'type' => TransactionType::Income,
                     'category_id' => $incomeCategoryId,
+                    'financial_account_id' => $invoice->financial_account_id,
                     'invoice_id' => $invoice->id,
                     'amount' => $delta,
                     'transaction_date' => $data['payment_date'] ?? now()->toDateString(),

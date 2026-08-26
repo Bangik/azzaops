@@ -36,6 +36,21 @@
                         @enderror
                     </div>
 
+                    <div class="col-md-6 mb-3">
+                        <label for="financial_account_id" class="form-label">Akun Keuangan (Opsional)</label>
+                        <select class="form-select @error('financial_account_id') is-invalid @enderror"
+                            id="financial_account_id" name="financial_account_id">
+                            <option value="">Tidak dikaitkan ke akun</option>
+                            @foreach ($financialAccounts as $account)
+                                <option value="{{ $account->id }}" @selected(old('financial_account_id') == $account->id)>{{ $account->name }}
+                                    ({{ $account->code }})</option>
+                            @endforeach
+                        </select>
+                        @error('financial_account_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
                     <div class="col-md-8 mb-3">
                         <label for="description" class="form-label">Deskripsi Pemasukan</label>
                         <input type="text" class="form-control @error('description') is-invalid @enderror"

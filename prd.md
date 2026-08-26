@@ -587,23 +587,24 @@ Kategori bertipe `expense` dan `income` dapat dikelola melalui CRUD master kateg
 
 Catatan pemasukan dan pengeluaran.
 
-| Kolom            | Tipe                     | Nullable | Default           | Keterangan                                  |
-| ---------------- | ------------------------ | -------- | ----------------- | ------------------------------------------- |
-| id               | BIGINT UNSIGNED          | NO       | AUTO_INCREMENT    | PK                                          |
-| type             | ENUM('income','expense') | NO       |                   | Pemasukan atau pengeluaran                  |
-| category_id      | BIGINT UNSIGNED          | YES      | NULL              | FK → financial_categories.id                |
-| invoice_id       | BIGINT UNSIGNED          | YES      | NULL              | FK → invoices.id (jika income dari invoice) |
-| expense_id       | BIGINT UNSIGNED          | YES      | NULL              | FK → expenses.id (jika expense)             |
-| amount           | DECIMAL(15,2)            | NO       |                   | Nominal                                     |
-| transaction_date | DATE                     | NO       |                   | Tanggal transaksi                           |
-| description      | TEXT                     | YES      | NULL              | Keterangan                                  |
-| reference_number | VARCHAR(100)             | YES      | NULL              | Nomor referensi (nomor transfer, dll)       |
-| recorded_by      | BIGINT UNSIGNED          | NO       |                   | FK → users.id                               |
-| created_at       | TIMESTAMP                | NO       | CURRENT_TIMESTAMP |                                             |
-| updated_at       | TIMESTAMP                | NO       | CURRENT_TIMESTAMP |                                             |
+| Kolom                | Tipe                     | Nullable | Default           | Keterangan                                  |
+| -------------------- | ------------------------ | -------- | ----------------- | ------------------------------------------- |
+| id                   | BIGINT UNSIGNED          | NO       | AUTO_INCREMENT    | PK                                          |
+| type                 | ENUM('income','expense') | NO       |                   | Pemasukan atau pengeluaran                  |
+| category_id          | BIGINT UNSIGNED          | YES      | NULL              | FK → financial_categories.id                |
+| financial_account_id | BIGINT UNSIGNED          | YES      | NULL              | FK → financial_accounts.id                  |
+| invoice_id           | BIGINT UNSIGNED          | YES      | NULL              | FK → invoices.id (jika income dari invoice) |
+| expense_id           | BIGINT UNSIGNED          | YES      | NULL              | FK → expenses.id (jika expense)             |
+| amount               | DECIMAL(15,2)            | NO       |                   | Nominal                                     |
+| transaction_date     | DATE                     | NO       |                   | Tanggal transaksi                           |
+| description          | TEXT                     | YES      | NULL              | Keterangan                                  |
+| reference_number     | VARCHAR(100)             | YES      | NULL              | Nomor referensi (nomor transfer, dll)       |
+| recorded_by          | BIGINT UNSIGNED          | NO       |                   | FK → users.id                               |
+| created_at           | TIMESTAMP                | NO       | CURRENT_TIMESTAMP |                                             |
+| updated_at           | TIMESTAMP                | NO       | CURRENT_TIMESTAMP |                                             |
 
 **Index:** `INDEX(type)`, `INDEX(transaction_date)`, `INDEX(invoice_id)`, `INDEX(expense_id)`  
-**Foreign Key:** `category_id → financial_categories(id)`, `invoice_id → invoices(id) ON DELETE SET NULL`, `expense_id → expenses(id) ON DELETE SET NULL`, `recorded_by → users(id)`
+**Foreign Key:** `category_id → financial_categories(id)`, `financial_account_id → financial_accounts(id) ON DELETE SET NULL`, `invoice_id → invoices(id) ON DELETE SET NULL`, `expense_id → expenses(id) ON DELETE SET NULL`, `recorded_by → users(id)`
 
 Pemasukan dari invoice/work order mengisi `invoice_id`, sedangkan pemasukan di luar work order disimpan sebagai transaksi bertipe `income` dengan `invoice_id` bernilai `NULL`. Pemasukan manual wajib menggunakan kategori aktif bertipe `income`.
 
@@ -613,22 +614,23 @@ Pemasukan dari invoice/work order mengisi `invoice_id`, sedangkan pemasukan di l
 
 Pengeluaran operasional.
 
-| Kolom         | Tipe            | Nullable | Default           | Keterangan                                            |
-| ------------- | --------------- | -------- | ----------------- | ----------------------------------------------------- |
-| id            | BIGINT UNSIGNED | NO       | AUTO_INCREMENT    | PK                                                    |
-| category_id   | BIGINT UNSIGNED | YES      | NULL              | FK → financial_categories.id                          |
-| work_order_id | BIGINT UNSIGNED | YES      | NULL              | FK → work_orders.id (jika terkait WO tertentu)        |
-| description   | VARCHAR(255)    | NO       |                   | Keterangan pengeluaran                                |
-| pic           | VARCHAR(255)    | YES      | NULL              | PIC atau pihak terkait pengeluaran, berupa teks bebas |
-| amount        | DECIMAL(15,2)   | NO       |                   | Nominal                                               |
-| expense_date  | DATE            | NO       |                   | Tanggal pengeluaran                                   |
-| receipt_photo | VARCHAR(255)    | YES      | NULL              | Path foto struk/nota                                  |
-| notes         | TEXT            | YES      | NULL              |                                                       |
-| recorded_by   | BIGINT UNSIGNED | NO       |                   | FK → users.id                                         |
-| created_at    | TIMESTAMP       | NO       | CURRENT_TIMESTAMP |                                                       |
-| updated_at    | TIMESTAMP       | NO       | CURRENT_TIMESTAMP |                                                       |
+| Kolom                | Tipe            | Nullable | Default           | Keterangan                                            |
+| -------------------- | --------------- | -------- | ----------------- | ----------------------------------------------------- |
+| id                   | BIGINT UNSIGNED | NO       | AUTO_INCREMENT    | PK                                                    |
+| category_id          | BIGINT UNSIGNED | YES      | NULL              | FK → financial_categories.id                          |
+| financial_account_id | BIGINT UNSIGNED | YES      | NULL              | FK → financial_accounts.id                            |
+| work_order_id        | BIGINT UNSIGNED | YES      | NULL              | FK → work_orders.id (jika terkait WO tertentu)        |
+| description          | VARCHAR(255)    | NO       |                   | Keterangan pengeluaran                                |
+| pic                  | VARCHAR(255)    | YES      | NULL              | PIC atau pihak terkait pengeluaran, berupa teks bebas |
+| amount               | DECIMAL(15,2)   | NO       |                   | Nominal                                               |
+| expense_date         | DATE            | NO       |                   | Tanggal pengeluaran                                   |
+| receipt_photo        | VARCHAR(255)    | YES      | NULL              | Path foto struk/nota                                  |
+| notes                | TEXT            | YES      | NULL              |                                                       |
+| recorded_by          | BIGINT UNSIGNED | NO       |                   | FK → users.id                                         |
+| created_at           | TIMESTAMP       | NO       | CURRENT_TIMESTAMP |                                                       |
+| updated_at           | TIMESTAMP       | NO       | CURRENT_TIMESTAMP |                                                       |
 
-**Foreign Key:** `category_id → financial_categories(id)`, `work_order_id → work_orders(id) ON DELETE SET NULL`, `recorded_by → users(id)`
+**Foreign Key:** `category_id → financial_categories(id)`, `financial_account_id → financial_accounts(id) ON DELETE SET NULL`, `work_order_id → work_orders(id) ON DELETE SET NULL`, `recorded_by → users(id)`
 
 ---
 
@@ -1024,12 +1026,14 @@ Customer ──WA──▶ Admin/CS
 2. **Pemasukan manual di luar work order:** Admin dapat mencatat pemasukan yang tidak berasal dari invoice melalui modul Keuangan:
 
 - Pilih kategori aktif bertipe `income`
+- Pilih akun keuangan aktif sebagai tujuan pemasukan secara opsional
 - Isi deskripsi, nominal, dan tanggal transaksi
 - Isi nomor referensi secara opsional (misalnya nomor bukti transfer)
 - Sistem membuat record `financial_transactions` bertipe `income` tanpa `invoice_id`
 
 3. **Pengeluaran manual:** Admin menginput pengeluaran melalui modul Keuangan:
     - Pilih kategori (Material, Transport, Operasional, dll)
+    - Pilih akun keuangan aktif sebagai sumber pengeluaran secara opsional
     - Isi nominal, tanggal, deskripsi
 
 - Isi PIC pengeluaran secara opsional sebagai teks bebas
@@ -1520,7 +1524,7 @@ Pagination {
 **Pemasukan:**
 
 - List semua pemasukan, baik dari invoice/work order maupun pemasukan manual di luar work order
-- Tambah pemasukan di luar work order: kategori income aktif, deskripsi, nominal, tanggal, dan nomor referensi (opsional)
+- Tambah pemasukan di luar work order: kategori income aktif, akun keuangan (opsional), deskripsi, nominal, tanggal, dan nomor referensi (opsional)
 - Pemasukan manual tidak memiliki invoice/work order dan ditandai sebagai pemasukan di luar WO
 - Detail pemasukan dari invoice: invoice number, customer, tanggal, amount
 - Filter by tanggal, customer
@@ -1528,7 +1532,7 @@ Pagination {
 **Pengeluaran:**
 
 - List semua pengeluaran
-- Tambah pengeluaran: kategori, deskripsi, PIC teks bebas (opsional), nominal, tanggal, link ke WO (opsional), foto struk
+- Tambah pengeluaran: kategori, akun keuangan (opsional), deskripsi, PIC teks bebas (opsional), nominal, tanggal, link ke WO (opsional), foto struk
 - Edit / hapus pengeluaran
 
 **Kategori Pengeluaran (Super Admin):**
@@ -1550,6 +1554,7 @@ Pagination {
 - Filter periode: hari ini, minggu ini, bulan ini, custom range
 - Ringkasan: total pemasukan, total pengeluaran, neraca saldo, cost percentage
 - Tabel detail transaksi (income + expense digabung, urut tanggal)
+- Tampilkan akun keuangan pada detail transaksi dan pengeluaran jika tersedia
 - Grafik pemasukan vs pengeluaran per hari/minggu/bulan
 - _Cetak/export PDF — nice to have_
 

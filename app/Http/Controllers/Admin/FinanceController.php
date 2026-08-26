@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\StoreIncomeRequest;
 use App\Http\Requests\Admin\UpdateExpenseRequest;
 use App\Models\Expense;
 use App\Models\FinancialCategory;
+use App\Models\FinancialAccount;
 use App\Models\FinancialTransaction;
 use App\Models\WorkOrder;
 use App\Services\FinanceService;
@@ -26,14 +27,14 @@ class FinanceController extends Controller
 
         $summary = $this->financeService->getSummary($from, $to);
 
-        $transactions = FinancialTransaction::with(['category', 'invoice', 'expense', 'recorder'])
+        $transactions = FinancialTransaction::with(['category', 'financialAccount', 'invoice', 'expense', 'recorder'])
             ->whereBetween('transaction_date', [$from, $to])
             ->latest('transaction_date')
             ->latest('id')
             ->paginate(20)
             ->withQueryString();
 
-        $expenses = Expense::with(['category', 'workOrder'])
+        $expenses = Expense::with(['category', 'financialAccount', 'workOrder'])
             ->whereBetween('expense_date', [$from, $to])
             ->latest('expense_date')
             ->paginate(10, ['*'], 'expenses_page')
@@ -45,16 +46,18 @@ class FinanceController extends Controller
     public function create()
     {
         $categories = FinancialCategory::expense()->active()->orderBy('name')->get();
+        $financialAccounts = FinancialAccount::active()->orderBy('name')->get();
         $workOrders = WorkOrder::latest()->limit(100)->get(['id', 'wo_number', 'title']);
 
-        return view('admin.finance.create', compact('categories', 'workOrders'));
+        return view('admin.finance.create', compact('categories', 'financialAccounts', 'workOrders'));
     }
 
     public function createIncome()
     {
         $categories = FinancialCategory::income()->active()->orderBy('name')->get();
+        $financialAccounts = FinancialAccount::active()->orderBy('name')->get();
 
-        return view('admin.finance.income-create', compact('categories'));
+        return view('admin.finance.income-create', compact('categories', 'financialAccounts'));
     }
 
     public function storeIncome(StoreIncomeRequest $request)
@@ -78,9 +81,13 @@ class FinanceController extends Controller
     public function edit(Expense $expense)
     {
         $categories = FinancialCategory::expense()->active()->orderBy('name')->get();
+        $financialAccounts = FinancialAccount::where(function ($query) use ($expense) {
+            $query->where('is_active', true)
+                ->orWhere('id', $expense->financial_account_id);
+        })->orderBy('name')->get();
         $workOrders = WorkOrder::latest()->limit(100)->get(['id', 'wo_number', 'title']);
 
-        return view('admin.finance.edit', compact('expense', 'categories', 'workOrders'));
+        return view('admin.finance.edit', compact('expense', 'categories', 'financialAccounts', 'workOrders'));
     }
 
     public function update(UpdateExpenseRequest $request, Expense $expense)

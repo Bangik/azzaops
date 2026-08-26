@@ -13,6 +13,7 @@ class Expense extends Model
 
     protected $fillable = [
         'category_id',
+        'financial_account_id',
         'work_order_id',
         'description',
         'pic',
@@ -36,6 +37,11 @@ class Expense extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(FinancialCategory::class, 'category_id');
+    }
+
+    public function financialAccount(): BelongsTo
+    {
+        return $this->belongsTo(FinancialAccount::class);
     }
 
     public function workOrder(): BelongsTo

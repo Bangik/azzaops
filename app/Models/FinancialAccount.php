@@ -27,6 +27,16 @@ class FinancialAccount extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(FinancialTransaction::class);
+    }
+
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
