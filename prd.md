@@ -107,14 +107,15 @@ PT. Azza Karunia Jaya adalah perusahaan jasa instalasi, perawatan, dan servis AC
 
 **Invoice & RAB:**
 
-| ID    | User Story                                                                                                    | Priority |
-| ----- | ------------------------------------------------------------------------------------------------------------- | -------- |
-| AD-10 | Sebagai Admin, saya dapat generate invoice dari work order (termasuk item jasa & material)                    | Must     |
-| AD-11 | Sebagai Admin, saya dapat mendownload invoice dalam format PDF                                                | Must     |
-| AD-12 | Sebagai Admin, saya dapat membuat RAB untuk pekerjaan instalasi                                               | Must     |
-| AD-13 | Sebagai Admin, saya dapat mendownload RAB dalam format PDF                                                    | Must     |
-| AD-14 | Sebagai Admin, saya dapat mengubah status invoice (kirim ke customer, tandai lunas, dll)                      | Must     |
-| AD-15 | Sebagai Admin, saya dapat membuat invoice dengan nilai Rp 0 (untuk pengecekan yang dilanjutkan ke pengerjaan) | Must     |
+| ID    | User Story                                                                                                       | Priority |
+| ----- | ---------------------------------------------------------------------------------------------------------------- | -------- |
+| AD-10 | Sebagai Admin, saya dapat generate invoice dari work order (termasuk item jasa & material)                       | Must     |
+| AD-11 | Sebagai Admin, saya dapat mendownload invoice dalam format PDF                                                   | Must     |
+| AD-23 | Sebagai Admin, saya dapat mendownload kwitansi berstatus LUNAS sebagai bukti pembayaran invoice yang sudah lunas | Must     |
+| AD-12 | Sebagai Admin, saya dapat membuat RAB untuk pekerjaan instalasi                                                  | Must     |
+| AD-13 | Sebagai Admin, saya dapat mendownload RAB dalam format PDF                                                       | Must     |
+| AD-14 | Sebagai Admin, saya dapat mengubah status invoice (kirim ke customer, tandai lunas, dll)                         | Must     |
+| AD-15 | Sebagai Admin, saya dapat membuat invoice dengan nilai Rp 0 (untuk pengecekan yang dilanjutkan ke pengerjaan)    | Must     |
 
 **Keuangan:**
 
@@ -1442,7 +1443,7 @@ Pagination {
 - Daftar teknisi yang ditugaskan + status assignment
 - Laporan teknisi + foto (gallery view)
 - Link ke invoice & RAB terkait
-- Action buttons: edit, assign (jika role kepala teknisi), generate invoice, generate RAB, cancel
+- Action buttons: edit, assign (jika role kepala teknisi), generate invoice, download invoice, download kwitansi jika sudah lunas, generate RAB, cancel
 
 **Edit Work Order:**
 
@@ -1471,6 +1472,14 @@ Pagination {
 - Subtotal, diskon, pajak, grand total
 - Catatan/terms
 - Footer: text konfigurabel dari settings
+
+**Kwitansi Pembayaran PDF:**
+
+- Menggunakan template dan tata letak yang sama dengan invoice PDF
+- Judul dokumen: "KWITANSI" dengan status "LUNAS"
+- Hanya tersedia setelah invoice berstatus pembayaran `paid`
+- Menampilkan customer, nomor invoice sebagai referensi, tanggal pembayaran, metode pembayaran, akun keuangan, dan total pembayaran
+- Dapat didownload dari daftar/detail invoice serta daftar/detail Work Order
 
 **Update Status Invoice:**
 

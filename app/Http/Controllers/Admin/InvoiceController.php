@@ -30,7 +30,7 @@ class InvoiceController extends Controller
             $q = $request->q;
             $query->where(function ($b) use ($q) {
                 $b->where('invoice_number', 'like', "%{$q}%")
-                  ->orWhereHas('customer', fn ($c) => $c->where('name', 'like', "%{$q}%"));
+                    ->orWhereHas('customer', fn($c) => $c->where('name', 'like', "%{$q}%"));
             });
         }
 
@@ -105,5 +105,16 @@ class InvoiceController extends Controller
         $pdf = $this->pdfService->generateInvoicePdf($invoice);
 
         return $pdf->stream("invoice-{$invoice->invoice_number}.pdf");
+    }
+
+    public function receiptPdf(Invoice $invoice)
+    {
+        if ($invoice->payment_status !== PaymentStatus::Paid) {
+            return redirect()->back()->with('error', 'Kwitansi hanya dapat dibuat setelah invoice lunas');
+        }
+
+        $pdf = $this->pdfService->generateReceiptPdf($invoice);
+
+        return $pdf->download("kwitansi-{$invoice->invoice_number}.pdf");
     }
 }

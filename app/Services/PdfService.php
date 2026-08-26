@@ -22,6 +22,16 @@ class PdfService
         return $pdf;
     }
 
+    public function generateReceiptPdf(Invoice $invoice)
+    {
+        $invoice->load(['customer', 'workOrder.assignments.technician', 'items', 'issuer', 'financialAccount']);
+        $settings = $this->getCompanySettings();
+        $data = $this->getInvoiceV2Data($invoice, $settings, true);
+
+        return Pdf::loadView('pdf.invoicev2', $data)
+            ->setPaper('a4', 'portrait');
+    }
+
     public function generateRabPdf(Rab $rab)
     {
         $rab->load(['customer', 'workOrder', 'items', 'creator']);
@@ -69,7 +79,7 @@ class PdfService
         ];
     }
 
-    private function getInvoiceV2Data(Invoice $invoice, array $settings): array
+    private function getInvoiceV2Data(Invoice $invoice, array $settings, bool $isReceipt = false): array
     {
         $logo = $settings['company_logo'];
         if ($logo && ! str_starts_with($logo, 'data:') && ! filter_var($logo, FILTER_VALIDATE_URL)) {
@@ -77,9 +87,13 @@ class PdfService
         }
 
         return [
+            'documentTitle' => $isReceipt ? 'KWITANSI' : 'INVOICE',
+            'documentStatus' => $isReceipt ? 'LUNAS' : null,
+            'amountLabel' => $isReceipt ? 'TOTAL DIBAYAR' : 'JUMLAH YANG HARUS DIBAYAR',
+            'dateLabel' => $isReceipt ? 'Tanggal Pembayaran' : 'Tanggal',
             'invoiceNumber' => $invoice->invoice_number,
-            'invoiceDate' => $invoice->created_at->format('d/m/Y'),
-            'dueDate' => $invoice->due_date?->format('d/m/Y') ?? '-',
+            'invoiceDate' => ($isReceipt ? $invoice->payment_date : $invoice->created_at)?->format('d/m/Y') ?? '-',
+            'dueDate' => $isReceipt ? '-' : ($invoice->due_date?->format('d/m/Y') ?? '-'),
             'company' => [
                 'name' => $settings['company_name'],
                 'tagline' => $settings['company_tagline'],
@@ -106,11 +120,12 @@ class PdfService
                 ? intval($invoice->discount_value) . '%'
                 : null,
             'tax' => (float) $invoice->tax_amount,
-            'total' => (float) $invoice->total,
+            'total' => $isReceipt ? (float) $invoice->paid_amount : (float) $invoice->total,
             'payment' => [
                 'bank_code' => $invoice->financialAccount?->code ?? '-',
                 'bank_name' => $invoice->financialAccount?->name ?? 'Akun Keuangan',
                 'account_number' => $invoice->financialAccount?->code ?? '-',
+                'method' => $invoice->payment_method ?? '-',
                 'email' => $settings['company_email'],
             ],
             'signature' => [

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Invoice @isset($invoiceNumber)
+    <title>{{ $documentTitle ?? 'INVOICE' }} @isset($invoiceNumber)
             {{ $invoiceNumber }}
         @endisset
     </title>
@@ -291,6 +291,10 @@
 
     @php
         // Nilai default -- bisa dioverride dari controller lewat data view
+        $documentTitle = $documentTitle ?? 'INVOICE';
+        $documentStatus = $documentStatus ?? null;
+        $amountLabel = $amountLabel ?? 'JUMLAH YANG HARUS DIBAYAR';
+        $dateLabel = $dateLabel ?? 'Tanggal';
         $invoiceNumber = $invoiceNumber ?? '1234567890-2022';
         $invoiceDate = $invoiceDate ?? 'Jumat, 25 / 08 / 2022';
         $dueDate = $dueDate ?? 'Selasa, 27 / 08 / 2022';
@@ -373,8 +377,11 @@
                     </table>
                 </td>
                 <td style="width:40%; vertical-align:top;">
-                    <div class="invoice-title">INVOICE</div>
+                    <div class="invoice-title">{{ $documentTitle }}</div>
                     <div class="invoice-no">NO: {{ $invoiceNumber }}</div>
+                    @if ($documentStatus)
+                        <div class="invoice-no" style="color:#a9cdd6; margin-top:10px;">{{ $documentStatus }}</div>
+                    @endif
                 </td>
             </tr>
         </table>
@@ -403,7 +410,7 @@
                     </table>
                 </td>
                 <td style="width:40%; vertical-align:top;">
-                    <div class="date-label">Tanggal</div>
+                    <div class="date-label">{{ $dateLabel }}</div>
                     <div class="date-value">{{ $invoiceDate }}</div>
                     <div class="date-label">Tanggal Jatuh Tempo</div>
                     <div class="date-value" style="margin-bottom:0;">{{ $dueDate }}</div>
@@ -427,7 +434,7 @@
                     </div>
                 </td>
                 <td style="width:40%; vertical-align:top;">
-                    <div class="amount-label">JUMLAH YANG HARUS DIBAYAR</div>
+                    <div class="amount-label">{{ $amountLabel }}</div>
                     <div class="amount-value">{{ $rupiah($total) }}</div>
                 </td>
             </tr>
@@ -469,6 +476,10 @@
             <tr>
                 <td style="width:55%; vertical-align:top;">
                     <div class="payment-heading">Metode Pembayaran</div>
+                    @if (!empty($payment['method']))
+                        <div class="payment-label">METODE:</div>
+                        <div class="payment-value">{{ strtoupper($payment['method']) }}</div>
+                    @endif
                     <table>
                         <tr>
                             <td style="width:50%; vertical-align:top;">

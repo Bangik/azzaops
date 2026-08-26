@@ -23,7 +23,7 @@ class WorkOrderController extends Controller
 
     public function index(Request $request)
     {
-        $query = WorkOrder::with(['customer', 'serviceCategory', 'type', 'assignments.technician'])
+        $query = WorkOrder::with(['customer', 'serviceCategory', 'type', 'invoice', 'assignments.technician'])
             ->latest();
 
         if ($request->filled('status')) {
@@ -39,7 +39,7 @@ class WorkOrderController extends Controller
             $query->where(function ($builder) use ($q) {
                 $builder->where('wo_number', 'like', "%{$q}%")
                     ->orWhere('title', 'like', "%{$q}%")
-                    ->orWhereHas('customer', fn ($c) => $c->where('name', 'like', "%{$q}%")
+                    ->orWhereHas('customer', fn($c) => $c->where('name', 'like', "%{$q}%")
                         ->orWhere('company_name', 'like', "%{$q}%"));
             });
         }

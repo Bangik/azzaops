@@ -39,6 +39,7 @@ Route::middleware(['auth', 'role:super_admin,admin,kepala_teknisi'])->prefix('ad
     Route::resource('invoices', InvoiceController::class);
     Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
     Route::get('invoices/{invoice}/preview', [InvoiceController::class, 'previewPdf'])->name('invoices.preview');
+    Route::get('invoices/{invoice}/receipt', [InvoiceController::class, 'receiptPdf'])->name('invoices.receipt');
     Route::put('invoices/{invoice}/pay', [InvoiceController::class, 'pay'])->name('invoices.pay');
 
     Route::resource('rab', RabController::class);
