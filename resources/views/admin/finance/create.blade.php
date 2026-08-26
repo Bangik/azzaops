@@ -53,7 +53,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-3 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label for="amount" class="form-label">Nominal (Rp)</label>
                         <input type="number" class="form-control @error('amount') is-invalid @enderror" id="amount"
                             name="amount" value="{{ old('amount') }}" required min="1">
@@ -62,7 +62,16 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-3 mb-3">
+                    <div class="col-md-6 mb-3">
+                        <label for="pic" class="form-label">PIC Pengeluaran (Opsional)</label>
+                        <input type="text" class="form-control @error('pic') is-invalid @enderror" id="pic"
+                            name="pic" value="{{ old('pic') }}" placeholder="Nama PIC atau pihak terkait">
+                        @error('pic')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6 mb-3">
                         <label for="expense_date" class="form-label">Tanggal Pengeluaran</label>
                         <input type="text" class="form-control datepicker @error('expense_date') is-invalid @enderror"
                             id="expense_date" name="expense_date" value="{{ old('expense_date', now()->format('Y-m-d')) }}"
@@ -72,7 +81,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-12 mb-3">
                         <label for="receipt_photo" class="form-label">Foto Struk / Nota (Opsional)</label>
                         <input type="file" class="form-control @error('receipt_photo') is-invalid @enderror"
                             id="receipt_photo" name="receipt_photo" accept="image/*">

@@ -609,19 +609,20 @@ Catatan pemasukan dan pengeluaran.
 
 Pengeluaran operasional.
 
-| Kolom         | Tipe            | Nullable | Default           | Keterangan                                     |
-| ------------- | --------------- | -------- | ----------------- | ---------------------------------------------- |
-| id            | BIGINT UNSIGNED | NO       | AUTO_INCREMENT    | PK                                             |
-| category_id   | BIGINT UNSIGNED | YES      | NULL              | FK → financial_categories.id                   |
-| work_order_id | BIGINT UNSIGNED | YES      | NULL              | FK → work_orders.id (jika terkait WO tertentu) |
-| description   | VARCHAR(255)    | NO       |                   | Keterangan pengeluaran                         |
-| amount        | DECIMAL(15,2)   | NO       |                   | Nominal                                        |
-| expense_date  | DATE            | NO       |                   | Tanggal pengeluaran                            |
-| receipt_photo | VARCHAR(255)    | YES      | NULL              | Path foto struk/nota                           |
-| notes         | TEXT            | YES      | NULL              |                                                |
-| recorded_by   | BIGINT UNSIGNED | NO       |                   | FK → users.id                                  |
-| created_at    | TIMESTAMP       | NO       | CURRENT_TIMESTAMP |                                                |
-| updated_at    | TIMESTAMP       | NO       | CURRENT_TIMESTAMP |                                                |
+| Kolom         | Tipe            | Nullable | Default           | Keterangan                                            |
+| ------------- | --------------- | -------- | ----------------- | ----------------------------------------------------- |
+| id            | BIGINT UNSIGNED | NO       | AUTO_INCREMENT    | PK                                                    |
+| category_id   | BIGINT UNSIGNED | YES      | NULL              | FK → financial_categories.id                          |
+| work_order_id | BIGINT UNSIGNED | YES      | NULL              | FK → work_orders.id (jika terkait WO tertentu)        |
+| description   | VARCHAR(255)    | NO       |                   | Keterangan pengeluaran                                |
+| pic           | VARCHAR(255)    | YES      | NULL              | PIC atau pihak terkait pengeluaran, berupa teks bebas |
+| amount        | DECIMAL(15,2)   | NO       |                   | Nominal                                               |
+| expense_date  | DATE            | NO       |                   | Tanggal pengeluaran                                   |
+| receipt_photo | VARCHAR(255)    | YES      | NULL              | Path foto struk/nota                                  |
+| notes         | TEXT            | YES      | NULL              |                                                       |
+| recorded_by   | BIGINT UNSIGNED | NO       |                   | FK → users.id                                         |
+| created_at    | TIMESTAMP       | NO       | CURRENT_TIMESTAMP |                                                       |
+| updated_at    | TIMESTAMP       | NO       | CURRENT_TIMESTAMP |                                                       |
 
 **Foreign Key:** `category_id → financial_categories(id)`, `work_order_id → work_orders(id) ON DELETE SET NULL`, `recorded_by → users(id)`
 
@@ -1019,6 +1020,8 @@ Customer ──WA──▶ Admin/CS
 2. **Pengeluaran manual:** Admin menginput pengeluaran melalui modul Keuangan:
     - Pilih kategori (Material, Transport, Operasional, dll)
     - Isi nominal, tanggal, deskripsi
+
+- Isi PIC pengeluaran secara opsional sebagai teks bebas
     - Opsional: link ke Work Order tertentu (untuk tracking cost per job)
     - Opsional: upload foto struk/nota
     - Sistem otomatis membuat record di `financial_transactions` dengan tipe `expense`
@@ -1512,7 +1515,7 @@ Pagination {
 **Pengeluaran:**
 
 - List semua pengeluaran
-- Tambah pengeluaran: kategori, deskripsi, nominal, tanggal, link ke WO (opsional), foto struk
+- Tambah pengeluaran: kategori, deskripsi, PIC teks bebas (opsional), nominal, tanggal, link ke WO (opsional), foto struk
 - Edit / hapus pengeluaran
 
 **Kategori Pengeluaran (Super Admin):**
@@ -1963,6 +1966,7 @@ azzaops_mobile/
 - [ ] CRUD Customer
 - [ ] CRUD Kategori Jasa
 - [ ] CRUD Kategori Pengeluaran (Super Admin)
+- [ ] Kolom PIC teks bebas pada pengeluaran
 - [ ] Work Order: create, list, detail, update status
 - [ ] Assignment: assign teknisi (web)
 - [ ] API: auth, work order, assignment

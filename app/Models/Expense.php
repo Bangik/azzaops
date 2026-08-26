@@ -15,6 +15,7 @@ class Expense extends Model
         'category_id',
         'work_order_id',
         'description',
+        'pic',
         'amount',
         'expense_date',
         'receipt_photo',

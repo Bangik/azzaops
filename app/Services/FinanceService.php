@@ -23,8 +23,8 @@ class FinanceService
 
         $balance = $totalIncome - $totalExpense;
 
-        $costPercentage = $totalIncome > 0 
-            ? round(($totalExpense / $totalIncome) * 100, 2) 
+        $costPercentage = $totalIncome > 0
+            ? round(($totalExpense / $totalIncome) * 100, 2)
             : 0;
 
         return [
@@ -50,6 +50,7 @@ class FinanceService
                 'category_id' => $data['category_id'],
                 'work_order_id' => $data['work_order_id'] ?? null,
                 'description' => $data['description'],
+                'pic' => $data['pic'] ?? null,
                 'amount' => $data['amount'],
                 'expense_date' => $data['expense_date'],
                 'receipt_photo' => $photoPath,
@@ -91,6 +92,7 @@ class FinanceService
                 'category_id' => $data['category_id'],
                 'work_order_id' => $data['work_order_id'] ?? null,
                 'description' => $data['description'],
+                'pic' => $data['pic'] ?? null,
                 'amount' => $data['amount'],
                 'expense_date' => $data['expense_date'],
                 'receipt_photo' => $photoPath,

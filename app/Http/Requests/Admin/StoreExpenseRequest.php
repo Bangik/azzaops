@@ -17,6 +17,7 @@ class StoreExpenseRequest extends FormRequest
             'category_id' => ['required', 'exists:financial_categories,id'],
             'work_order_id' => ['nullable', 'exists:work_orders,id'],
             'description' => ['required', 'string', 'max:255'],
+            'pic' => ['nullable', 'string', 'max:255'],
             'amount' => ['required', 'numeric', 'min:1'],
             'expense_date' => ['required', 'date'],
             'receipt_photo' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg', 'max:5120'],
