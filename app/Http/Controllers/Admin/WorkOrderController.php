@@ -11,6 +11,7 @@ use App\Http\Requests\Admin\UpdateWorkOrderRequest;
 use App\Models\Customer;
 use App\Models\ServiceCategory;
 use App\Models\User;
+use App\Models\Vendor;
 use App\Models\WorkOrder;
 use App\Services\WorkOrderService;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class WorkOrderController extends Controller
 
     public function index(Request $request)
     {
-        $query = WorkOrder::with(['customer', 'serviceCategory', 'type', 'invoice', 'assignments.technician'])
+        $query = WorkOrder::with(['customer', 'vendor', 'serviceCategory', 'type', 'invoice', 'assignments.technician'])
             ->latest();
 
         if ($request->filled('status')) {
@@ -55,8 +56,9 @@ class WorkOrderController extends Controller
         $customers = Customer::orderBy('name')->get();
         $categories = ServiceCategory::active()->orderBy('name')->get();
         $types = \App\Models\WorkOrderType::active()->orderBy('name')->get();
+        $vendors = Vendor::active()->orderBy('name')->get();
 
-        return view('admin.work-orders.create', compact('customers', 'categories', 'types'));
+        return view('admin.work-orders.create', compact('customers', 'categories', 'types', 'vendors'));
     }
 
     public function store(StoreWorkOrderRequest $request)
@@ -75,6 +77,7 @@ class WorkOrderController extends Controller
     {
         $workOrder->load([
             'customer',
+            'vendor',
             'serviceCategory',
             'creator',
             'items',
@@ -103,8 +106,9 @@ class WorkOrderController extends Controller
         $customers = Customer::orderBy('name')->get();
         $categories = ServiceCategory::active()->orderBy('name')->get();
         $types = \App\Models\WorkOrderType::active()->orderBy('name')->get();
+        $vendors = Vendor::active()->orderBy('name')->get();
 
-        return view('admin.work-orders.edit', compact('workOrder', 'customers', 'categories', 'types'));
+        return view('admin.work-orders.edit', compact('workOrder', 'customers', 'categories', 'types', 'vendors'));
     }
 
     public function update(UpdateWorkOrderRequest $request, WorkOrder $workOrder)

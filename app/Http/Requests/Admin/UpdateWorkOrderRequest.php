@@ -16,6 +16,7 @@ class UpdateWorkOrderRequest extends FormRequest
         $rules = [
             'work_order_type_id' => ['required', 'exists:work_order_types,id'],
             'service_category_id' => ['required', 'exists:service_categories,id'],
+            'vendor_id' => ['nullable', 'exists:vendors,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'location' => ['required', 'string'],
@@ -28,6 +29,7 @@ class UpdateWorkOrderRequest extends FormRequest
             'items.*.quantity' => ['required_with:items', 'integer', 'min:1'],
             'items.*.unit' => ['nullable', 'string', 'max:50'],
             'items.*.unit_price' => ['required_with:items', 'numeric', 'min:0'],
+            'items.*.vendor_unit_price' => ['nullable', 'numeric', 'min:0'],
         ];
 
         // admin cannot edit customer, so customer_id is not required from request if role is admin

@@ -16,6 +16,7 @@ class WorkOrderItem extends Model
         'quantity',
         'unit',
         'unit_price',
+        'vendor_unit_price',
         'total_price',
         'notes',
     ];
@@ -24,6 +25,7 @@ class WorkOrderItem extends Model
     {
         return [
             'unit_price' => 'decimal:2',
+            'vendor_unit_price' => 'decimal:2',
             'total_price' => 'decimal:2',
         ];
     }

@@ -69,6 +69,12 @@
                     <i class="bi bi-gear-wide-connected me-2"></i>Tipe Pekerjaan
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('admin.vendors.*') ? 'active' : '' }}"
+                    href="{{ route('admin.vendors.index') }}">
+                    <i class="bi bi-building me-2"></i>Vendor
+                </a>
+            </li>
             <li class="nav-section-label">Transaksi</li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.invoices.*') ? 'active' : '' }}"
@@ -86,6 +92,12 @@
                 <a class="nav-link {{ request()->routeIs('admin.finance.*') ? 'active' : '' }}"
                     href="{{ route('admin.finance.index') }}">
                     <i class="bi bi-cash-stack me-2"></i>Keuangan
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('admin.vendor-invoices.*') ? 'active' : '' }}"
+                    href="{{ route('admin.vendor-invoices.create') }}">
+                    <i class="bi bi-file-earmark-text me-2"></i>Invoice Vendor
                 </a>
             </li>
 

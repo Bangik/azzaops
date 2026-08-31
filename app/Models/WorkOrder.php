@@ -19,6 +19,7 @@ class WorkOrder extends Model
         'wo_number',
         'work_order_type_id',
         'customer_id',
+        'vendor_id',
         'service_category_id',
         'title',
         'description',
@@ -61,6 +62,11 @@ class WorkOrder extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function vendor(): BelongsTo
+    {
+        return $this->belongsTo(Vendor::class);
     }
 
     public function serviceCategory(): BelongsTo
@@ -139,6 +145,11 @@ class WorkOrder extends Model
 
     public function getTotalAttribute(): float
     {
-        return $this->items->sum(fn ($item) => $item->quantity * $item->unit_price);
+        return $this->items->sum(fn($item) => $item->quantity * $item->unit_price);
+    }
+
+    public function getVendorTotalAttribute(): float
+    {
+        return $this->items->sum(fn($item) => $item->quantity * ($item->vendor_unit_price ?? 0));
     }
 }

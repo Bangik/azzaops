@@ -93,6 +93,8 @@ PT. Azza Karunia Jaya adalah perusahaan jasa instalasi, perawatan, dan servis AC
 | AD-01 | Sebagai Admin, saya dapat mengelola data customer (tambah, edit, lihat, hapus) termasuk data perusahaan untuk customer B2B | Must     |
 | AD-02 | Sebagai Admin, saya dapat mengelola kategori jasa/service (AC Residential, AC Komersial, Elektronik, dll)                  | Must     |
 | AD-03 | Sebagai Admin, saya dapat melihat daftar teknisi beserta status ketersediaannya                                            | Must     |
+| AD-24 | Sebagai Admin, saya dapat mengelola data vendor dan mengaitkan Work Order dengan vendor tertentu                           | Must     |
+| AD-25 | Sebagai Admin, saya dapat membuat invoice vendor gabungan berdasarkan vendor dan rentang tanggal pengerjaan                | Must     |
 
 **Work Order:**
 
@@ -319,6 +321,7 @@ Tabel utama pekerjaan.
 | wo_number           | VARCHAR(50)                                                                                                                    | NO       |                   | Nomor WO unik, format: WO-YYYYMMDD-XXXX                   |
 | work_order_type_id  | BIGINT UNSIGNED                                                                                                                | NO       |                   | FK → work_order_types.id                                  |
 | customer_id         | BIGINT UNSIGNED                                                                                                                | NO       |                   | FK → customers.id                                         |
+| vendor_id           | BIGINT UNSIGNED                                                                                                                | YES      | NULL              | FK → vendors.id, jika WO berasal dari vendor              |
 | service_category_id | BIGINT UNSIGNED                                                                                                                | NO       |                   | FK → service_categories.id                                |
 | title               | VARCHAR(255)                                                                                                                   | NO       |                   | Judul singkat pekerjaan                                   |
 | description         | TEXT                                                                                                                           | YES      | NULL              | Deskripsi/detail pekerjaan                                |
@@ -339,7 +342,7 @@ Tabel utama pekerjaan.
 | updated_at          | TIMESTAMP                                                                                                                      | NO       | CURRENT_TIMESTAMP |                                                           |
 
 **Index:** `UNIQUE(wo_number)`, `INDEX(status)`, `INDEX(customer_id)`, `INDEX(scheduled_date)`, `INDEX(parent_wo_id)`, `INDEX(job_order)`  
-**Foreign Key:** `customer_id → customers(id)`, `service_category_id → service_categories(id)`, `created_by → users(id)`, `parent_wo_id → work_orders(id) ON DELETE SET NULL`, `work_order_type_id → work_order_types(id)`
+**Foreign Key:** `customer_id → customers(id)`, `vendor_id → vendors(id) ON DELETE SET NULL`, `service_category_id → service_categories(id)`, `created_by → users(id)`, `parent_wo_id → work_orders(id) ON DELETE SET NULL`, `work_order_type_id → work_order_types(id)`
 
 ---
 
@@ -363,20 +366,43 @@ Daftar tipe pekerjaan dinamis.
 
 Detail item/jasa dalam work order (material, jasa, sparepart).
 
-| Kolom         | Tipe            | Nullable | Default           | Keterangan                                    |
-| ------------- | --------------- | -------- | ----------------- | --------------------------------------------- |
-| id            | BIGINT UNSIGNED | NO       | AUTO_INCREMENT    | PK                                            |
-| work_order_id | BIGINT UNSIGNED | NO       |                   | FK → work_orders.id                           |
-| description   | VARCHAR(255)    | NO       |                   | Deskripsi item (jasa cuci AC, freon R32, dll) |
-| quantity      | INT             | NO       | 1                 | Jumlah                                        |
-| unit          | VARCHAR(50)     | YES      | NULL              | Satuan (unit, meter, set, dll)                |
-| unit_price    | DECIMAL(15,2)   | NO       | 0                 | Harga satuan                                  |
-| total_price   | DECIMAL(15,2)   | NO       | 0                 | quantity × unit_price                         |
-| notes         | TEXT            | YES      | NULL              |                                               |
-| created_at    | TIMESTAMP       | NO       | CURRENT_TIMESTAMP |                                               |
-| updated_at    | TIMESTAMP       | NO       | CURRENT_TIMESTAMP |                                               |
+| Kolom             | Tipe            | Nullable | Default           | Keterangan                                    |
+| ----------------- | --------------- | -------- | ----------------- | --------------------------------------------- |
+| id                | BIGINT UNSIGNED | NO       | AUTO_INCREMENT    | PK                                            |
+| work_order_id     | BIGINT UNSIGNED | NO       |                   | FK → work_orders.id                           |
+| description       | VARCHAR(255)    | NO       |                   | Deskripsi item (jasa cuci AC, freon R32, dll) |
+| quantity          | INT             | NO       | 1                 | Jumlah                                        |
+| unit              | VARCHAR(50)     | YES      | NULL              | Satuan (unit, meter, set, dll)                |
+| unit_price        | DECIMAL(15,2)   | NO       | 0                 | Harga satuan                                  |
+| vendor_unit_price | DECIMAL(15,2)   | YES      | NULL              | Harga vendor, terpisah dari harga customer    |
+| total_price       | DECIMAL(15,2)   | NO       | 0                 | quantity × unit_price                         |
+| notes             | TEXT            | YES      | NULL              |                                               |
+| created_at        | TIMESTAMP       | NO       | CURRENT_TIMESTAMP |                                               |
+| updated_at        | TIMESTAMP       | NO       | CURRENT_TIMESTAMP |                                               |
 
 **Foreign Key:** `work_order_id → work_orders(id) ON DELETE CASCADE`
+
+---
+
+#### `vendors`
+
+Master vendor yang memiliki customer dan menggunakan teknisi perusahaan.
+
+| Kolom      | Tipe            | Nullable | Default           | Keterangan            |
+| ---------- | --------------- | -------- | ----------------- | --------------------- |
+| id         | BIGINT UNSIGNED | NO       | AUTO_INCREMENT    | PK                    |
+| name       | VARCHAR(255)    | NO       |                   | Nama vendor           |
+| phone      | VARCHAR(20)     | YES      | NULL              | Nomor telepon vendor  |
+| email      | VARCHAR(255)    | YES      | NULL              | Email vendor          |
+| address    | TEXT            | YES      | NULL              | Alamat vendor         |
+| notes      | TEXT            | YES      | NULL              | Catatan tambahan      |
+| is_active  | BOOLEAN         | NO       | TRUE              | Status aktif/nonaktif |
+| created_at | TIMESTAMP       | NO       | CURRENT_TIMESTAMP |                       |
+| updated_at | TIMESTAMP       | NO       | CURRENT_TIMESTAMP |                       |
+
+**Foreign Key:** `work_orders.vendor_id → vendors(id) ON DELETE SET NULL`
+
+Vendor bersifat opsional pada Work Order. Jika `vendor_id` terisi, WO dikelompokkan sebagai pekerjaan vendor. Harga penagihan vendor disimpan pada `work_order_items.vendor_unit_price`, terpisah dari harga customer langsung `unit_price`.
 
 ---
 
@@ -1462,6 +1488,14 @@ Pagination {
 - Bisa tambah/edit/hapus item
 - Isi diskon, pajak
 - Preview sebelum simpan
+
+**Invoice Vendor Gabungan:**
+
+- Pilih vendor dan rentang tanggal berdasarkan `scheduled_date` Work Order
+- Menggabungkan beberapa Work Order vendor ke satu PDF
+- Menggunakan `vendor_unit_price` sebagai harga penagihan vendor
+- PDF berisi ringkasan invoice vendor dan laporan teknisi dari seluruh Work Order terpilih
+- Invoice customer per Work Order tetap terpisah dan tidak berubah
 
 **Invoice PDF:**
 

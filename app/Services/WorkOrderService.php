@@ -29,6 +29,7 @@ class WorkOrderService
                 'wo_number' => $woNumber,
                 'work_order_type_id' => $data['work_order_type_id'] ?? $data['type'] ?? 1,
                 'customer_id' => $data['customer_id'],
+                'vendor_id' => $data['vendor_id'] ?? null,
                 'service_category_id' => $data['service_category_id'],
                 'title' => $data['title'],
                 'description' => $data['description'] ?? null,
@@ -52,6 +53,7 @@ class WorkOrderService
                             'quantity' => $qty,
                             'unit' => $item['unit'] ?? null,
                             'unit_price' => $price,
+                            'vendor_unit_price' => $item['vendor_unit_price'] ?? null,
                             'total_price' => $qty * $price,
                             'notes' => $item['notes'] ?? null,
                         ]);
@@ -131,6 +133,7 @@ class WorkOrderService
             $workOrder->update([
                 'work_order_type_id' => $data['work_order_type_id'] ?? $workOrder->work_order_type_id,
                 'customer_id' => $data['customer_id'],
+                'vendor_id' => $data['vendor_id'] ?? null,
                 'service_category_id' => $data['service_category_id'],
                 'title' => $data['title'],
                 'description' => $data['description'] ?? null,
@@ -153,6 +156,7 @@ class WorkOrderService
                             'quantity' => $qty,
                             'unit' => $item['unit'] ?? null,
                             'unit_price' => $price,
+                            'vendor_unit_price' => $item['vendor_unit_price'] ?? null,
                             'total_price' => $qty * $price,
                             'notes' => $item['notes'] ?? null,
                         ]);

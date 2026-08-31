@@ -16,6 +16,7 @@ class StoreWorkOrderRequest extends FormRequest
         return [
             'work_order_type_id' => ['required', 'exists:work_order_types,id'],
             'customer_id' => ['required', 'exists:customers,id'],
+            'vendor_id' => ['nullable', 'exists:vendors,id'],
             'service_category_id' => ['required', 'exists:service_categories,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -29,6 +30,7 @@ class StoreWorkOrderRequest extends FormRequest
             'items.*.quantity' => ['required_with:items', 'integer', 'min:1'],
             'items.*.unit' => ['nullable', 'string', 'max:50'],
             'items.*.unit_price' => ['required_with:items', 'numeric', 'min:0'],
+            'items.*.vendor_unit_price' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 

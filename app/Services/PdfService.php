@@ -7,6 +7,7 @@ use App\Models\Rab;
 use App\Models\Setting;
 use App\Models\WorkOrder;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class PdfService
 {
@@ -63,6 +64,21 @@ class PdfService
             ->setPaper('a4', 'portrait');
 
         return $pdf;
+    }
+
+    public function generateVendorInvoicePdf($vendor, $workOrders, string $from, string $to)
+    {
+        $settings = $this->getCompanySettings();
+        $workOrders->loadMissing(['customer', 'items', 'assignments.technician', 'reports.technician', 'reports.photos']);
+
+        return Pdf::loadView('pdf.vendor_invoice', [
+            'vendor' => $vendor,
+            'workOrders' => $workOrders,
+            'from' => Carbon::parse($from),
+            'to' => Carbon::parse($to),
+            'total' => $workOrders->sum(fn($workOrder) => $workOrder->vendor_total),
+            'settings' => $settings,
+        ])->setPaper('a4', 'portrait');
     }
 
     private function getCompanySettings(): array

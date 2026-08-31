@@ -72,6 +72,10 @@
                             <div class="text-muted small">Kategori Layanan</div>
                             <div class="fw-semibold">{{ $workOrder->serviceCategory->name }}</div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="text-muted small">Vendor</div>
+                            <div class="fw-semibold">{{ $workOrder->vendor?->name ?? 'Customer langsung' }}</div>
+                        </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">

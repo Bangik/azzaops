@@ -4,191 +4,250 @@
 @section('page-title', 'Buat Work Order Baru')
 
 @section('content')
-<div class="card">
-    <div class="card-body">
-        <form action="{{ route('admin.work-orders.store') }}" method="POST">
-            @csrf
-            
-            <h5 class="card-title mb-3 border-bottom pb-2">Informasi Pekerjaan</h5>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="customer_id" class="form-label">Customer</label>
-                    <select class="form-select @error('customer_id') is-invalid @enderror" id="customer_id" name="customer_id" required>
-                        <option value="">Pilih Customer</option>
-                        @foreach($customers as $customer)
-                            <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
-                                {{ $customer->display_name }} ({{ $customer->phone }})
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('customer_id')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
+    <div class="card">
+        <div class="card-body">
+            <form action="{{ route('admin.work-orders.store') }}" method="POST">
+                @csrf
 
-                <div class="col-md-6 mb-3">
-                    <label for="service_category_id" class="form-label">Kategori Layanan</label>
-                    <select class="form-select @error('service_category_id') is-invalid @enderror" id="service_category_id" name="service_category_id" required>
-                        <option value="">Pilih Kategori</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ old('service_category_id') == $category->id ? 'selected' : '' }}>
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('service_category_id')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label for="work_order_type_id" class="form-label">Tipe Pekerjaan</label>
-                    <select class="form-select @error('work_order_type_id') is-invalid @enderror" id="work_order_type_id" name="work_order_type_id" required>
-                        @foreach($types as $type)
-                            <option value="{{ $type->id }}" {{ old('work_order_type_id') == $type->id ? 'selected' : '' }}>
-                                {{ $type->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('work_order_type_id')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label for="scheduled_date" class="form-label">Tanggal Rencana</label>
-                    <input type="text" class="form-control datepicker @error('scheduled_date') is-invalid @enderror" id="scheduled_date" name="scheduled_date" value="{{ old('scheduled_date', now()->format('Y-m-d')) }}">
-                    @error('scheduled_date')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label for="scheduled_time" class="form-label">Jam Rencana</label>
-                    <input type="time" class="form-control @error('scheduled_time') is-invalid @enderror" id="scheduled_time" name="scheduled_time" value="{{ old('scheduled_time') }}">
-                    @error('scheduled_time')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label for="job_order" class="form-label">Urutan Pekerjaan</label>
-                    <input type="number" class="form-control @error('job_order') is-invalid @enderror" id="job_order" name="job_order" value="{{ old('job_order') }}" min="0" placeholder="Urutan (contoh: 1)">
-                    @error('job_order')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="col-md-12 mb-3">
-                    <label for="title" class="form-label">Judul Singkat Pekerjaan</label>
-                    <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title') }}" placeholder="Contoh: Perbaikan AC Bocor, Cuci AC 2 Unit" required>
-                    @error('title')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="col-md-12 mb-3">
-                    <label for="location" class="form-label">Alamat Lengkap Lokasi</label>
-                    <textarea class="form-control @error('location') is-invalid @enderror" id="location" name="location" rows="2" placeholder="Gunakan alamat lengkap pengerjaan di sini" required>{{ old('location') }}</textarea>
-                    @error('location')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="col-md-12 mb-3">
-                    <label for="gmaps_link" class="form-label">Link Google Maps Lokasi (Opsional)</label>
-                    <input type="text" class="form-control @error('gmaps_link') is-invalid @enderror" id="gmaps_link" name="gmaps_link" value="{{ old('gmaps_link') }}" placeholder="https://maps.google.com/?q=...">
-                    @error('gmaps_link')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="col-md-12 mb-3">
-                    <label for="description" class="form-label">Deskripsi & Keluhan Detail</label>
-                    <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="3" placeholder="Tulis keluhan lengkap dari customer...">{{ old('description') }}</textarea>
-                    @error('description')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-
-            <h5 class="card-title mt-4 mb-3 border-bottom pb-2 d-flex justify-content-between align-items-center">
-                <span>Daftar Pekerjaan / Jasa & Material</span>
-                <button type="button" class="btn btn-outline-primary btn-sm" id="btn-add-item">
-                    <i class="bi bi-plus"></i> Tambah Item
-                </button>
-            </h5>
-            <div class="table-responsive">
-                <table class="table table-bordered align-middle" id="items-table">
-                    <thead class="table-light text-center">
-                        <tr>
-                            <th style="width: 45%;">Deskripsi Jasa / Barang</th>
-                            <th style="width: 12%;">Qty</th>
-                            <th style="width: 15%;">Satuan</th>
-                            <th style="width: 20%;">Harga Satuan</th>
-                            <th style="width: 8%;">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="items-container">
-                        @if(old('items'))
-                            @foreach(old('items') as $index => $item)
-                            <tr class="item-row">
-                                <td>
-                                    <input type="text" class="form-control form-control-sm @error("items.$index.description") is-invalid @enderror" name="items[{{ $index }}][description]" value="{{ $item['description'] }}" required>
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control form-control-sm text-center quantity-field" name="items[{{ $index }}][quantity]" value="{{ $item['quantity'] }}" min="1" required>
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control form-control-sm text-center" name="items[{{ $index }}][unit]" value="{{ $item['unit'] }}" placeholder="unit, set, m">
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control form-control-sm text-end price-field" name="items[{{ $index }}][unit_price]" value="{{ $item['unit_price'] }}" min="0" required>
-                                </td>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item"><i class="bi bi-trash"></i></button>
-                                </td>
-                            </tr>
+                <h5 class="card-title mb-3 border-bottom pb-2">Informasi Pekerjaan</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="customer_id" class="form-label">Customer</label>
+                        <select class="form-select @error('customer_id') is-invalid @enderror" id="customer_id"
+                            name="customer_id" required>
+                            <option value="">Pilih Customer</option>
+                            @foreach ($customers as $customer)
+                                <option value="{{ $customer->id }}"
+                                    {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
+                                    {{ $customer->display_name }} ({{ $customer->phone }})
+                                </option>
                             @endforeach
-                        @else
-                            <tr class="item-row">
-                                <td>
-                                    <input type="text" class="form-control form-control-sm" name="items[0][description]" placeholder="Jasa pengecekan / cuci AC / sparepart" required>
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control form-control-sm text-center quantity-field" name="items[0][quantity]" value="1" min="1" required>
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control form-control-sm text-center" name="items[0][unit]" placeholder="unit, set, m">
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control form-control-sm text-end price-field" name="items[0][unit_price]" value="0" min="0" required>
-                                </td>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item" disabled><i class="bi bi-trash"></i></button>
-                                </td>
-                            </tr>
-                        @endif
-                    </tbody>
-                </table>
-            </div>
+                        </select>
+                        @error('customer_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
-            <div class="mt-4">
-                <button type="submit" class="btn btn-primary px-4">Buat Work Order</button>
-                <a href="{{ route('admin.work-orders.index') }}" class="btn btn-secondary">Batal</a>
-            </div>
-        </form>
+                    <div class="col-md-6 mb-3">
+                        <label for="service_category_id" class="form-label">Kategori Layanan</label>
+                        <select class="form-select @error('service_category_id') is-invalid @enderror"
+                            id="service_category_id" name="service_category_id" required>
+                            <option value="">Pilih Kategori</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}"
+                                    {{ old('service_category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('service_category_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="vendor_id" class="form-label">Vendor (Opsional)</label>
+                        <select class="form-select @error('vendor_id') is-invalid @enderror" id="vendor_id"
+                            name="vendor_id">
+                            <option value="">Customer langsung</option>
+                            @foreach ($vendors as $vendor)
+                                <option value="{{ $vendor->id }}" @selected(old('vendor_id') == $vendor->id)>{{ $vendor->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('vendor_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="work_order_type_id" class="form-label">Tipe Pekerjaan</label>
+                        <select class="form-select @error('work_order_type_id') is-invalid @enderror"
+                            id="work_order_type_id" name="work_order_type_id" required>
+                            @foreach ($types as $type)
+                                <option value="{{ $type->id }}"
+                                    {{ old('work_order_type_id') == $type->id ? 'selected' : '' }}>
+                                    {{ $type->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('work_order_type_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="scheduled_date" class="form-label">Tanggal Rencana</label>
+                        <input type="text" class="form-control datepicker @error('scheduled_date') is-invalid @enderror"
+                            id="scheduled_date" name="scheduled_date"
+                            value="{{ old('scheduled_date', now()->format('Y-m-d')) }}">
+                        @error('scheduled_date')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="scheduled_time" class="form-label">Jam Rencana</label>
+                        <input type="time" class="form-control @error('scheduled_time') is-invalid @enderror"
+                            id="scheduled_time" name="scheduled_time" value="{{ old('scheduled_time') }}">
+                        @error('scheduled_time')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="job_order" class="form-label">Urutan Pekerjaan</label>
+                        <input type="number" class="form-control @error('job_order') is-invalid @enderror" id="job_order"
+                            name="job_order" value="{{ old('job_order') }}" min="0"
+                            placeholder="Urutan (contoh: 1)">
+                        @error('job_order')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label for="title" class="form-label">Judul Singkat Pekerjaan</label>
+                        <input type="text" class="form-control @error('title') is-invalid @enderror" id="title"
+                            name="title" value="{{ old('title') }}"
+                            placeholder="Contoh: Perbaikan AC Bocor, Cuci AC 2 Unit" required>
+                        @error('title')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label for="location" class="form-label">Alamat Lengkap Lokasi</label>
+                        <textarea class="form-control @error('location') is-invalid @enderror" id="location" name="location" rows="2"
+                            placeholder="Gunakan alamat lengkap pengerjaan di sini" required>{{ old('location') }}</textarea>
+                        @error('location')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label for="gmaps_link" class="form-label">Link Google Maps Lokasi (Opsional)</label>
+                        <input type="text" class="form-control @error('gmaps_link') is-invalid @enderror" id="gmaps_link"
+                            name="gmaps_link" value="{{ old('gmaps_link') }}" placeholder="https://maps.google.com/?q=...">
+                        @error('gmaps_link')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label for="description" class="form-label">Deskripsi & Keluhan Detail</label>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description"
+                            rows="3" placeholder="Tulis keluhan lengkap dari customer...">{{ old('description') }}</textarea>
+                        @error('description')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <h5 class="card-title mt-4 mb-3 border-bottom pb-2 d-flex justify-content-between align-items-center">
+                    <span>Daftar Pekerjaan / Jasa & Material</span>
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="btn-add-item">
+                        <i class="bi bi-plus"></i> Tambah Item
+                    </button>
+                </h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle" id="items-table">
+                        <thead class="table-light text-center">
+                            <tr>
+                                <th style="width: 45%;">Deskripsi Jasa / Barang</th>
+                                <th style="width: 12%;">Qty</th>
+                                <th style="width: 15%;">Satuan</th>
+                                <th style="width: 20%;">Harga Satuan</th>
+                                <th style="width: 20%;">Harga Vendor</th>
+                                <th style="width: 8%;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="items-container">
+                            @if (old('items'))
+                                @foreach (old('items') as $index => $item)
+                                    <tr class="item-row">
+                                        <td>
+                                            <input type="text"
+                                                class="form-control form-control-sm @error("items.$index.description") is-invalid @enderror"
+                                                name="items[{{ $index }}][description]"
+                                                value="{{ $item['description'] }}" required>
+                                        </td>
+                                        <td>
+                                            <input type="number"
+                                                class="form-control form-control-sm text-center quantity-field"
+                                                name="items[{{ $index }}][quantity]"
+                                                value="{{ $item['quantity'] }}" min="1" required>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control form-control-sm text-center"
+                                                name="items[{{ $index }}][unit]" value="{{ $item['unit'] }}"
+                                                placeholder="unit, set, m">
+                                        </td>
+                                        <td>
+                                            <input type="number"
+                                                class="form-control form-control-sm text-end price-field"
+                                                name="items[{{ $index }}][unit_price]"
+                                                value="{{ $item['unit_price'] }}" min="0" required>
+                                        </td>
+                                        <td><input type="number" class="form-control form-control-sm text-end"
+                                                name="items[{{ $index }}][vendor_unit_price]"
+                                                value="{{ $item['vendor_unit_price'] ?? '' }}" min="0"
+                                                placeholder="Opsional"></td>
+                                        <td class="text-center">
+                                            <button type="button"
+                                                class="btn btn-sm btn-outline-danger btn-remove-item"><i
+                                                    class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr class="item-row">
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm"
+                                            name="items[0][description]"
+                                            placeholder="Jasa pengecekan / cuci AC / sparepart" required>
+                                    </td>
+                                    <td>
+                                        <input type="number"
+                                            class="form-control form-control-sm text-center quantity-field"
+                                            name="items[0][quantity]" value="1" min="1" required>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm text-center"
+                                            name="items[0][unit]" placeholder="unit, set, m">
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm text-end price-field"
+                                            name="items[0][unit_price]" value="0" min="0" required>
+                                    </td>
+                                    <td><input type="number" class="form-control form-control-sm text-end"
+                                            name="items[0][vendor_unit_price]" min="0" placeholder="Opsional">
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item"
+                                            disabled><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary px-4">Buat Work Order</button>
+                    <a href="{{ route('admin.work-orders.index') }}" class="btn btn-secondary">Batal</a>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')
-<script>
-    $(function() {
-        let itemIndex = $('#items-container tr').length;
+    <script>
+        $(function() {
+            let itemIndex = $('#items-container tr').length;
 
-        $('#btn-add-item').on('click', function() {
-            let newRow = `
+            $('#btn-add-item').on('click', function() {
+                let newRow = `
             <tr class="item-row">
                 <td>
                     <input type="text" class="form-control form-control-sm" name="items[${itemIndex}][description]" placeholder="Jasa pengecekan / cuci AC / sparepart" required>
@@ -202,31 +261,32 @@
                 <td>
                     <input type="number" class="form-control form-control-sm text-end price-field" name="items[${itemIndex}][unit_price]" value="0" min="0" required>
                 </td>
+                <td><input type="number" class="form-control form-control-sm text-end" name="items[${itemIndex}][vendor_unit_price]" min="0" placeholder="Opsional"></td>
                 <td class="text-center">
                     <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item"><i class="bi bi-trash"></i></button>
                 </td>
             </tr>`;
-            
-            $('#items-container').append(newRow);
-            itemIndex++;
-            toggleRemoveButtons();
-        });
 
-        $('#items-container').on('click', '.btn-remove-item', function() {
-            $(this).closest('tr').remove();
-            toggleRemoveButtons();
-        });
+                $('#items-container').append(newRow);
+                itemIndex++;
+                toggleRemoveButtons();
+            });
 
-        function toggleRemoveButtons() {
-            let rows = $('#items-container tr').length;
-            if (rows <= 1) {
-                $('#items-container .btn-remove-item').attr('disabled', true);
-            } else {
-                $('#items-container .btn-remove-item').removeAttr('disabled');
+            $('#items-container').on('click', '.btn-remove-item', function() {
+                $(this).closest('tr').remove();
+                toggleRemoveButtons();
+            });
+
+            function toggleRemoveButtons() {
+                let rows = $('#items-container tr').length;
+                if (rows <= 1) {
+                    $('#items-container .btn-remove-item').attr('disabled', true);
+                } else {
+                    $('#items-container .btn-remove-item').removeAttr('disabled');
+                }
             }
-        }
-        
-        toggleRemoveButtons();
-    });
-</script>
+
+            toggleRemoveButtons();
+        });
+    </script>
 @endpush

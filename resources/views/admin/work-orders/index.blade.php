@@ -74,6 +74,7 @@
                             <th>No. WO</th>
                             <th>Tipe</th>
                             <th>Customer</th>
+                            <th>Vendor</th>
                             <th>Kategori</th>
                             <th>Tanggal/Jam Rencana</th>
                             <th>Urutan</th>
@@ -98,6 +99,7 @@
                                         <div class="text-muted small">{{ $wo->customer->company_name }}</div>
                                     @endif
                                 </td>
+                                <td>{{ $wo->vendor?->name ?? '-' }}</td>
                                 <td>{{ $wo->serviceCategory->name }}</td>
                                 <td>
                                     {{ $wo->scheduled_date ? $wo->scheduled_date->format('d/m/Y') : '-' }}
