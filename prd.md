@@ -485,7 +485,7 @@ Tabel invoice tagihan ke customer.
 | discount_type        | VARCHAR(10)                             | NO       | 'fixed'           | Tipe diskon: 'percent' atau 'fixed'           |
 | discount_value       | DECIMAL(15,2)                           | NO       | 0                 | Nilai input diskon                            |
 | tax_percentage       | DECIMAL(5,2)                            | NO       | 0                 | Persentase PPN                                |
-| tax_amount           | DECIMAL(15,2)                           | NO       | 0                 | Nominal PPN (memotong pokok)                  |
+| tax_amount           | DECIMAL(15,2)                           | NO       | 0                 | Nominal PPN (dihitung dari subtotal)         |
 | total                | DECIMAL(15,2)                           | NO       | 0                 | Grand total                                   |
 | status               | ENUM('draft','sent','paid','cancelled') | NO       | 'draft'           | Status invoice                                |
 | payment_status       | ENUM('unpaid','partial','paid')         | NO       | 'unpaid'          | Status pembayaran                             |
@@ -1280,16 +1280,20 @@ GET /api/v1/notifications/unread-count
 
 ```
 GET /api/v1/dashboard
+  Query:    { date?: string } (Format YYYY-MM-DD, default: hari ini)
   Response: {
-    today_assignments: int,
-    pending_assignments: int,
-    completed_today: int,
-    total_completed: int,
+    date: string,
+    my_total_work_orders: int,        // 1. Angka semua pekerjaan teknisi login pada tanggal filter
+    all_total_work_orders: int,       // 2. Angka seluruh pekerjaan di sistem pada tanggal filter
+    my_completed_work_orders: int,    // 3. Angka pekerjaan selesai teknisi login pada tanggal filter
+    all_completed_work_orders: int,   // 4. Angka seluruh pekerjaan selesai di sistem pada tanggal filter
+    today_assignments: int,           // Alias
+    pending_assignments: int,         // Alias
+    completed_today: int,             // Alias
+    total_completed: int,             // Alias
     recent_work_orders: WorkOrder[]
   }
-  Note:     Data disesuaikan per role
-            Teknisi → data dia sendiri
-            Kepala Teknisi → data semua teknisi
+  Note:     Default filter date adalah tanggal hari ini (today) dan mendukung filter parameter date.
 ```
 
 ### 5.8 Data Types Reference
