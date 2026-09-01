@@ -10,7 +10,7 @@
             <p class="text-muted mb-0">{{ $workOrder->title }}</p>
         </div>
         <div class="d-flex gap-2">
-            @if ($workOrder->status === App\Enums\WorkOrderStatus::Reported && !$workOrder->invoice)
+            @if ($workOrder->status === App\Enums\WorkOrderStatus::Reported)
                 <a href="{{ route('admin.invoices.create', ['work_order_id' => $workOrder->id]) }}" class="btn btn-success">
                     <i class="bi bi-receipt me-1"></i> Bikin Invoice
                 </a>
@@ -108,10 +108,13 @@
                         <div class="col-md-6">
                             <div class="text-muted small">Lama Pengerjaan</div>
                             <div class="fw-semibold">
-                                @if($workOrder->duration)
-                                    <span class="badge bg-info text-dark"><i class="bi bi-stopwatch me-1"></i>{{ $workOrder->duration }}</span>
-                                    @if($workOrder->started_at)
-                                        <small class="text-muted d-block mt-1">({{ $workOrder->started_at->format('H:i') }} - {{ $workOrder->completed_at ? $workOrder->completed_at->format('H:i') : 'Sekarang' }})</small>
+                                @if ($workOrder->duration)
+                                    <span class="badge bg-info text-dark"><i
+                                            class="bi bi-stopwatch me-1"></i>{{ $workOrder->duration }}</span>
+                                    @if ($workOrder->started_at)
+                                        <small class="text-muted d-block mt-1">({{ $workOrder->started_at->format('H:i') }}
+                                            -
+                                            {{ $workOrder->completed_at ? $workOrder->completed_at->format('H:i') : 'Sekarang' }})</small>
                                     @endif
                                 @else
                                     <span class="text-muted">-</span>
@@ -200,7 +203,8 @@
                                         <span class="text-muted small"> |
                                             {{ $report->submitted_at->format('d/m/Y H:i') }}</span>
                                     </div>
-                                    <button type="button" class="btn btn-xs btn-outline-warning" data-bs-toggle="collapse"
+                                    <button type="button" class="btn btn-xs btn-outline-warning"
+                                        data-bs-toggle="collapse"
                                         data-bs-target="#editReportCollapse-{{ $report->id }}" title="Edit Laporan"
                                         style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
                                         <i class="bi bi-pencil"></i> Edit Laporan
