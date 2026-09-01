@@ -10,8 +10,8 @@
             <p class="text-muted mb-0">{{ $workOrder->title }}</p>
         </div>
         <div class="d-flex gap-2">
-            @if (!$workOrder->invoice)
-                <a href="{{ route('admin.invoices.create', ['work_order_id' => $workOrder->id]) }}" class="btn btn-primary">
+            @if ($workOrder->status === App\Enums\WorkOrderStatus::Reported && !$workOrder->invoice)
+                <a href="{{ route('admin.invoices.create', ['work_order_id' => $workOrder->id]) }}" class="btn btn-success">
                     <i class="bi bi-receipt me-1"></i> Bikin Invoice
                 </a>
             @endif

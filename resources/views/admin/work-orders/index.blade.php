@@ -126,9 +126,9 @@
                                             class="btn btn-sm btn-info text-white btn-action" title="Detail">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        @if (!$wo->invoice)
+                                        @if ($wo->status === App\Enums\WorkOrderStatus::Reported && !$wo->invoice)
                                             <a href="{{ route('admin.invoices.create', ['work_order_id' => $wo->id]) }}"
-                                                class="btn btn-sm btn-primary btn-action" title="Generate Invoice">
+                                                class="btn btn-sm btn-success btn-action" title="Bikin Invoice">
                                                 <i class="bi bi-receipt"></i>
                                             </a>
                                         @endif
