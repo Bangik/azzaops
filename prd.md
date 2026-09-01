@@ -1155,18 +1155,17 @@ GET /api/app-version/latest
 
 ```
 GET /api/v1/work-orders
-  Query:    { status?: string, date?: string, page?: int, per_page?: int }
+  Query:    { status?: string, date?: string (default: today / 'YYYY-MM-DD' atau 'all'), page?: int, per_page?: int }
   Response: { data: WorkOrder[], meta: Pagination }
-  Note:     Teknisi → hanya WO yang di-assign ke dia
-            Kepala Teknisi → semua WO yang status >= 'pending'
+  Note:     Menampilkan seluruh WO transparan ke semua akun (default filter tanggal hari ini)
 
 GET /api/v1/work-orders/{id}
   Response: { data: WorkOrder (with customer, items, assignments, reports) }
 
 GET /api/v1/work-orders/today
-  Query:    { page?: int, per_page?: int }
+  Query:    { status?: string, page?: int, per_page?: int }
   Response: { data: WorkOrder[], meta: Pagination }
-  Note:     WO hari ini yang di-assign ke user login
+  Note:     Seluruh WO terjadwal hari ini (today)
 
 GET /api/v1/work-orders/{id}/timeline
   Response: { data: StatusChange[] }

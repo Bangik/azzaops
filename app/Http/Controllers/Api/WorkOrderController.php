@@ -26,22 +26,18 @@ class WorkOrderController extends Controller
 
     public function index(Request $request)
     {
-        $user = $request->user();
         $query = WorkOrder::with(['customer', 'serviceCategory', 'type', 'assignments.technician', 'reports.photos']);
 
-        // If user is technician, only show work orders assigned to them
-        if ($user->role === UserRole::Teknisi) {
-            $query->whereHas('assignments', function ($q) use ($user) {
-                $q->where('technician_id', $user->id);
-            });
+        // Default date filter to today if no date filter is explicitly provided, or allow filtering by specific date
+        $filterDate = $request->filled('date') ? $request->date : today()->toDateString();
+        
+        // If client sends 'all' or empty parameter explicitly to ignore date filter, we can support it, but default is today
+        if ($request->get('date') !== 'all') {
+            $query->whereDate('scheduled_date', $filterDate);
         }
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
-        }
-
-        if ($request->filled('date')) {
-            $query->whereDate('scheduled_date', $request->date);
         }
 
         $workOrders = $query->orderByRaw('CASE WHEN job_order IS NULL THEN 1 ELSE 0 END')
@@ -56,16 +52,8 @@ class WorkOrderController extends Controller
 
     public function today(Request $request)
     {
-        $user = $request->user();
         $query = WorkOrder::with(['customer', 'serviceCategory', 'type', 'assignments.technician', 'reports.photos'])
             ->whereDate('scheduled_date', today());
-
-        // If user is technician, only show work orders assigned to them
-        if ($user->role === UserRole::Teknisi) {
-            $query->whereHas('assignments', function ($q) use ($user) {
-                $q->where('technician_id', $user->id);
-            });
-        }
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
