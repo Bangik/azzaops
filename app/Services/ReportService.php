@@ -64,8 +64,11 @@ class ReportService
                     'completed_at' => now(),
                 ]);
 
-            // Update Work Order Status to reported
-            $workOrder->update(['status' => WorkOrderStatus::Reported]);
+            // Update Work Order Status to reported & set completed_at if not set
+            $workOrder->update([
+                'status' => WorkOrderStatus::Reported,
+                'completed_at' => $workOrder->completed_at ?? now(),
+            ]);
 
             // Find administrators / kepala teknisi to notify
             $managers = \App\Models\User::whereIn('role', [\App\Enums\UserRole::SuperAdmin, \App\Enums\UserRole::Admin, \App\Enums\UserRole::KepalaTeknisi])

@@ -101,6 +101,17 @@
                             </div>
                         </div>
                         <div class="col-md-6">
+                            <div class="text-muted small">Lama Pengerjaan</div>
+                            <div class="fw-semibold">
+                                @if($workOrder->duration)
+                                    <span class="badge bg-info text-dark"><i class="bi bi-stopwatch me-1"></i>{{ $workOrder->duration }}</span>
+                                    @if($workOrder->started_at)
+                                        <small class="text-muted d-block mt-1">({{ $workOrder->started_at->format('H:i') }} - {{ $workOrder->completed_at ? $workOrder->completed_at->format('H:i') : 'Sekarang' }})</small>
+                                    @endif
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
                     <div class="mb-3">

@@ -1321,8 +1321,10 @@ WorkOrder {
   description: string | null
   location: string
   scheduled_date: string | null    // YYYY-MM-DD
-  started_at: string | null        // ISO 8601
-  completed_at: string | null
+  started_at: string | null        // ISO 8601 (waktu mulai pengerjaan teknisi)
+  completed_at: string | null      // ISO 8601 (waktu submit laporan/selesai)
+  duration: string | null          // Lama pengerjaan (misal: "1 jam 30 menit")
+  duration_minutes: number | null  // Lama pengerjaan dalam menit
   status: string                   // enum work_order_status
   scheduled_time: string | null    // HH:mm:ss
   job_order: number | null         // Urutan pengerjaan

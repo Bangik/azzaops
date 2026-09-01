@@ -15,6 +15,11 @@ class WorkOrder extends Model
 {
     use HasFactory;
 
+    protected $appends = [
+        'duration',
+        'duration_minutes',
+    ];
+
     protected $fillable = [
         'wo_number',
         'work_order_type_id',
@@ -151,5 +156,35 @@ class WorkOrder extends Model
     public function getVendorTotalAttribute(): float
     {
         return $this->items->sum(fn($item) => $item->quantity * ($item->vendor_unit_price ?? 0));
+    }
+
+    public function getDurationAttribute(): ?string
+    {
+        if (!$this->started_at) {
+            return null;
+        }
+
+        $endTime = $this->completed_at ?? ($this->status === WorkOrderStatus::Completed || $this->status === WorkOrderStatus::Reported ? $this->updated_at : now());
+        
+        $totalMinutes = (int) $this->started_at->diffInMinutes($endTime);
+        $hours = intdiv($totalMinutes, 60);
+        $minutes = $totalMinutes % 60;
+
+        if ($hours > 0) {
+            return "{$hours} jam {$minutes} menit";
+        }
+
+        return "{$minutes} menit";
+    }
+
+    public function getDurationMinutesAttribute(): ?int
+    {
+        if (!$this->started_at) {
+            return null;
+        }
+
+        $endTime = $this->completed_at ?? ($this->status === WorkOrderStatus::Completed || $this->status === WorkOrderStatus::Reported ? $this->updated_at : now());
+
+        return (int) $this->started_at->diffInMinutes($endTime);
     }
 }
