@@ -64,7 +64,9 @@ class FcmService
             ]
         ];
 
-        $response = Http::withToken($accessToken)
+        $response = Http::timeout(3)
+            ->connectTimeout(2)
+            ->withToken($accessToken)
             ->acceptJson()
             ->post($url, $payload);
 
@@ -107,7 +109,9 @@ class FcmService
             ]
         ];
 
-        $response = Http::withToken($accessToken)
+        $response = Http::timeout(3)
+            ->connectTimeout(2)
+            ->withToken($accessToken)
             ->acceptJson()
             ->post($url, $payload);
 
@@ -150,10 +154,13 @@ class FcmService
             $base64UrlSignature = $this->base64UrlEncode($signature);
             $assertion = $signatureInput . '.' . $base64UrlSignature;
 
-            $response = Http::asForm()->post($tokenUri, [
-                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                'assertion' => $assertion
-            ]);
+            $response = Http::timeout(3)
+                ->connectTimeout(2)
+                ->asForm()
+                ->post($tokenUri, [
+                    'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                    'assertion' => $assertion
+                ]);
 
             if ($response->successful()) {
                 return $response->json('access_token');

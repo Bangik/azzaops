@@ -21,6 +21,16 @@ class ReportService
     public function submit(WorkOrder $workOrder, array $data, int $technicianId): WorkOrderReport
     {
         return DB::transaction(function () use ($workOrder, $data, $technicianId) {
+            // Check if report was already submitted in this same minute or pending duplicate submission
+            $existingReport = WorkOrderReport::where('work_order_id', $workOrder->id)
+                ->where('technician_id', $technicianId)
+                ->where('created_at', '>=', now()->subSeconds(30))
+                ->first();
+
+            if ($existingReport) {
+                return $existingReport;
+            }
+
             // Create Report
             $report = WorkOrderReport::create([
                 'work_order_id' => $workOrder->id,
@@ -75,12 +85,14 @@ class ReportService
                 ->where('is_active', true)
                 ->get();
 
+            $technicianName = \App\Models\User::find($technicianId)?->name ?? 'Teknisi';
+
             foreach ($managers as $manager) {
                 Notification::create([
                     'user_id' => $manager->id,
                     'type' => NotificationType::ReportSubmitted,
                     'title' => 'Laporan Pekerjaan Disubmit',
-                    'body' => "Teknisi " . auth()->user()->name . " telah mengirim laporan untuk " . $workOrder->wo_number,
+                    'body' => "Teknisi " . $technicianName . " telah mengirim laporan untuk " . $workOrder->wo_number,
                     'data' => [
                         'work_order_id' => $workOrder->id,
                         'report_id' => $report->id,
@@ -88,15 +100,19 @@ class ReportService
                 ]);
 
                 if ($manager->fcm_token) {
-                    $this->fcmService->sendToToken(
-                        $manager->fcm_token,
-                        'Laporan Pekerjaan Disubmit',
-                        "Teknisi " . auth()->user()->name . " telah mengirim laporan untuk " . $workOrder->wo_number,
-                        [
-                            'work_order_id' => $workOrder->id,
-                            'report_id' => $report->id,
-                        ]
-                    );
+                    try {
+                        $this->fcmService->sendToToken(
+                            $manager->fcm_token,
+                            'Laporan Pekerjaan Disubmit',
+                            "Teknisi " . $technicianName . " telah mengirim laporan untuk " . $workOrder->wo_number,
+                            [
+                                'work_order_id' => $workOrder->id,
+                                'report_id' => $report->id,
+                            ]
+                        );
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::warning('FCM notification failed: ' . $e->getMessage());
+                    }
                 }
             }
 

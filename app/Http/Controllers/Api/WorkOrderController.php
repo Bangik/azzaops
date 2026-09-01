@@ -29,8 +29,11 @@ class WorkOrderController extends Controller
         $user = $request->user();
         $query = WorkOrder::with(['customer', 'serviceCategory', 'type', 'assignments.technician', 'reports.photos']);
 
-        if ($user->role === UserRole::Teknisi || $user->role === UserRole::KepalaTeknisi) {
-            $query->whereNotIn('status', [WorkOrderStatus::Completed, WorkOrderStatus::Cancelled]);
+        // If user is technician, only show work orders assigned to them
+        if ($user->role === UserRole::Teknisi) {
+            $query->whereHas('assignments', function ($q) use ($user) {
+                $q->where('technician_id', $user->id);
+            });
         }
 
         if ($request->filled('status')) {
@@ -57,8 +60,15 @@ class WorkOrderController extends Controller
         $query = WorkOrder::with(['customer', 'serviceCategory', 'type', 'assignments.technician', 'reports.photos'])
             ->whereDate('scheduled_date', today());
 
-        if ($user->role === UserRole::Teknisi || $user->role === UserRole::KepalaTeknisi) {
-            $query->whereNotIn('status', [WorkOrderStatus::Completed, WorkOrderStatus::Cancelled]);
+        // If user is technician, only show work orders assigned to them
+        if ($user->role === UserRole::Teknisi) {
+            $query->whereHas('assignments', function ($q) use ($user) {
+                $q->where('technician_id', $user->id);
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
         }
 
         $workOrders = $query->orderByRaw('CASE WHEN job_order IS NULL THEN 1 ELSE 0 END')
