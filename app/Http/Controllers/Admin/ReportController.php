@@ -15,6 +15,7 @@ use App\Exports\InvoicesExport;
 use App\Exports\RabsExport;
 use App\Exports\FinanceExport;
 use App\Exports\StaffExport;
+use App\Exports\AttendancesExport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -74,6 +75,14 @@ class ReportController extends Controller
                 ])->orderBy('name')->paginate(20)->withQueryString();
                 break;
 
+            case 'attendance':
+                $query = \App\Models\Attendance::with('user')
+                    ->whereBetween('date', [$from, $to]);
+                if ($techId) $query->where('user_id', $techId);
+                if ($status) $query->where('status', $status);
+                $data = $query->latest('date')->paginate(20)->withQueryString();
+                break;
+
             case 'wo':
             default:
                 $query = WorkOrder::with(['customer', 'serviceCategory', 'type', 'assignments.technician'])
@@ -123,6 +132,9 @@ class ReportController extends Controller
                 break;
             case 'staff':
                 $exportClass = new StaffExport($from, $to);
+                break;
+            case 'attendance':
+                $exportClass = new AttendancesExport($from, $to, $techId, $status);
                 break;
             case 'wo':
             default:

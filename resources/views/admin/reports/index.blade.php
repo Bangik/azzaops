@@ -61,6 +61,12 @@
                 <i class="bi bi-person-badge me-1"></i> Staff
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {{ $type === 'attendance' ? 'active' : '' }}"
+                href="{{ route('admin.reports.index', ['type' => 'attendance', 'from' => $from, 'to' => $to]) }}">
+                <i class="bi bi-calendar-check me-1"></i> Presensi
+            </a>
+        </li>
     </ul>
 
     {{-- Filter Bar --}}
@@ -144,6 +150,29 @@
                 </div>
             @endif
 
+            @if ($type === 'attendance')
+                <div class="col-md-2">
+                    <label class="form-label small">Staff</label>
+                    <select name="technician_id" class="form-select form-select-sm">
+                        <option value="">Semua Staff</option>
+                        @foreach ($technicians as $tech)
+                            <option value="{{ $tech->id }}" @selected($techId == $tech->id)>
+                                {{ $tech->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small">Status</label>
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">Semua Status</option>
+                        @foreach (\App\Enums\AttendanceStatus::cases() as $s)
+                            <option value="{{ $s->value }}" @selected($status === $s->value)>{{ $s->label() }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
+
             <div class="col-md-2 d-grid">
                 <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-funnel me-1"></i> Filter</button>
             </div>
@@ -173,6 +202,10 @@
 
                         @case('staff')
                             Data Kinerja Staff
+                        @break
+
+                        @case('attendance')
+                            Data Laporan Presensi
                         @break
 
                         @default
@@ -357,6 +390,39 @@
                                 <tr>
                                     <td colspan="7" class="text-center py-4 text-muted">Tidak ada data staff ditemukan
                                     </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                @elseif($type === 'attendance')
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Nama Staff</th>
+                                <th>Role</th>
+                                <th>Jam Masuk</th>
+                                <th>Jam Pulang</th>
+                                <th>Status</th>
+                                <th>Durasi</th>
+                                <th>Catatan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($data as $a)
+                                <tr>
+                                    <td>{{ $a->date->format('d/m/Y') }}</td>
+                                    <td class="fw-semibold">{{ $a->user->name }}</td>
+                                    <td><span class="badge text-bg-light border">{{ $a->user->role->label() }}</span></td>
+                                    <td>{{ $a->check_in ?? '-' }}</td>
+                                    <td>{{ $a->check_out ?? '-' }}</td>
+                                    <td><span class="badge bg-{{ $a->status->color() }}">{{ $a->status->label() }}</span></td>
+                                    <td>{{ $a->work_duration ?? '-' }}</td>
+                                    <td>{{ $a->notes ?? '-' }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="text-center py-4 text-muted">Tidak ada data presensi ditemukan</td>
                                 </tr>
                             @endforelse
                         </tbody>

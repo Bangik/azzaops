@@ -75,6 +75,12 @@
                     <i class="bi bi-building me-2"></i>Vendor
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('admin.attendances.my') ? 'active' : '' }}"
+                    href="{{ route('admin.attendances.my') }}">
+                    <i class="bi bi-calendar-check me-2"></i>Presensi
+                </a>
+            </li>
             <li class="nav-section-label">Transaksi</li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.invoices.*') ? 'active' : '' }}"
@@ -113,6 +119,12 @@
                     <a class="nav-link {{ request()->routeIs('admin.devices.*') ? 'active' : '' }}"
                         href="{{ route('admin.devices.index') }}">
                         <i class="bi bi-phone me-2"></i>Device Staff
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.attendances.index') || request()->routeIs('admin.attendances.export') ? 'active' : '' }}"
+                        href="{{ route('admin.attendances.index') }}">
+                        <i class="bi bi-clipboard-data me-2"></i>Log Presensi
                     </a>
                 </li>
                 <li class="nav-item">

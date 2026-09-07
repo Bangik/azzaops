@@ -77,6 +77,11 @@ class User extends Authenticatable
         return $this->hasMany(WorkOrder::class, 'created_by');
     }
 
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
     // === Scopes ===
 
     public function scopeActive(Builder $query): Builder

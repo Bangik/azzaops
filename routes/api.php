@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AssignmentController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\AttendanceController as ApiAttendanceController;
 
 Route::prefix('v1')->name('api.')->group(function () {
     // Auth
@@ -58,6 +59,12 @@ Route::prefix('v1')->name('api.')->group(function () {
 
         // Dashboard
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // Attendance / Presensi
+        Route::get('attendances/today', [ApiAttendanceController::class, 'today'])->name('attendances.today');
+        Route::post('attendances/check-in', [ApiAttendanceController::class, 'checkIn'])->name('attendances.check-in');
+        Route::post('attendances/check-out', [ApiAttendanceController::class, 'checkOut'])->name('attendances.check-out');
+        Route::get('attendances/my-log', [ApiAttendanceController::class, 'myLog'])->name('attendances.my-log');
 
         // User Devices
         Route::post('devices', [\App\Http\Controllers\Api\DeviceController::class, 'upsert'])->name('devices.upsert');

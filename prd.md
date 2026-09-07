@@ -83,6 +83,9 @@ PT. Azza Karunia Jaya adalah perusahaan jasa instalasi, perawatan, dan servis AC
 | SA-05 | Sebagai Super Admin, saya dapat melihat audit log aktivitas user                                                                       | Should   |
 | SA-06 | Sebagai Super Admin, saya dapat mengelola kategori pengeluaran (tambah, edit, aktifkan/nonaktifkan, hapus) untuk pencatatan keuangan   | Must     |
 | SA-07 | Sebagai Super Admin, saya dapat mengelola kategori pemasukan (tambah, edit, aktifkan/nonaktifkan, hapus) untuk pencatatan keuangan     | Must     |
+| SA-08 | Sebagai Super Admin, saya dapat melihat log presensi seluruh staff dengan filter tanggal, staff, dan status                            | Must     |
+| SA-09 | Sebagai Super Admin, saya dapat mengekspor data presensi ke Excel/CSV berdasarkan rentang waktu                                        | Must     |
+| SA-10 | Sebagai Super Admin, saya dapat mengatur jam masuk dan jam pulang kerja untuk sistem presensi                                          | Must     |
 
 ### 2.2 Admin/CS
 
@@ -95,6 +98,8 @@ PT. Azza Karunia Jaya adalah perusahaan jasa instalasi, perawatan, dan servis AC
 | AD-03 | Sebagai Admin, saya dapat melihat daftar teknisi beserta status ketersediaannya                                            | Must     |
 | AD-24 | Sebagai Admin, saya dapat mengelola data vendor dan mengaitkan Work Order dengan vendor tertentu                           | Must     |
 | AD-25 | Sebagai Admin, saya dapat membuat invoice vendor gabungan berdasarkan vendor dan rentang tanggal pengerjaan                | Must     |
+| AD-26 | Sebagai Admin, saya dapat melakukan presensi masuk dan pulang melalui web panel                                            | Must     |
+| AD-27 | Sebagai Admin, saya dapat melihat riwayat presensi saya sendiri                                                            | Must     |
 
 **Work Order:**
 
@@ -160,6 +165,8 @@ PT. Azza Karunia Jaya adalah perusahaan jasa instalasi, perawatan, dan servis AC
 | TK-06 | Sebagai Teknisi, saya dapat upload foto dokumentasi pekerjaan (sebelum & sesudah)                  | Must     |
 | TK-07 | Sebagai Teknisi, saya dapat melihat riwayat pekerjaan yang pernah saya kerjakan                    | Must     |
 | TK-08 | Sebagai Teknisi, saya dapat melihat dan mengelola profil saya                                      | Must     |
+| TK-09 | Sebagai Teknisi, saya dapat melakukan presensi masuk dan pulang melalui aplikasi mobile             | Must     |
+| TK-10 | Sebagai Teknisi, saya dapat melihat riwayat presensi saya sendiri                                  | Must     |
 
 ---
 
@@ -234,6 +241,12 @@ ENUM notification_type:
   'report_submitted'       -- Laporan disubmit
   'invoice_created'        -- Invoice dibuat
   'payment_received'       -- Pembayaran diterima
+
+-- Attendance Status
+ENUM attendance_status:
+  'present'        -- Hadir tepat waktu
+  'late'           -- Terlambat (check-in setelah jam masuk)
+  'absent'         -- Tidak hadir
 
 -- Photo Type
 ENUM photo_type:
@@ -763,6 +776,42 @@ Informasi rilis versi aplikasi Android staff.
 
 ---
 
+#### `attendances`
+
+Presensi harian staff (admin & teknisi).
+
+| Kolom      | Tipe                                 | Nullable | Default           | Keterangan                                       |
+| ---------- | ------------------------------------ | -------- | ----------------- | ------------------------------------------------ |
+| id         | BIGINT UNSIGNED                      | NO       | AUTO_INCREMENT    | PK                                               |
+| user_id    | BIGINT UNSIGNED                      | NO       |                   | FK → users.id                                    |
+| date       | DATE                                 | NO       |                   | Tanggal presensi                                 |
+| check_in   | TIME                                 | YES      | NULL              | Jam masuk                                        |
+| check_out  | TIME                                 | YES      | NULL              | Jam pulang                                       |
+| status     | ENUM('present','late','absent')      | NO       | 'present'         | Status kehadiran                                 |
+| notes      | TEXT                                 | YES      | NULL              | Catatan presensi                                 |
+| created_at | TIMESTAMP                            | NO       | CURRENT_TIMESTAMP |                                                  |
+| updated_at | TIMESTAMP                            | NO       | CURRENT_TIMESTAMP |                                                  |
+
+**Index:** `UNIQUE(user_id, date)`, `INDEX(date)`, `INDEX(status)`
+**Foreign Key:** `user_id → users(id) ON DELETE CASCADE`
+
+**Business Rules:**
+- Setiap user hanya bisa presensi 1x per hari (unique constraint user_id + date)
+- Status otomatis `late` jika check_in setelah `work_start_time` dari settings
+- Status `present` jika check_in sebelum/tepat `work_start_time`
+- Admin presensi via web, teknisi presensi via mobile app
+- Log presensi & export hanya bisa diakses Super Admin
+- Semua staff bisa melihat riwayat presensi sendiri
+
+**Settings terkait:**
+
+| Key              | Value  | Group      | Deskripsi      |
+| ---------------- | ------ | ---------- | -------------- |
+| work_start_time  | 08:00  | attendance | Jam masuk kerja |
+| work_end_time    | 17:00  | attendance | Jam pulang kerja |
+
+---
+
 ---
 
 ### 3.3 Entity Relationship Diagram (Tekstual)
@@ -772,6 +821,7 @@ users (1) ──────────── (N) work_order_assignments
 users (1) ──────────── (N) work_order_reports
 users (1) ──────────── (N) notifications
 users (1) ──────────── (N) user_devices
+users (1) ──────────── (N) attendances
 
 customers (1) ──────── (N) work_orders
 customers (1) ──────── (N) invoices
@@ -1275,7 +1325,35 @@ GET /api/v1/notifications/unread-count
   Response: { count: int }
 ```
 
-### 5.7 Dashboard (Mobile)
+### 5.7 Attendance / Presensi
+
+```
+GET /api/v1/attendances/today
+  Response: {
+    attendance: Attendance | null,
+    schedule: { work_start_time: string, work_end_time: string },
+    has_checked_in: boolean,
+    has_checked_out: boolean
+  }
+  Note:     Status presensi hari ini + jadwal kerja
+
+POST /api/v1/attendances/check-in
+  Request:  { notes?: string }
+  Response: { data: Attendance }
+  Note:     Presensi masuk, otomatis set status present/late
+
+POST /api/v1/attendances/check-out
+  Request:  { notes?: string }
+  Response: { data: Attendance }
+  Note:     Presensi pulang, harus sudah check-in
+
+GET /api/v1/attendances/my-log
+  Query:    { from?: string, to?: string, page?: int, per_page?: int }
+  Response: { data: Attendance[], meta: Pagination }
+  Note:     Riwayat presensi user yang login
+```
+
+### 5.8 Dashboard (Mobile)
 
 ```
 GET /api/v1/dashboard
@@ -1295,7 +1373,7 @@ GET /api/v1/dashboard
   Note:     Default filter date adalah tanggal hari ini (today) dan mendukung filter parameter date.
 ```
 
-### 5.8 Data Types Reference
+### 5.9 Data Types Reference
 
 ```typescript
 // User
@@ -1402,6 +1480,18 @@ Notification {
   is_read: boolean
   read_at: string | null
   created_at: string
+}
+
+// Attendance
+Attendance {
+  id: int
+  date: string               // YYYY-MM-DD
+  check_in: string | null    // HH:mm:ss
+  check_out: string | null   // HH:mm:ss
+  status: 'present' | 'late' | 'absent'
+  status_label: string       // Hadir / Terlambat / Tidak Hadir
+  notes: string | null
+  work_duration: string | null  // "08 jam 30 menit"
 }
 
 // Pagination
@@ -1618,6 +1708,24 @@ Pagination {
 - Konfigurasi invoice (prefix nomor, footer text, default pajak)
 - Konfigurasi upload (max ukuran foto, max jumlah per laporan)
 
+#### Presensi (Web)
+
+**Presensi Saya (semua admin):**
+
+- Kartu status presensi hari ini (jam masuk, jam pulang, status, durasi kerja)
+- Tombol presensi masuk (jika belum check-in)
+- Tombol presensi pulang (jika sudah check-in, belum check-out)
+- Riwayat presensi terakhir (tabel 10 data terbaru)
+- Catatan opsional saat presensi
+
+**Log Presensi (Super Admin only):**
+
+- Tabel log presensi seluruh staff
+- Filter: rentang tanggal, staff, status (hadir/terlambat/tidak hadir)
+- Setting jadwal kerja (jam masuk & jam pulang)
+- Ekspor ke Excel (.xlsx) dan CSV
+- Integrasi dengan modul Laporan (tab Presensi)
+
 ---
 
 ### 6.2 Mobile (Flutter + GetX)
@@ -1697,6 +1805,16 @@ Pagination {
 - Lihat dan edit nama, phone, avatar
 - Ganti password
 - Logout
+
+#### Presensi (Mobile)
+
+- Kartu status presensi hari ini (jadwal kerja, jam masuk, jam pulang, status)
+- Tombol presensi masuk dengan konfirmasi dialog + catatan opsional
+- Tombol presensi pulang dengan konfirmasi dialog + catatan opsional
+- Indikator status (Hadir/Terlambat) otomatis berdasarkan jam masuk
+- Riwayat presensi dengan infinite scroll / pagination
+- Pull-to-refresh untuk update status terkini
+- Tab Presensi di bottom navigation bar
 
 ---
 
@@ -1930,12 +2048,14 @@ azzaops/
 │   │   ├── FinancialTransaction.php
 │   │   ├── Expense.php
 │   │   ├── Notification.php
+│   │   ├── Attendance.php
 │   │   └── Setting.php
 │   ├── Services/
 │   │   ├── WorkOrderService.php
 │   │   ├── InvoiceService.php
 │   │   ├── RabService.php
 │   │   ├── FinanceService.php
+│   │   ├── AttendanceService.php
 │   │   ├── NotificationService.php
 │   │   └── PdfService.php
 │   └── Observers/
@@ -1994,6 +2114,7 @@ azzaops_mobile/
 │   │   │   │   ├── work_order_model.dart
 │   │   │   │   ├── assignment_model.dart
 │   │   │   │   ├── report_model.dart
+│   │   │   │   ├── attendance_model.dart
 │   │   │   │   └── notification_model.dart
 │   │   │   ├── providers/
 │   │   │   │   └── api_provider.dart      # HTTP client (GetConnect)
@@ -2002,6 +2123,7 @@ azzaops_mobile/
 │   │   │       ├── work_order_repository.dart
 │   │   │       ├── assignment_repository.dart
 │   │   │       ├── report_repository.dart
+│   │   │       ├── attendance_provider.dart
 │   │   │       └── notification_repository.dart
 │   │   └── modules/
 │   │       ├── auth/

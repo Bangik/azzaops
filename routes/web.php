@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\FinancialCategoryController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Admin\VendorInvoiceController;
+use App\Http\Controllers\Admin\AttendanceController;
 
 // Auth routes (no Breeze, manual)
 Route::middleware('guest')->group(function () {
@@ -55,6 +56,11 @@ Route::middleware(['auth', 'role:super_admin,admin,kepala_teknisi'])->prefix('ad
     Route::get('reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
     Route::get('reports/export', [\App\Http\Controllers\Admin\ReportController::class, 'export'])->name('reports.export');
 
+    // Presensi - semua staff bisa akses presensi sendiri
+    Route::get('attendances/my', [AttendanceController::class, 'myAttendance'])->name('attendances.my');
+    Route::post('attendances/check-in', [AttendanceController::class, 'checkIn'])->name('attendances.check-in');
+    Route::post('attendances/check-out', [AttendanceController::class, 'checkOut'])->name('attendances.check-out');
+
     Route::get('finance', [FinanceController::class, 'index'])->name('finance.index');
     Route::get('finance/incomes/create', [FinanceController::class, 'createIncome'])->name('incomes.create');
     Route::post('finance/incomes', [FinanceController::class, 'storeIncome'])->name('incomes.store');
@@ -68,6 +74,9 @@ Route::middleware(['auth', 'role:super_admin,admin,kepala_teknisi'])->prefix('ad
 
     // Super Admin only
     Route::middleware('role:super_admin')->group(function () {
+        Route::get('attendances', [AttendanceController::class, 'index'])->name('attendances.index');
+        Route::get('attendances/export', [AttendanceController::class, 'export'])->name('attendances.export');
+        Route::put('attendances/schedule', [AttendanceController::class, 'updateSchedule'])->name('attendances.update-schedule');
         Route::resource('financial-accounts', \App\Http\Controllers\Admin\FinancialAccountController::class);
         Route::resource('financial-categories', FinancialCategoryController::class)->except(['show']);
         Route::resource('income-categories', FinancialCategoryController::class)
