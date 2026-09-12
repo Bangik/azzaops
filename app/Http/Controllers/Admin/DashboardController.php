@@ -5,20 +5,29 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\TransactionType;
 use App\Enums\WorkOrderStatus;
 use App\Http\Controllers\Controller;
+use App\Models\FinancialAccount;
 use App\Models\FinancialTransaction;
 use App\Models\WorkOrder;
+use App\Models\WorkOrderType;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $financialAccountId = $request->query('financial_account_id');
+        $financialAccounts = FinancialAccount::orderBy('name')->get();
+        $selectedAccount = $financialAccountId ? FinancialAccount::find($financialAccountId) : null;
+
         // 1. Stat cards
         $woNew = WorkOrder::status(WorkOrderStatus::Pending)->count() + WorkOrder::status(WorkOrderStatus::Assigned)->count();
         $woInProgress = WorkOrder::status(WorkOrderStatus::InProgress)->count() + WorkOrder::status(WorkOrderStatus::Checking)->count();
         $woCompleted = WorkOrder::status(WorkOrderStatus::Completed)->count();
+
         $incomeThisMonth = FinancialTransaction::income()
+            ->when($financialAccountId, fn($q) => $q->where('financial_account_id', $financialAccountId))
             ->whereMonth('transaction_date', now()->month)
             ->whereYear('transaction_date', now()->year)
             ->sum('amount');
@@ -33,11 +42,13 @@ class DashboardController extends Controller
             $months[] = $date->translatedFormat('F Y');
 
             $incomeData[] = (float) FinancialTransaction::income()
+                ->when($financialAccountId, fn($q) => $q->where('financial_account_id', $financialAccountId))
                 ->whereMonth('transaction_date', $date->month)
                 ->whereYear('transaction_date', $date->year)
                 ->sum('amount');
 
             $expenseData[] = (float) FinancialTransaction::expenseType()
+                ->when($financialAccountId, fn($q) => $q->where('financial_account_id', $financialAccountId))
                 ->whereMonth('transaction_date', $date->month)
                 ->whereYear('transaction_date', $date->year)
                 ->sum('amount');
@@ -46,7 +57,7 @@ class DashboardController extends Controller
         // 3. Work Order types distribution (current month)
         $typeLabels = [];
         $typeValues = [];
-        $dbTypes = \App\Models\WorkOrderType::orderBy('name')->get();
+        $dbTypes = WorkOrderType::orderBy('name')->get();
         foreach ($dbTypes as $type) {
             $typeLabels[] = $type->name;
             $typeValues[] = WorkOrder::where('work_order_type_id', $type->id)
@@ -72,7 +83,10 @@ class DashboardController extends Controller
             'expenseData',
             'typeLabels',
             'typeValues',
-            'recentActions'
+            'recentActions',
+            'financialAccounts',
+            'selectedAccount',
+            'financialAccountId'
         ));
     }
 }
