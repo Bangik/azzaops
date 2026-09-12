@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'google' => [
+        'credentials_path' => env('GOOGLE_CREDENTIALS_PATH', 'app/google/service-account.json'),
+        'spreadsheet_id' => env('GOOGLE_SPREADSHEET_ID'),
+    ],
+
 ];

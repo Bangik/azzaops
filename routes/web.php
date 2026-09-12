@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Admin\VendorInvoiceController;
 use App\Http\Controllers\Admin\AttendanceController;
+use App\Http\Controllers\Admin\GoogleSheetSyncController;
 
 // Auth routes (no Breeze, manual)
 Route::middleware('guest')->group(function () {
@@ -92,5 +93,7 @@ Route::middleware(['auth', 'role:super_admin,admin,kepala_teknisi'])->prefix('ad
         Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
         Route::resource('app-versions', \App\Http\Controllers\Admin\AppVersionController::class)->only(['index', 'store', 'destroy']);
+        Route::get('google-sheet-sync', [GoogleSheetSyncController::class, 'index'])->name('google-sheet-sync.index');
+        Route::post('google-sheet-sync', [GoogleSheetSyncController::class, 'sync'])->name('google-sheet-sync.sync');
     });
 });

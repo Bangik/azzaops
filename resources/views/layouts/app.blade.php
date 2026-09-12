@@ -149,6 +149,12 @@
 
             @if (auth()->user()->role->value === 'super_admin')
                 <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.google-sheet-sync.*') ? 'active' : '' }}"
+                        href="{{ route('admin.google-sheet-sync.index') }}">
+                        <i class="bi bi-cloud-arrow-up me-2"></i>Sync Spreadsheet
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}"
                         href="{{ route('admin.settings.index') }}">
                         <i class="bi bi-gear me-2"></i>Settings
