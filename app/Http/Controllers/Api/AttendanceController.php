@@ -46,6 +46,12 @@ class AttendanceController extends Controller
      */
     public function checkIn(Request $request)
     {
+        $validated = $request->validate([
+            'notes' => ['nullable', 'string'],
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
+        ]);
+
         $user = auth()->user();
         $existing = $this->attendanceService->getTodayAttendance($user->id);
 
@@ -53,7 +59,12 @@ class AttendanceController extends Controller
             return $this->errorResponse('Anda sudah melakukan presensi masuk hari ini.', 422);
         }
 
-        $attendance = $this->attendanceService->checkIn($user->id, $request->input('notes'));
+        $attendance = $this->attendanceService->checkIn(
+            $user->id,
+            $validated['notes'] ?? null,
+            (float) $validated['latitude'],
+            (float) $validated['longitude']
+        );
 
         return $this->successResponse([
             'id' => $attendance->id,
@@ -70,6 +81,12 @@ class AttendanceController extends Controller
      */
     public function checkOut(Request $request)
     {
+        $validated = $request->validate([
+            'notes' => ['nullable', 'string'],
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
+        ]);
+
         $user = auth()->user();
         $existing = $this->attendanceService->getTodayAttendance($user->id);
 
@@ -81,7 +98,12 @@ class AttendanceController extends Controller
             return $this->errorResponse('Anda sudah melakukan presensi pulang hari ini.', 422);
         }
 
-        $attendance = $this->attendanceService->checkOut($user->id, $request->input('notes'));
+        $attendance = $this->attendanceService->checkOut(
+            $user->id,
+            $validated['notes'] ?? null,
+            (float) $validated['latitude'],
+            (float) $validated['longitude']
+        );
 
         return $this->successResponse([
             'id' => $attendance->id,

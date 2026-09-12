@@ -67,7 +67,18 @@ class AttendanceController extends Controller
      */
     public function checkIn(Request $request)
     {
-        $this->attendanceService->checkIn(auth()->id(), $request->input('notes'));
+        $validated = $request->validate([
+            'notes' => ['nullable', 'string'],
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
+        ]);
+
+        $this->attendanceService->checkIn(
+            auth()->id(),
+            $validated['notes'] ?? null,
+            (float) $validated['latitude'],
+            (float) $validated['longitude']
+        );
 
         return redirect()->route('admin.attendances.my')
             ->with('success', 'Presensi masuk berhasil dicatat.');
@@ -78,7 +89,18 @@ class AttendanceController extends Controller
      */
     public function checkOut(Request $request)
     {
-        $this->attendanceService->checkOut(auth()->id(), $request->input('notes'));
+        $validated = $request->validate([
+            'notes' => ['nullable', 'string'],
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
+        ]);
+
+        $this->attendanceService->checkOut(
+            auth()->id(),
+            $validated['notes'] ?? null,
+            (float) $validated['latitude'],
+            (float) $validated['longitude']
+        );
 
         return redirect()->route('admin.attendances.my')
             ->with('success', 'Presensi pulang berhasil dicatat.');
@@ -92,6 +114,9 @@ class AttendanceController extends Controller
         $request->validate([
             'work_start_time' => 'required|date_format:H:i',
             'work_end_time' => 'required|date_format:H:i|after:work_start_time',
+            'attendance_radius_meters' => 'required|integer|min:1|max:100000',
+            'attendance_latitude' => 'required|numeric|between:-90,90',
+            'attendance_longitude' => 'required|numeric|between:-180,180',
         ]);
 
         \App\Models\Setting::updateOrCreate(
@@ -102,6 +127,21 @@ class AttendanceController extends Controller
         \App\Models\Setting::updateOrCreate(
             ['key' => 'work_end_time'],
             ['value' => $request->work_end_time, 'group' => 'attendance', 'description' => 'Jam pulang kerja']
+        );
+
+        \App\Models\Setting::updateOrCreate(
+            ['key' => 'attendance_radius_meters'],
+            ['value' => $request->attendance_radius_meters, 'group' => 'attendance', 'description' => 'Radius presensi dalam meter']
+        );
+
+        \App\Models\Setting::updateOrCreate(
+            ['key' => 'attendance_latitude'],
+            ['value' => $request->attendance_latitude, 'group' => 'attendance', 'description' => 'Latitude lokasi presensi']
+        );
+
+        \App\Models\Setting::updateOrCreate(
+            ['key' => 'attendance_longitude'],
+            ['value' => $request->attendance_longitude, 'group' => 'attendance', 'description' => 'Longitude lokasi presensi']
         );
 
         return redirect()->route('admin.attendances.index')

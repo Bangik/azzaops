@@ -126,12 +126,12 @@ PT. Azza Karunia Jaya adalah perusahaan jasa instalasi, perawatan, dan servis AC
 
 **Keuangan:**
 
-| ID    | User Story                                                                                                                      | Priority |
-| ----- | ------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| AD-16 | Sebagai Admin, saya dapat melihat dashboard keuangan (pemasukan, pengeluaran, neraca saldo)                                     | Must     |
-| AD-17 | Sebagai Admin, saya dapat menginput pengeluaran operasional (beli material, transport, dll)                                     | Must     |
-| AD-18 | Sebagai Admin, saya dapat melihat laporan keuangan per periode (harian, mingguan, bulanan)                                      | Must     |
-| AD-19 | Sebagai Admin, saya dapat melihat cost percentage per pekerjaan                                                                 | Should   |
+| ID    | User Story                                                                                                                                                                        | Priority |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| AD-16 | Sebagai Admin, saya dapat melihat dashboard keuangan (pemasukan, pengeluaran, neraca saldo)                                                                                       | Must     |
+| AD-17 | Sebagai Admin, saya dapat menginput pengeluaran operasional (beli material, transport, dll)                                                                                       | Must     |
+| AD-18 | Sebagai Admin, saya dapat melihat laporan keuangan per periode (harian, mingguan, bulanan)                                                                                        | Must     |
+| AD-19 | Sebagai Admin, saya dapat melihat cost percentage per pekerjaan                                                                                                                   | Should   |
 | AD-22 | Sebagai Admin, saya dapat mencatat dan mengedit pemasukan di luar work order dengan kategori, nominal, tanggal, dan nomor referensi opsional; Super Admin juga dapat menghapusnya | Must     |
 
 **Dashboard:**
@@ -165,7 +165,7 @@ PT. Azza Karunia Jaya adalah perusahaan jasa instalasi, perawatan, dan servis AC
 | TK-06 | Sebagai Teknisi, saya dapat upload foto dokumentasi pekerjaan (sebelum & sesudah)                  | Must     |
 | TK-07 | Sebagai Teknisi, saya dapat melihat riwayat pekerjaan yang pernah saya kerjakan                    | Must     |
 | TK-08 | Sebagai Teknisi, saya dapat melihat dan mengelola profil saya                                      | Must     |
-| TK-09 | Sebagai Teknisi, saya dapat melakukan presensi masuk dan pulang melalui aplikasi mobile             | Must     |
+| TK-09 | Sebagai Teknisi, saya dapat melakukan presensi masuk dan pulang melalui aplikasi mobile            | Must     |
 | TK-10 | Sebagai Teknisi, saya dapat melihat riwayat presensi saya sendiri                                  | Must     |
 
 ---
@@ -498,7 +498,7 @@ Tabel invoice tagihan ke customer.
 | discount_type        | VARCHAR(10)                             | NO       | 'fixed'           | Tipe diskon: 'percent' atau 'fixed'           |
 | discount_value       | DECIMAL(15,2)                           | NO       | 0                 | Nilai input diskon                            |
 | tax_percentage       | DECIMAL(5,2)                            | NO       | 0                 | Persentase PPN                                |
-| tax_amount           | DECIMAL(15,2)                           | NO       | 0                 | Nominal PPN (dihitung dari subtotal)         |
+| tax_amount           | DECIMAL(15,2)                           | NO       | 0                 | Nominal PPN (dihitung dari subtotal)          |
 | total                | DECIMAL(15,2)                           | NO       | 0                 | Grand total                                   |
 | status               | ENUM('draft','sent','paid','cancelled') | NO       | 'draft'           | Status invoice                                |
 | payment_status       | ENUM('unpaid','partial','paid')         | NO       | 'unpaid'          | Status pembayaran                             |
@@ -780,35 +780,38 @@ Informasi rilis versi aplikasi Android staff.
 
 Presensi harian staff (admin & teknisi).
 
-| Kolom      | Tipe                                 | Nullable | Default           | Keterangan                                       |
-| ---------- | ------------------------------------ | -------- | ----------------- | ------------------------------------------------ |
-| id         | BIGINT UNSIGNED                      | NO       | AUTO_INCREMENT    | PK                                               |
-| user_id    | BIGINT UNSIGNED                      | NO       |                   | FK → users.id                                    |
-| date       | DATE                                 | NO       |                   | Tanggal presensi                                 |
-| check_in   | TIME                                 | YES      | NULL              | Jam masuk                                        |
-| check_out  | TIME                                 | YES      | NULL              | Jam pulang                                       |
-| status     | ENUM('present','late','absent')      | NO       | 'present'         | Status kehadiran                                 |
-| notes      | TEXT                                 | YES      | NULL              | Catatan presensi                                 |
-| created_at | TIMESTAMP                            | NO       | CURRENT_TIMESTAMP |                                                  |
-| updated_at | TIMESTAMP                            | NO       | CURRENT_TIMESTAMP |                                                  |
+| Kolom      | Tipe                            | Nullable | Default           | Keterangan       |
+| ---------- | ------------------------------- | -------- | ----------------- | ---------------- |
+| id         | BIGINT UNSIGNED                 | NO       | AUTO_INCREMENT    | PK               |
+| user_id    | BIGINT UNSIGNED                 | NO       |                   | FK → users.id    |
+| date       | DATE                            | NO       |                   | Tanggal presensi |
+| check_in   | TIME                            | YES      | NULL              | Jam masuk        |
+| check_out  | TIME                            | YES      | NULL              | Jam pulang       |
+| status     | ENUM('present','late','absent') | NO       | 'present'         | Status kehadiran |
+| notes      | TEXT                            | YES      | NULL              | Catatan presensi |
+| created_at | TIMESTAMP                       | NO       | CURRENT_TIMESTAMP |                  |
+| updated_at | TIMESTAMP                       | NO       | CURRENT_TIMESTAMP |                  |
 
 **Index:** `UNIQUE(user_id, date)`, `INDEX(date)`, `INDEX(status)`
 **Foreign Key:** `user_id → users(id) ON DELETE CASCADE`
 
 **Business Rules:**
+
 - Setiap user hanya bisa presensi 1x per hari (unique constraint user_id + date)
 - Status otomatis `late` jika check_in setelah `work_start_time` dari settings
 - Status `present` jika check_in sebelum/tepat `work_start_time`
+- Presensi masuk dan pulang wajib dilakukan dalam radius lokasi presensi yang dikonfigurasi Super Admin berdasarkan latitude, longitude, dan radius meter
+- Web mengambil koordinat dari browser, sedangkan mobile mengirim latitude dan longitude pada request presensi; server menolak presensi di luar radius
 - Admin presensi via web, teknisi presensi via mobile app
 - Log presensi & export hanya bisa diakses Super Admin
 - Semua staff bisa melihat riwayat presensi sendiri
 
 **Settings terkait:**
 
-| Key              | Value  | Group      | Deskripsi      |
-| ---------------- | ------ | ---------- | -------------- |
-| work_start_time  | 08:00  | attendance | Jam masuk kerja |
-| work_end_time    | 17:00  | attendance | Jam pulang kerja |
+| Key             | Value | Group      | Deskripsi        |
+| --------------- | ----- | ---------- | ---------------- |
+| work_start_time | 08:00 | attendance | Jam masuk kerja  |
+| work_end_time   | 17:00 | attendance | Jam pulang kerja |
 
 ---
 
@@ -1331,21 +1334,27 @@ GET /api/v1/notifications/unread-count
 GET /api/v1/attendances/today
   Response: {
     attendance: Attendance | null,
-    schedule: { work_start_time: string, work_end_time: string },
+    schedule: {
+      work_start_time: string,
+      work_end_time: string,
+      attendance_radius_meters: number,
+      attendance_latitude: number | null,
+      attendance_longitude: number | null
+    },
     has_checked_in: boolean,
     has_checked_out: boolean
   }
   Note:     Status presensi hari ini + jadwal kerja
 
 POST /api/v1/attendances/check-in
-  Request:  { notes?: string }
+  Request:  { notes?: string, latitude: number, longitude: number }
   Response: { data: Attendance }
-  Note:     Presensi masuk, otomatis set status present/late
+  Note:     Presensi masuk, otomatis set status present/late; ditolak jika di luar radius lokasi presensi
 
 POST /api/v1/attendances/check-out
-  Request:  { notes?: string }
+  Request:  { notes?: string, latitude: number, longitude: number }
   Response: { data: Attendance }
-  Note:     Presensi pulang, harus sudah check-in
+  Note:     Presensi pulang, harus sudah check-in dan berada dalam radius lokasi presensi
 
 GET /api/v1/attendances/my-log
   Query:    { from?: string, to?: string, page?: int, per_page?: int }

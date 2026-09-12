@@ -32,22 +32,55 @@
             <form action="{{ route('admin.attendances.update-schedule') }}" method="POST" class="row g-3 align-items-end">
                 @csrf
                 @method('PUT')
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label">Jam Masuk</label>
                     <input type="time" name="work_start_time" class="form-control"
                         value="{{ $schedule['work_start_time'] }}" required>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label">Jam Pulang</label>
-                    <input type="time" name="work_end_time" class="form-control"
-                        value="{{ $schedule['work_end_time'] }}" required>
+                    <input type="time" name="work_end_time" class="form-control" value="{{ $schedule['work_end_time'] }}"
+                        required>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
+                    <label class="form-label">Radius Presensi (meter)</label>
+                    <input type="number" name="attendance_radius_meters" class="form-control"
+                        value="{{ $schedule['attendance_radius_meters'] }}" min="1" max="100000" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Latitude</label>
+                    <input type="number" name="attendance_latitude" class="form-control" step="0.0000001"
+                        value="{{ $schedule['attendance_latitude'] }}" min="-90" max="90" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Longitude</label>
+                    <input type="number" name="attendance_longitude" class="form-control" step="0.0000001"
+                        value="{{ $schedule['attendance_longitude'] }}" min="-180" max="180" required>
+                </div>
+                <div class="col-md-2">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-check-lg me-1"></i> Simpan Jadwal
                     </button>
                 </div>
             </form>
+
+            <div class="mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <h6 class="mb-1"><i class="bi bi-map me-2"></i>Lokasi dan Radius Presensi</h6>
+                        <small class="text-muted">Klik peta atau geser marker untuk menentukan titik lokasi
+                            presensi.</small>
+                    </div>
+                    <span class="badge text-bg-light border">OpenStreetMap</span>
+                </div>
+                <div id="attendance-location-map" class="attendance-location-map"
+                    data-latitude="{{ $schedule['attendance_latitude'] }}"
+                    data-longitude="{{ $schedule['attendance_longitude'] }}"
+                    data-radius="{{ $schedule['attendance_radius_meters'] }}"></div>
+                <div class="small text-muted mt-2">
+                    <i class="bi bi-info-circle me-1"></i> Lingkaran menunjukkan area tempat staff boleh melakukan presensi.
+                </div>
+            </div>
         </div>
     </div>
 
@@ -144,3 +177,109 @@
         </div>
     </div>
 @endsection
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('vendor/leaflet/leaflet.css') }}">
+    <style>
+        .attendance-location-map {
+            height: 360px;
+            min-height: 280px;
+            border-radius: .375rem;
+            overflow: hidden;
+            border: 1px solid #dee2e6;
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <script src="{{ asset('vendor/leaflet/leaflet.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mapElement = document.getElementById('attendance-location-map');
+            if (!mapElement || typeof L === 'undefined') {
+                return;
+            }
+
+            const form = document.querySelector('form[action="{{ route('admin.attendances.update-schedule') }}"]');
+            const latitudeInput = form.querySelector('[name="attendance_latitude"]');
+            const longitudeInput = form.querySelector('[name="attendance_longitude"]');
+            const radiusInput = form.querySelector('[name="attendance_radius_meters"]');
+            const defaultCenter = [-6.2000000, 106.8166667];
+            const configuredLatitude = parseFloat(mapElement.dataset.latitude);
+            const configuredLongitude = parseFloat(mapElement.dataset.longitude);
+            const configuredRadius = parseInt(mapElement.dataset.radius, 10) || 100;
+            const hasConfiguredLocation = Number.isFinite(configuredLatitude) && Number.isFinite(
+                configuredLongitude);
+            const center = hasConfiguredLocation ? [configuredLatitude, configuredLongitude] : defaultCenter;
+
+            const map = L.map(mapElement).setView(center, hasConfiguredLocation ? 16 : 11);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
+            }).addTo(map);
+
+            let marker = hasConfiguredLocation ? L.marker(center, {
+                draggable: true
+            }).addTo(map) : null;
+            let circle = hasConfiguredLocation ? L.circle(center, {
+                radius: configuredRadius,
+                color: '#0d6efd',
+                fillColor: '#0d6efd',
+                fillOpacity: 0.18,
+                weight: 2
+            }).addTo(map) : null;
+
+            function setLocation(latitude, longitude) {
+                latitudeInput.value = latitude.toFixed(7);
+                longitudeInput.value = longitude.toFixed(7);
+
+                if (!marker) {
+                    marker = L.marker([latitude, longitude], {
+                        draggable: true
+                    }).addTo(map);
+                    marker.on('dragend', function(event) {
+                        const position = event.target.getLatLng();
+                        setLocation(position.lat, position.lng);
+                    });
+                } else {
+                    marker.setLatLng([latitude, longitude]);
+                }
+
+                if (!circle) {
+                    circle = L.circle([latitude, longitude], {
+                        radius: parseInt(radiusInput.value, 10) || 100,
+                        color: '#0d6efd',
+                        fillColor: '#0d6efd',
+                        fillOpacity: 0.18,
+                        weight: 2
+                    }).addTo(map);
+                } else {
+                    circle.setLatLng([latitude, longitude]);
+                }
+
+                map.panTo([latitude, longitude]);
+            }
+
+            if (marker) {
+                marker.on('dragend', function(event) {
+                    const position = event.target.getLatLng();
+                    setLocation(position.lat, position.lng);
+                });
+            }
+
+            map.on('click', function(event) {
+                setLocation(event.latlng.lat, event.latlng.lng);
+            });
+
+            radiusInput.addEventListener('input', function() {
+                if (circle) {
+                    circle.setRadius(parseInt(radiusInput.value, 10) || 0);
+                }
+            });
+
+            setTimeout(function() {
+                map.invalidateSize();
+            }, 100);
+        });
+    </script>
+@endpush
