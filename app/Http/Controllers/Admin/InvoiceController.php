@@ -41,14 +41,26 @@ class InvoiceController extends Controller
 
     public function create(Request $request)
     {
-        $workOrder = WorkOrder::with(['customer', 'items'])->findOrFail($request->work_order_id);
+        $workOrder = WorkOrder::with(['customer', 'items', 'invoice'])->findOrFail($request->work_order_id);
+
+        if ($workOrder->invoice && $workOrder->invoice->status !== InvoiceStatus::Draft) {
+            return redirect()
+                ->route('admin.invoices.show', $workOrder->invoice)
+                ->with('error', 'Invoice untuk Work Order ini sudah dibuat sebelumnya');
+        }
 
         return view('admin.invoices.create', compact('workOrder'));
     }
 
     public function store(Request $request)
     {
-        $workOrder = WorkOrder::findOrFail($request->work_order_id);
+        $workOrder = WorkOrder::with('invoice')->findOrFail($request->work_order_id);
+
+        if ($workOrder->invoice && $workOrder->invoice->status !== InvoiceStatus::Draft) {
+            return redirect()
+                ->route('admin.invoices.show', $workOrder->invoice)
+                ->with('error', 'Invoice untuk Work Order ini sudah dibuat sebelumnya');
+        }
 
         $data = $request->validate([
             'due_date' => ['nullable', 'date'],

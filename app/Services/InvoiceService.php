@@ -41,13 +41,7 @@ class InvoiceService
             $taxAmount = round($subtotal * $taxPercentage / 100, 2);
             $total = max(0, $subtotal + $taxAmount - $discount);
 
-            $dateStr = now()->format('Ymd');
-            $count = Invoice::whereDate('created_at', now())->count() + 1;
-            $invoiceNumber = 'INV-' . $dateStr . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
-
-            $invoice = Invoice::create([
-                'invoice_number' => $invoiceNumber,
-                'work_order_id' => $workOrder->id,
+            $invoiceData = [
                 'customer_id' => $workOrder->customer_id,
                 'subtotal' => $subtotal,
                 'discount' => $discount,
@@ -62,7 +56,27 @@ class InvoiceService
                 'due_date' => $data['due_date'] ?? null,
                 'notes' => $data['notes'] ?? null,
                 'issued_by' => $issuedBy,
-            ]);
+            ];
+
+            // Setiap WO hanya boleh punya satu invoice. Jika draft-nya sudah ada
+            // (auto-dibuat saat WO dibuat), invoice tersebut diperbarui, bukan
+            // dibuatkan invoice baru (mencegah invoice ganda / double invoice).
+            $invoice = $workOrder->invoice;
+            if ($invoice) {
+                $invoice->update($invoiceData);
+                $invoice->items()->delete();
+            } else {
+                // Nomor invoice disamakan dengan nomor WO (hanya beda prefix)
+                $invoiceNumber = str_starts_with($workOrder->wo_number, 'WO-')
+                    ? 'INV-' . substr($workOrder->wo_number, 3)
+                    : 'INV-' . $workOrder->wo_number;
+
+                $invoice = Invoice::create([
+                    'invoice_number' => $invoiceNumber,
+                    'work_order_id' => $workOrder->id,
+                    ...$invoiceData,
+                ]);
+            }
 
             foreach ($items as $item) {
                 if (empty($item['description'])) {

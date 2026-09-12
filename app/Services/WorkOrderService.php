@@ -68,8 +68,8 @@ class WorkOrderService
             $taxAmount = round($subtotal * $taxPercentage / 100, 2);
             $total = max(0, $subtotal + $taxAmount - $discount); // PPN dihitung dari subtotal sebelum diskon, lalu ditambahkan ke total akhir setelah dikurangi diskon
 
-            $invCount = \App\Models\Invoice::whereDate('created_at', now())->count() + 1;
-            $invoiceNumber = 'INV-' . $dateStr . '-' . str_pad($invCount, 4, '0', STR_PAD_LEFT);
+            // Nomor urut invoice disamakan dengan nomor urut WO (hanya beda prefix) agar selalu sinkron
+            $invoiceNumber = 'INV-' . $dateStr . '-' . $sequence;
 
             $invoice = \App\Models\Invoice::create([
                 'invoice_number' => $invoiceNumber,
