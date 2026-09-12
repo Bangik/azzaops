@@ -18,14 +18,28 @@ class WorkOrderReport extends Model
         'work_done',
         'recommendations',
         'materials_used',
+        'is_draft',
         'submitted_at',
     ];
 
     protected function casts(): array
     {
         return [
+            'is_draft' => 'boolean',
             'submitted_at' => 'datetime',
         ];
+    }
+
+    // === Scopes ===
+
+    public function scopeFinal($query)
+    {
+        return $query->where('is_draft', false);
+    }
+
+    public function scopeDraft($query)
+    {
+        return $query->where('is_draft', true);
     }
 
     // === Relationships ===

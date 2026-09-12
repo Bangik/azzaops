@@ -129,6 +129,11 @@ class WorkOrder extends Model
         return $this->hasMany(WorkOrderTakeover::class);
     }
 
+    public function sessions(): HasMany
+    {
+        return $this->hasMany(WorkOrderSession::class);
+    }
+
     // === Scopes ===
 
     public function scopeStatus(Builder $query, WorkOrderStatus $status): Builder
@@ -160,13 +165,11 @@ class WorkOrder extends Model
 
     public function getDurationAttribute(): ?string
     {
-        if (!$this->started_at) {
+        $totalMinutes = $this->duration_minutes;
+        if ($totalMinutes === null) {
             return null;
         }
 
-        $endTime = $this->completed_at ?? ($this->status === WorkOrderStatus::Completed || $this->status === WorkOrderStatus::Reported ? $this->updated_at : now());
-        
-        $totalMinutes = (int) $this->started_at->diffInMinutes($endTime);
         $hours = intdiv($totalMinutes, 60);
         $minutes = $totalMinutes % 60;
 
@@ -179,6 +182,19 @@ class WorkOrder extends Model
 
     public function getDurationMinutesAttribute(): ?int
     {
+        if ($this->sessions()->exists()) {
+            $totalMinutes = 0;
+            foreach ($this->sessions as $session) {
+                if ($session->ended_at) {
+                    $totalMinutes += (int) $session->started_at->diffInMinutes($session->ended_at);
+                } else {
+                    $endTime = $this->completed_at ?? ($this->status === WorkOrderStatus::Completed || $this->status === WorkOrderStatus::Reported ? $this->updated_at : now());
+                    $totalMinutes += (int) $session->started_at->diffInMinutes($endTime);
+                }
+            }
+            return $totalMinutes;
+        }
+
         if (!$this->started_at) {
             return null;
         }

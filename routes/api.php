@@ -13,7 +13,7 @@ use App\Http\Controllers\Api\AttendanceController as ApiAttendanceController;
 Route::prefix('v1')->name('api.')->group(function () {
     // Auth
     Route::post('auth/login', [AuthController::class, 'login'])->name('login');
-    
+
     // Public App Version Check
     Route::get('app-version/latest', [\App\Http\Controllers\Api\AppVersionController::class, 'latest'])->name('app-version.latest');
 
@@ -32,6 +32,7 @@ Route::prefix('v1')->name('api.')->group(function () {
         Route::get('work-orders/today', [WorkOrderController::class, 'today'])->name('work-orders.today');
         Route::get('work-orders/{workOrder}', [WorkOrderController::class, 'show'])->name('work-orders.show');
         Route::put('work-orders/{workOrder}/status', [WorkOrderController::class, 'updateStatus'])->name('work-orders.update-status');
+        Route::post('work-orders/{workOrder}/pause', [WorkOrderController::class, 'pause'])->name('work-orders.pause');
         Route::post('work-orders/{workOrder}/takeover', [WorkOrderController::class, 'requestTakeover'])->name('work-orders.takeover');
 
         // Takeovers
@@ -49,6 +50,9 @@ Route::prefix('v1')->name('api.')->group(function () {
         // Reports
         Route::post('work-orders/{workOrder}/reports', [ReportController::class, 'store'])->name('reports.store');
         Route::get('work-orders/{workOrder}/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('work-orders/{workOrder}/reports/draft', [ReportController::class, 'getDraft'])->name('reports.get-draft');
+        Route::post('work-orders/{workOrder}/reports/draft', [ReportController::class, 'saveDraft'])->name('reports.save-draft');
+        Route::delete('reports/photos/{photo}', [ReportController::class, 'deleteDraftPhoto'])->name('reports.delete-draft-photo');
         Route::get('reports/my', [ReportController::class, 'myReports'])->name('reports.my');
 
         // Notifications

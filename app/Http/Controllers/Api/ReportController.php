@@ -40,6 +40,55 @@ class ReportController extends Controller
         return $this->successResponse($report, 'Laporan berhasil dikirim');
     }
 
+    public function getDraft(Request $request, WorkOrder $workOrder)
+    {
+        $draft = $this->reportService->getDraft($workOrder, $request->user()->id);
+
+        return $this->successResponse($draft, 'Draft laporan berhasil diambil');
+    }
+
+    public function saveDraft(Request $request, WorkOrder $workOrder)
+    {
+        // Check assignment
+        $assigned = $workOrder->assignments()
+            ->where('technician_id', $request->user()->id)
+            ->exists();
+
+        if (!$assigned) {
+            return $this->errorResponse('Anda tidak ditugaskan pada perintah kerja ini', 403);
+        }
+
+        $request->validate([
+            'findings' => ['nullable', 'string'],
+            'work_done' => ['nullable', 'string'],
+            'recommendations' => ['nullable', 'string'],
+            'materials_used' => ['nullable', 'string'],
+            'photos' => ['nullable', 'array'],
+            'photos.*.file' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg', 'max:5120'],
+            'photos.*.type' => ['nullable', 'string', 'in:before,progress,after'],
+            'photos.*.caption' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $report = $this->reportService->saveDraft(
+            $workOrder,
+            $request->all(),
+            $request->user()->id
+        );
+
+        return $this->successResponse($report, 'Draft laporan berhasil disimpan');
+    }
+
+    public function deleteDraftPhoto(Request $request, int $photo)
+    {
+        $deleted = $this->reportService->deleteDraftPhoto($photo, $request->user()->id);
+
+        if (!$deleted) {
+            return $this->errorResponse('Foto draft tidak ditemukan atau Anda tidak berhak menghapusnya', 404);
+        }
+
+        return $this->successResponse(null, 'Foto draft berhasil dihapus');
+    }
+
     public function index(WorkOrder $workOrder)
     {
         $reports = $workOrder->reports()->with(['technician', 'photos'])->latest()->get();

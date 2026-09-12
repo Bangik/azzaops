@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Enums\AssignmentStatus;
+use App\Enums\UserRole;
 use App\Enums\WorkOrderStatus;
 use App\Models\WorkOrder;
 use App\Models\WorkOrderAssignment;
+use App\Models\WorkOrderSession;
 use App\Models\Notification;
 use App\Enums\NotificationType;
 use Illuminate\Support\Facades\DB;
@@ -284,6 +286,81 @@ class WorkOrderService
             $newWoData['gmaps_link'] = $newWoData['gmaps_link'] ?? $workOrder->gmaps_link;
 
             return $this->create($newWoData, $createdBy);
+        });
+    }
+
+    public function startSession(WorkOrder $workOrder, ?int $technicianId = null, ?WorkOrderStatus $status = null): WorkOrderSession
+    {
+        return DB::transaction(function () use ($workOrder, $technicianId, $status) {
+            $activeSession = $workOrder->sessions()->whereNull('ended_at')->first();
+
+            if (!$activeSession) {
+                $activeSession = WorkOrderSession::create([
+                    'work_order_id' => $workOrder->id,
+                    'technician_id' => $technicianId,
+                    'started_at' => now(),
+                ]);
+            }
+
+            $updateData = [];
+
+            if (!$workOrder->started_at) {
+                $updateData['started_at'] = now();
+            }
+
+            if ($status && $workOrder->status !== $status) {
+                $updateData['status'] = $status;
+            }
+
+            if (!empty($updateData)) {
+                $workOrder->update($updateData);
+            }
+
+            return $activeSession;
+        });
+    }
+
+    public function pauseSession(WorkOrder $workOrder, ?int $technicianId = null, ?string $reason = null): void
+    {
+        DB::transaction(function () use ($workOrder, $technicianId, $reason) {
+            $activeSessions = $workOrder->sessions()->whereNull('ended_at')->get();
+
+            foreach ($activeSessions as $session) {
+                $session->update([
+                    'ended_at' => now(),
+                    'notes' => $reason,
+                ]);
+            }
+
+            $workOrder->update(['status' => WorkOrderStatus::Pending]);
+
+            // Notify managers about paused work
+            $managers = \App\Models\User::whereIn('role', [UserRole::SuperAdmin, UserRole::Admin, UserRole::KepalaTeknisi])
+                ->where('is_active', true)
+                ->get();
+
+            $technicianName = $technicianId ? (\App\Models\User::find($technicianId)?->name ?? 'Teknisi') : 'Teknisi';
+            $bodyReason = $reason ? " Alasan: {$reason}" : '';
+
+            foreach ($managers as $manager) {
+                Notification::create([
+                    'user_id' => $manager->id,
+                    'type' => NotificationType::WorkOrderUpdated,
+                    'title' => 'Pekerjaan Ditunda (Pending)',
+                    'body' => "Pekerjaan {$workOrder->wo_number} ditunda oleh {$technicianName}.{$bodyReason}",
+                    'data' => ['work_order_id' => $workOrder->id],
+                    'is_read' => false,
+                ]);
+            }
+        });
+    }
+
+    public function endSession(WorkOrder $workOrder): void
+    {
+        DB::transaction(function () use ($workOrder) {
+            $workOrder->sessions()->whereNull('ended_at')->update([
+                'ended_at' => now(),
+            ]);
         });
     }
 }

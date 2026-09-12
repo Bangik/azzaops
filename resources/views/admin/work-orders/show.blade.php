@@ -111,7 +111,36 @@
                                 @if ($workOrder->duration)
                                     <span class="badge bg-info text-dark"><i
                                             class="bi bi-stopwatch me-1"></i>{{ $workOrder->duration }}</span>
-                                    @if ($workOrder->started_at)
+                                    @if ($workOrder->sessions->count())
+                                        <button type="button"
+                                            class="btn btn-link btn-sm text-decoration-none p-0 ms-1 align-baseline"
+                                            data-bs-toggle="collapse" data-bs-target="#sessionsBreakdown">
+                                            <small><i class="bi bi-clock-history me-1"></i>Rincian Sesi
+                                                ({{ $workOrder->sessions->count() }})</small>
+                                        </button>
+                                        <div class="collapse mt-2" id="sessionsBreakdown">
+                                            <div class="bg-light p-2 rounded border small font-monospace"
+                                                style="font-size: 0.8rem;">
+                                                @foreach ($workOrder->sessions as $index => $sess)
+                                                    <div class="mb-1 pb-1 border-bottom border-light-subtle">
+                                                        <strong>Sesi {{ $index + 1 }}:</strong>
+                                                        {{ $sess->started_at->format('d/m/Y H:i') }} -
+                                                        {{ $sess->ended_at ? $sess->ended_at->format('H:i') : 'Sedang berjalan' }}
+                                                        <span class="text-primary fw-bold">({{ $sess->duration }})</span>
+                                                        @if ($sess->technician)
+                                                            <span class="text-muted">&bull;
+                                                                {{ $sess->technician->name }}</span>
+                                                        @endif
+                                                        @if ($sess->notes)
+                                                            <div class="text-danger mt-1"><i
+                                                                    class="bi bi-pause-circle me-1"></i>Ditunda:
+                                                                {{ $sess->notes }}</div>
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @elseif ($workOrder->started_at)
                                         <small class="text-muted d-block mt-1">({{ $workOrder->started_at->format('H:i') }}
                                             -
                                             {{ $workOrder->completed_at ? $workOrder->completed_at->format('H:i') : 'Sekarang' }})</small>
@@ -170,7 +199,8 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="text-center text-muted py-4">Belum ada item pekerjaan</td>
+                                        <td colspan="5" class="text-center text-muted py-4">Belum ada item pekerjaan
+                                        </td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -178,7 +208,8 @@
                                 <tfoot>
                                     <tr class="table-light">
                                         <td colspan="4" class="text-end fw-bold">Grand Total</td>
-                                        <td class="text-end fw-bold">Rp {{ number_format($workOrder->total, 0, ',', '.') }}
+                                        <td class="text-end fw-bold">Rp
+                                            {{ number_format($workOrder->total, 0, ',', '.') }}
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -200,8 +231,13 @@
                                 <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
                                     <div>
                                         <span class="fw-semibold text-primary">{{ $report->technician->name }}</span>
-                                        <span class="text-muted small"> |
-                                            {{ $report->submitted_at->format('d/m/Y H:i') }}</span>
+                                        @if ($report->is_draft)
+                                            <span class="badge bg-warning text-dark ms-2"><i
+                                                    class="bi bi-file-earmark-text me-1"></i>Draft (Belum Final)</span>
+                                        @else
+                                            <span class="text-muted small"> |
+                                                {{ $report->submitted_at ? $report->submitted_at->format('d/m/Y H:i') : $report->updated_at->format('d/m/Y H:i') }}</span>
+                                        @endif
                                     </div>
                                     <button type="button" class="btn btn-xs btn-outline-warning"
                                         data-bs-toggle="collapse"

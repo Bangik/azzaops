@@ -83,6 +83,8 @@ class WorkOrderController extends Controller
             'items',
             'assignments.technician',
             'assignments.assigner',
+            'sessions.technician',
+            'reports.technician',
             'reports.photos',
             'invoice',
             'rab',

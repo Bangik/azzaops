@@ -80,6 +80,7 @@ class WorkOrderController extends Controller
             'items',
             'assignments.technician',
             'assignments.assigner',
+            'sessions.technician',
             'reports.technician',
             'reports.photos',
             'invoice',
@@ -114,23 +115,22 @@ class WorkOrderController extends Controller
             return $this->errorResponse('Status tidak valid', 422);
         }
 
-        // Update status of work order
-        $workOrder->update([
-            'status' => $status,
-            'notes' => $request->notes ?? $workOrder->notes
-        ]);
-
-        // If status is completed, update assignments status to completed as well
-        if ($status === WorkOrderStatus::Completed) {
+        if ($status === WorkOrderStatus::InProgress || $status === WorkOrderStatus::Checking) {
+            app(\App\Services\WorkOrderService::class)->startSession($workOrder, $request->user()->id, $status);
+        } elseif ($status === WorkOrderStatus::Pending) {
+            app(\App\Services\WorkOrderService::class)->pauseSession($workOrder, $request->user()->id, $request->notes);
+        } elseif ($status === WorkOrderStatus::Completed) {
+            app(\App\Services\WorkOrderService::class)->endSession($workOrder);
+            $workOrder->update(['status' => $status]);
             $workOrder->assignments()->update([
                 'status' => AssignmentStatus::Completed,
                 'completed_at' => now(),
             ]);
-        }
-
-        // If status is in_progress, set started_at if not already set
-        if ($status === WorkOrderStatus::InProgress && !$workOrder->started_at) {
-            $workOrder->update(['started_at' => now()]);
+        } else {
+            $workOrder->update([
+                'status' => $status,
+                'notes' => $request->notes ?? $workOrder->notes
+            ]);
         }
 
         // Notify managers about status change
@@ -157,8 +157,33 @@ class WorkOrderController extends Controller
             'creator',
             'items',
             'assignments.technician',
+            'sessions.technician',
             'reports.photos',
         ]), 'Status work order berhasil diperbarui');
+    }
+
+    public function pause(Request $request, WorkOrder $workOrder)
+    {
+        $request->validate([
+            'notes' => 'nullable|string',
+            'reason' => 'nullable|string',
+        ]);
+
+        $reason = $request->notes ?? $request->reason;
+
+        app(\App\Services\WorkOrderService::class)->pauseSession($workOrder, $request->user()->id, $reason);
+
+        return $this->successResponse($workOrder->load([
+            'customer',
+            'vendor',
+            'serviceCategory',
+            'type',
+            'creator',
+            'items',
+            'assignments.technician',
+            'sessions.technician',
+            'reports.photos',
+        ]), 'Pekerjaan berhasil ditunda (pending)');
     }
 
     public function requestTakeover(Request $request, WorkOrder $workOrder)
