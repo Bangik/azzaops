@@ -64,6 +64,13 @@ Route::middleware(['auth', 'role:super_admin,admin,kepala_teknisi'])->prefix('ad
     Route::get('finance', [FinanceController::class, 'index'])->name('finance.index');
     Route::get('finance/incomes/create', [FinanceController::class, 'createIncome'])->name('incomes.create');
     Route::post('finance/incomes', [FinanceController::class, 'storeIncome'])->name('incomes.store');
+    Route::middleware('role:super_admin,admin')->group(function () {
+        Route::get('finance/incomes/{financialTransaction}/edit', [FinanceController::class, 'editIncome'])->name('incomes.edit');
+        Route::put('finance/incomes/{financialTransaction}', [FinanceController::class, 'updateIncome'])->name('incomes.update');
+    });
+    Route::delete('finance/incomes/{financialTransaction}', [FinanceController::class, 'destroyIncome'])
+        ->middleware('role:super_admin')
+        ->name('incomes.destroy');
     Route::resource('finance/expenses', FinanceController::class)->names('expenses')->only(['create', 'store', 'edit', 'update', 'destroy']);
 
     // Super Admin only (Admin no longer has access to staff and devices as requested)

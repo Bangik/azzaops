@@ -124,6 +124,7 @@
                                     <th>Kategori / Akun</th>
                                     <th>Deskripsi / Sumber</th>
                                     <th class="text-end">Nominal</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -154,10 +155,30 @@
                                             {{ $t->type->value === 'income' ? '+' : '-' }}Rp
                                             {{ number_format($t->amount, 0, ',', '.') }}
                                         </td>
+                                        <td>
+                                            @if ($t->type->value === 'income' && !$t->invoice_id)
+                                                <div class="d-flex gap-1">
+                                                    @if (in_array(Auth::user()->role->value, ['admin', 'super_admin']))
+                                                        <a href="{{ route('admin.incomes.edit', $t) }}"
+                                                            class="btn btn-sm btn-warning btn-action"
+                                                            title="Edit pemasukan"><i class="bi bi-pencil"></i></a>
+                                                    @endif
+                                                    @if (Auth::user()->role->value === 'super_admin')
+                                                        <form action="{{ route('admin.incomes.destroy', $t) }}"
+                                                            method="POST"
+                                                            onsubmit="return confirmDelete('Hapus catatan pemasukan ini?')">
+                                                            @csrf @method('DELETE')
+                                                            <button class="btn btn-sm btn-danger btn-action"
+                                                                title="Hapus pemasukan"><i class="bi bi-trash"></i></button>
+                                                        </form>
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center text-muted py-4">Belum ada transaksi di
+                                        <td colspan="5" class="text-center text-muted py-4">Belum ada transaksi di
                                             periode ini</td>
                                     </tr>
                                 @endforelse
@@ -214,12 +235,15 @@
                                                 <a href="{{ route('admin.expenses.edit', $e) }}"
                                                     class="btn btn-sm btn-warning btn-action"><i
                                                         class="bi bi-pencil"></i></a>
-                                                <form action="{{ route('admin.expenses.destroy', $e) }}" method="POST"
-                                                    onsubmit="return confirmDelete('Hapus catatan pengeluaran ini?')">
-                                                    @csrf @method('DELETE')
-                                                    <button class="btn btn-sm btn-danger btn-action"><i
-                                                            class="bi bi-trash"></i></button>
-                                                </form>
+                                                @if (Auth::user()->role->value === 'super_admin')
+                                                    <form action="{{ route('admin.expenses.destroy', $e) }}"
+                                                        method="POST"
+                                                        onsubmit="return confirmDelete('Hapus catatan pengeluaran ini?')">
+                                                        @csrf @method('DELETE')
+                                                        <button class="btn btn-sm btn-danger btn-action"><i
+                                                                class="bi bi-trash"></i></button>
+                                                    </form>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>

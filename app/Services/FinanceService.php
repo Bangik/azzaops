@@ -89,6 +89,27 @@ class FinanceService
         ]));
     }
 
+    public function updateIncome(FinancialTransaction $transaction, array $data): FinancialTransaction
+    {
+        return DB::transaction(function () use ($transaction, $data) {
+            $transaction->update([
+                'category_id' => $data['category_id'],
+                'financial_account_id' => $data['financial_account_id'] ?? null,
+                'amount' => $data['amount'],
+                'transaction_date' => $data['transaction_date'],
+                'description' => $data['description'],
+                'reference_number' => $data['reference_number'] ?? null,
+            ]);
+
+            return $transaction;
+        });
+    }
+
+    public function deleteIncome(FinancialTransaction $transaction): void
+    {
+        DB::transaction(fn() => $transaction->delete());
+    }
+
     public function updateExpense(Expense $expense, array $data): Expense
     {
         return DB::transaction(function () use ($expense, $data) {

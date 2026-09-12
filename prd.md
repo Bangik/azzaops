@@ -132,7 +132,7 @@ PT. Azza Karunia Jaya adalah perusahaan jasa instalasi, perawatan, dan servis AC
 | AD-17 | Sebagai Admin, saya dapat menginput pengeluaran operasional (beli material, transport, dll)                                     | Must     |
 | AD-18 | Sebagai Admin, saya dapat melihat laporan keuangan per periode (harian, mingguan, bulanan)                                      | Must     |
 | AD-19 | Sebagai Admin, saya dapat melihat cost percentage per pekerjaan                                                                 | Should   |
-| AD-22 | Sebagai Admin, saya dapat mencatat pemasukan di luar work order dengan kategori, nominal, tanggal, dan nomor referensi opsional | Must     |
+| AD-22 | Sebagai Admin, saya dapat mencatat dan mengedit pemasukan di luar work order dengan kategori, nominal, tanggal, dan nomor referensi opsional; Super Admin juga dapat menghapusnya | Must     |
 
 **Dashboard:**
 

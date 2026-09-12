@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreExpenseRequest;
 use App\Http\Requests\Admin\StoreIncomeRequest;
+use App\Http\Requests\Admin\UpdateIncomeRequest;
 use App\Http\Requests\Admin\UpdateExpenseRequest;
 use App\Models\Expense;
 use App\Models\FinancialCategory;
@@ -69,6 +70,39 @@ class FinanceController extends Controller
             ->with('success', 'Pemasukan berhasil dicatat');
     }
 
+    public function editIncome(FinancialTransaction $financialTransaction)
+    {
+        $this->ensureManualIncome($financialTransaction);
+
+        $categories = FinancialCategory::income()->active()->orderBy('name')->get();
+        $financialAccounts = FinancialAccount::where(function ($query) use ($financialTransaction) {
+            $query->where('is_active', true)
+                ->orWhere('id', $financialTransaction->financial_account_id);
+        })->orderBy('name')->get();
+
+        return view('admin.finance.income-edit', compact('financialTransaction', 'categories', 'financialAccounts'));
+    }
+
+    public function updateIncome(UpdateIncomeRequest $request, FinancialTransaction $financialTransaction)
+    {
+        $this->ensureManualIncome($financialTransaction);
+        $this->financeService->updateIncome($financialTransaction, $request->validated());
+
+        return redirect()
+            ->route('admin.finance.index')
+            ->with('success', 'Pemasukan berhasil diperbarui');
+    }
+
+    public function destroyIncome(FinancialTransaction $financialTransaction)
+    {
+        $this->ensureManualIncome($financialTransaction);
+        $this->financeService->deleteIncome($financialTransaction);
+
+        return redirect()
+            ->route('admin.finance.index')
+            ->with('success', 'Pemasukan berhasil dihapus');
+    }
+
     public function store(StoreExpenseRequest $request)
     {
         $this->financeService->createExpense($request->validated(), $request->user()->id);
@@ -121,5 +155,14 @@ class FinanceController extends Controller
             ],
             default => [now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()],
         };
+    }
+
+    private function ensureManualIncome(FinancialTransaction $financialTransaction): void
+    {
+        abort_unless(
+            $financialTransaction->type === \App\Enums\TransactionType::Income
+                && $financialTransaction->invoice_id === null,
+            404
+        );
     }
 }
