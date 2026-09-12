@@ -30,7 +30,7 @@ class WorkOrderController extends Controller
 
         // Default date filter to today if no date filter is explicitly provided, or allow filtering by specific date
         $filterDate = $request->filled('date') ? $request->date : today()->toDateString();
-        
+
         // If client sends 'all' or empty parameter explicitly to ignore date filter, we can support it, but default is today
         if ($request->get('date') !== 'all') {
             $query->whereDate('scheduled_date', $filterDate);
@@ -100,7 +100,7 @@ class WorkOrderController extends Controller
 
         $statusStr = $request->status;
         $status = null;
-        
+
         // Find matching status enum
         foreach (WorkOrderStatus::cases() as $case) {
             if ($case->value === $statusStr) {
@@ -146,15 +146,6 @@ class WorkOrderController extends Controller
                 'data' => ['work_order_id' => $workOrder->id],
                 'is_read' => false,
             ]);
-
-            if ($manager->fcm_token) {
-                $this->fcmService->sendToToken(
-                    $manager->fcm_token,
-                    'Status Work Order Diperbarui',
-                    "Status WO {$workOrder->wo_number} diperbarui menjadi: " . $status->label() . " oleh " . $request->user()->name,
-                    ['work_order_id' => $workOrder->id]
-                );
-            }
         }
 
         return $this->successResponse($workOrder->load([
@@ -242,7 +233,7 @@ class WorkOrderController extends Controller
                 'data' => ['work_order_id' => $workOrder->id, 'takeover_id' => $takeover->id],
             ]);
 
-            if ($manager->fcm_token) {
+            if ($manager->role === UserRole::KepalaTeknisi && $manager->fcm_token) {
                 $this->fcmService->sendToToken(
                     $manager->fcm_token,
                     'Permintaan Pengalihan Pekerjaan',
@@ -258,7 +249,7 @@ class WorkOrderController extends Controller
     public function approveTakeover(Request $request, WorkOrderTakeover $takeover)
     {
         $user = $request->user();
-        
+
         // Authorization check: Must be original technician, kepala_teknisi, admin, or super_admin
         $isOriginalTech = ($takeover->original_technician_id === $user->id);
         $isManager = in_array($user->role, [UserRole::SuperAdmin, UserRole::Admin, UserRole::KepalaTeknisi], true);

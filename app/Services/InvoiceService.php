@@ -14,10 +14,6 @@ use Illuminate\Support\Facades\DB;
 
 class InvoiceService
 {
-    public function __construct(
-        private readonly FcmService $fcmService
-    ) {}
-
     public function createFromWorkOrder(WorkOrder $workOrder, array $data, int $issuedBy): Invoice
     {
         return DB::transaction(function () use ($workOrder, $data, $issuedBy) {
@@ -153,18 +149,6 @@ class InvoiceService
                     ],
                     'is_read' => false,
                 ]);
-
-                if ($manager->fcm_token) {
-                    $this->fcmService->sendToToken(
-                        $manager->fcm_token,
-                        'Pembayaran Diterima',
-                        "Pembayaran sebesar Rp " . number_format($paidAmount, 0, ',', '.') . " diterima untuk invoice " . $invoice->invoice_number,
-                        [
-                            'invoice_id' => $invoice->id,
-                            'work_order_id' => $invoice->work_order_id,
-                        ]
-                    );
-                }
             }
 
             return $invoice->fresh();

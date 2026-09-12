@@ -14,10 +14,6 @@ use Illuminate\Support\Str;
 
 class ReportService
 {
-    public function __construct(
-        private readonly FcmService $fcmService
-    ) {}
-
     public function submit(WorkOrder $workOrder, array $data, int $technicianId): WorkOrderReport
     {
         return DB::transaction(function () use ($workOrder, $data, $technicianId) {
@@ -98,22 +94,6 @@ class ReportService
                         'report_id' => $report->id,
                     ],
                 ]);
-
-                if ($manager->fcm_token) {
-                    try {
-                        $this->fcmService->sendToToken(
-                            $manager->fcm_token,
-                            'Laporan Pekerjaan Disubmit',
-                            "Teknisi " . $technicianName . " telah mengirim laporan untuk " . $workOrder->wo_number,
-                            [
-                                'work_order_id' => $workOrder->id,
-                                'report_id' => $report->id,
-                            ]
-                        );
-                    } catch (\Throwable $e) {
-                        \Illuminate\Support\Facades\Log::warning('FCM notification failed: ' . $e->getMessage());
-                    }
-                }
             }
 
             return $report;
