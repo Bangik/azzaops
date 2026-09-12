@@ -1213,7 +1213,7 @@ GET /api/v1/work-orders
   Note:     Menampilkan seluruh WO transparan ke semua akun (default filter tanggal hari ini)
 
 GET /api/v1/work-orders/{id}
-  Response: { data: WorkOrder (with customer, items, assignments, reports) }
+  Response: { data: WorkOrder (with vendor, customer, items, assignments, reports) }
 
 GET /api/v1/work-orders/today
   Query:    { status?: string, page?: int, per_page?: int }

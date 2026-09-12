@@ -26,7 +26,7 @@ class WorkOrderController extends Controller
 
     public function index(Request $request)
     {
-        $query = WorkOrder::with(['customer', 'serviceCategory', 'type', 'assignments.technician', 'reports.photos']);
+        $query = WorkOrder::with(['customer', 'vendor', 'serviceCategory', 'type', 'assignments.technician', 'reports.photos']);
 
         // Default date filter to today if no date filter is explicitly provided, or allow filtering by specific date
         $filterDate = $request->filled('date') ? $request->date : today()->toDateString();
@@ -52,7 +52,7 @@ class WorkOrderController extends Controller
 
     public function today(Request $request)
     {
-        $query = WorkOrder::with(['customer', 'serviceCategory', 'type', 'assignments.technician', 'reports.photos'])
+        $query = WorkOrder::with(['customer', 'vendor', 'serviceCategory', 'type', 'assignments.technician', 'reports.photos'])
             ->whereDate('scheduled_date', today());
 
         if ($request->filled('status')) {
@@ -73,6 +73,7 @@ class WorkOrderController extends Controller
     {
         $workOrder->load([
             'customer',
+            'vendor',
             'serviceCategory',
             'type',
             'creator',
@@ -150,6 +151,7 @@ class WorkOrderController extends Controller
 
         return $this->successResponse($workOrder->load([
             'customer',
+            'vendor',
             'serviceCategory',
             'type',
             'creator',
