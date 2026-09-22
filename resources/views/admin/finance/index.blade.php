@@ -158,12 +158,10 @@
                                         <td>
                                             @if ($t->type->value === 'income' && !$t->invoice_id)
                                                 <div class="d-flex gap-1">
-                                                    @if (in_array(Auth::user()->role->value, ['admin', 'super_admin']))
+                                                    @if (Auth::user()->role->value === 'super_admin')
                                                         <a href="{{ route('admin.incomes.edit', $t) }}"
                                                             class="btn btn-sm btn-warning btn-action"
                                                             title="Edit pemasukan"><i class="bi bi-pencil"></i></a>
-                                                    @endif
-                                                    @if (Auth::user()->role->value === 'super_admin')
                                                         <form action="{{ route('admin.incomes.destroy', $t) }}"
                                                             method="POST"
                                                             onsubmit="return confirmDelete('Hapus catatan pemasukan ini?')">
@@ -205,7 +203,9 @@
                                     <th>Tanggal</th>
                                     <th>Deskripsi</th>
                                     <th class="text-end">Nominal</th>
-                                    <th>Aksi</th>
+                                    @if (Auth::user()->role->value === 'super_admin')
+                                        <th>Aksi</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -230,12 +230,12 @@
                                         </td>
                                         <td class="text-end text-danger fw-semibold">Rp
                                             {{ number_format($e->amount, 0, ',', '.') }}</td>
-                                        <td>
-                                            <div class="d-flex gap-1">
-                                                <a href="{{ route('admin.expenses.edit', $e) }}"
-                                                    class="btn btn-sm btn-warning btn-action"><i
-                                                        class="bi bi-pencil"></i></a>
-                                                @if (Auth::user()->role->value === 'super_admin')
+                                        @if (Auth::user()->role->value === 'super_admin')
+                                            <td>
+                                                <div class="d-flex gap-1">
+                                                    <a href="{{ route('admin.expenses.edit', $e) }}"
+                                                        class="btn btn-sm btn-warning btn-action"><i
+                                                            class="bi bi-pencil"></i></a>
                                                     <form action="{{ route('admin.expenses.destroy', $e) }}"
                                                         method="POST"
                                                         onsubmit="return confirmDelete('Hapus catatan pengeluaran ini?')">
@@ -243,9 +243,9 @@
                                                         <button class="btn btn-sm btn-danger btn-action"><i
                                                                 class="bi bi-trash"></i></button>
                                                     </form>
-                                                @endif
-                                            </div>
-                                        </td>
+                                                </div>
+                                            </td>
+                                        @endif
                                     </tr>
                                 @empty
                                     <tr>

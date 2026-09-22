@@ -271,6 +271,12 @@
                                             <textarea class="form-control form-control-sm" id="recommendations-{{ $report->id }}" name="recommendations"
                                                 rows="3">{{ $report->recommendations }}</textarea>
                                         </div>
+                                        <div class="mb-3">
+                                            <label for="materials_used-{{ $report->id }}"
+                                                class="form-label small fw-bold">Alat / Bahan Yang Digunakan</label>
+                                            <textarea class="form-control form-control-sm" id="materials_used-{{ $report->id }}" name="materials_used"
+                                                rows="2">{{ $report->materials_used }}</textarea>
+                                        </div>
                                         <div class="d-flex gap-2">
                                             <button type="submit" class="btn btn-sm btn-primary">Simpan Laporan</button>
                                             <button type="button" class="btn btn-sm btn-secondary"
@@ -295,6 +301,13 @@
                                         <div class="text-muted small fw-bold">Rekomendasi</div>
                                         <div class="text-dark bg-light p-2 rounded" style="white-space: pre-line;">
                                             {{ $report->recommendations }}</div>
+                                    </div>
+                                @endif
+                                @if ($report->materials_used)
+                                    <div class="mb-2">
+                                        <div class="text-muted small fw-bold">Alat / Bahan Yang digunakan</div>
+                                        <div class="text-dark bg-light p-2 rounded" style="white-space: pre-line;">
+                                            {{ $report->materials_used }}</div>
                                     </div>
                                 @endif
                                 @if ($report->photos->count())

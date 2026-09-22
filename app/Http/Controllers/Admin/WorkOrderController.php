@@ -271,6 +271,7 @@ class WorkOrderController extends Controller
             'findings' => ['required', 'string'],
             'work_done' => ['required', 'string'],
             'recommendations' => ['nullable', 'string'],
+            'materials_used' => ['nullable', 'string'],
         ]);
 
         $report->update($data);
