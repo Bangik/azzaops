@@ -16,6 +16,7 @@ class GoogleSheetSyncController extends Controller
     public function sync(Request $request)
     {
         $request->validate([
+            'type' => 'required|in:work-orders,finance,attendance',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
         ]);
@@ -29,12 +30,24 @@ class GoogleSheetSyncController extends Controller
                 $params['--end'] = $request->end_date;
             }
 
-            Artisan::call('sync:work-orders-sheet', $params);
+            $command = match($request->type) {
+                'finance' => 'sync:finance-sheet',
+                'attendance' => 'sync:attendance-sheet',
+                default => 'sync:work-orders-sheet',
+            };
+            
+            Artisan::call($command, $params);
             $output = Artisan::output();
 
+            $typeLabel = match($request->type) {
+                'finance' => 'Keuangan',
+                'attendance' => 'Presensi',
+                default => 'Work Order',
+            };
+            
             return redirect()
                 ->route('admin.google-sheet-sync.index')
-                ->with('success', 'Data berhasil disync ke Google Spreadsheet. ' . trim($output));
+                ->with('success', "Data $typeLabel berhasil disync ke Google Spreadsheet. " . trim($output));
         } catch (\Exception $e) {
             return redirect()
                 ->route('admin.google-sheet-sync.index')

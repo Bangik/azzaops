@@ -1659,6 +1659,15 @@ Pagination {
 
 #### Laporan & Dokumentasi
 
+**Sync Google Spreadsheet (Super Admin):**
+- Modul khusus untuk mem-push data secara langsung ke Google Spreadsheet via API Service Account
+- Target spreadsheet dikonfigurasi melalui `.env` (`GOOGLE_SPREADSHEET_ID` dan `GOOGLE_CREDENTIALS_PATH`)
+- Tab 1: **Work Orders** (Replace seluruh data WO beserta relasi customer, teknisi, invoice, laporan, RAB)
+- Tab 2: **Keuangan** (Replace seluruh data Financial Transaction beserta detail kategori, pencatat, referensi invoice/WO)
+- Tab 3: **Presensi** (Replace seluruh data Presensi beserta profil staff dan koordinat lokasi masuk/pulang)
+- Opsi filter berdasarkan **rentang tanggal** (Tanggal Mulai s.d Tanggal Akhir) untuk membatasi query yang berat
+- Dapat dijalankan via Web UI atau Scheduler (Terminal/Cron) menggunakan `php artisan sync:work-orders-sheet`, `php artisan sync:finance-sheet`, dan `php artisan sync:attendance-sheet`
+
 **Viewer Laporan Teknisi:**
 
 - Lihat laporan per WO (temuan, pekerjaan, rekomendasi, material)
