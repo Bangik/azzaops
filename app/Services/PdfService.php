@@ -49,7 +49,7 @@ class PdfService
         $workOrder->load(['customer', 'serviceCategory', 'creator', 'assignments.technician', 'reports.technician', 'reports.photos']);
         $settings = $this->getCompanySettings();
 
-        $pdf = Pdf::loadView('pdf.report', compact('workOrder', 'settings'))
+        $pdf = Pdf::loadView('pdf.report_v2', compact('workOrder', 'settings'))
             ->setPaper('a4', 'portrait');
 
         return $pdf;
@@ -57,10 +57,14 @@ class PdfService
 
     public function generateInvoiceReportPdf(WorkOrder $workOrder)
     {
-        $workOrder->load(['customer', 'serviceCategory', 'creator', 'assignments.technician', 'reports.technician', 'reports.photos', 'invoice.items', 'invoice.issuer']);
+        $workOrder->load(['customer', 'serviceCategory', 'creator', 'assignments.technician', 'reports.technician', 'reports.photos', 'invoice.items', 'invoice.issuer', 'invoice.financialAccount']);
         $settings = $this->getCompanySettings();
+        
+        $data = $this->getInvoiceV2Data($workOrder->invoice, $settings);
+        $data['workOrder'] = $workOrder;
+        $data['settings'] = $settings;
 
-        $pdf = Pdf::loadView('pdf.invoice_report', compact('workOrder', 'settings'))
+        $pdf = Pdf::loadView('pdf.invoice_report_v2', $data)
             ->setPaper('a4', 'portrait');
 
         return $pdf;

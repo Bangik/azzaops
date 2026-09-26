@@ -1601,8 +1601,9 @@ Pagination {
 - PDF berisi ringkasan invoice vendor dan laporan teknisi dari seluruh Work Order terpilih
 - Invoice customer per Work Order tetap terpisah dan tidak berubah
 
-**Invoice PDF:**
+**Invoice PDF & Laporan Pekerjaan (V2):**
 
+- Menggunakan template desain baru yang lebih modern (invoicev2)
 - Header: logo + nama + alamat + kontak perusahaan
 - Info customer
 - Nomor invoice, tanggal, jatuh tempo
@@ -1610,6 +1611,8 @@ Pagination {
 - Subtotal, diskon, pajak, grand total
 - Catatan/terms
 - Footer: text konfigurabel dari settings
+- Laporan Pekerjaan digabung pada halaman kedua dengan desain template v2 yang konsisten (berlaku juga untuk download Laporan WO saja tanpa invoice)
+- Laporan berisi ringkasan klien, temuan, pengerjaan, rekomendasi, dan galeri foto dokumentasi teknisi
 
 **Kwitansi Pembayaran PDF:**
 

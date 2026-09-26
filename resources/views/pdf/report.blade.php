@@ -1,3 +1,4 @@
+{{-- DEPRECATED: Gunakan report_v2.blade.php --}}
 <!DOCTYPE html>
 <html lang="id">
 <head>
