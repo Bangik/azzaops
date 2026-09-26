@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\FinancialCategoryController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Admin\VendorInvoiceController;
+use App\Http\Controllers\Admin\CombinedInvoiceController;
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\GoogleSheetSyncController;
 
@@ -37,6 +38,10 @@ Route::middleware(['auth', 'role:super_admin,admin,kepala_teknisi'])->prefix('ad
     Route::resource('vendors', VendorController::class)->except(['show']);
     Route::get('vendor-invoices/create', [VendorInvoiceController::class, 'create'])->name('vendor-invoices.create');
     Route::post('vendor-invoices/download', [VendorInvoiceController::class, 'download'])->name('vendor-invoices.download');
+    
+    Route::get('combined-invoices/create', [CombinedInvoiceController::class, 'create'])->name('combined-invoices.create');
+    Route::post('combined-invoices/download', [CombinedInvoiceController::class, 'download'])->name('combined-invoices.download');
+    
     Route::post('work-orders/{workOrder}/assign', [WorkOrderController::class, 'assign'])->name('work-orders.assign');
     Route::get('work-orders/{workOrder}/continue', [WorkOrderController::class, 'continue'])->name('work-orders.continue');
     Route::post('work-orders/{workOrder}/continue', [WorkOrderController::class, 'storeContinue'])->name('work-orders.store-continue');

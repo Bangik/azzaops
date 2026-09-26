@@ -85,6 +85,23 @@ class PdfService
         ])->setPaper('a4', 'portrait');
     }
 
+    public function generateCombinedInvoicePdf($workOrders)
+    {
+        $settings = $this->getCompanySettings();
+        $workOrders->loadMissing(['customer', 'items', 'assignments.technician', 'reports.technician', 'reports.photos', 'invoice']);
+
+        // Use invoice subtotal if available, else WO total
+        $total = $workOrders->sum(function($workOrder) {
+            return $workOrder->invoice ? $workOrder->invoice->total : $workOrder->total;
+        });
+
+        return Pdf::loadView('pdf.combined_invoice', [
+            'workOrders' => $workOrders,
+            'total' => $total,
+            'settings' => $settings,
+        ])->setPaper('a4', 'portrait');
+    }
+
     private function getCompanySettings(): array
     {
         return [

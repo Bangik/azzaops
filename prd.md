@@ -1608,6 +1608,14 @@ Pagination {
 - PDF berisi ringkasan invoice vendor dan laporan teknisi dari seluruh Work Order terpilih
 - Invoice customer per Work Order tetap terpisah dan tidak berubah
 
+**Invoice Gabungan (Fleksibel):**
+
+- Fitur untuk menggabungkan beberapa Work Order (Customer) secara fleksibel ke dalam satu PDF Invoice.
+- Admin dapat memfilter berdasarkan Customer dan rentang tanggal, lalu memilih (checkbox) spesifik Work Order yang ingin digabungkan.
+- Solusi untuk satu Customer dengan banyak Work Order (misal 2 cabang/rumah berbeda) yang meminta ditagihkan dalam 1 Invoice saja.
+- Bisa memilih Work Order dari Customer yang berbeda juga jika diperlukan.
+- PDF berisi rincian tagihan tiap WO berserta laporan teknisi dari seluruh Work Order terpilih.
+
 **Invoice PDF & Laporan Pekerjaan (V2):**
 
 - Menggunakan template desain baru yang lebih modern (invoicev2)

@@ -106,6 +106,12 @@
                     <i class="bi bi-file-earmark-text me-2"></i>Invoice Vendor
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('admin.combined-invoices.*') ? 'active' : '' }}"
+                    href="{{ route('admin.combined-invoices.create') }}">
+                    <i class="bi bi-files me-2"></i>Invoice Gabungan
+                </a>
+            </li>
 
             @if (auth()->user()->role->value === 'super_admin')
                 <li class="nav-section-label">Administrasi</li>
