@@ -22,7 +22,7 @@ class AttendanceController extends Controller
     {
         $user = auth()->user();
         $attendance = $this->attendanceService->getTodayAttendance($user->id);
-        $schedule = $this->attendanceService->getWorkSchedule();
+        $schedule = $this->attendanceService->getWorkSchedule($user);
 
         return $this->successResponse([
             'attendance' => $attendance ? [

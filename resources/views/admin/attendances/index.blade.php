@@ -26,43 +26,74 @@
     {{-- Setting Jadwal Kerja --}}
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h6 class="mb-0"><i class="bi bi-clock me-2"></i>Jadwal Kerja</h6>
+            <h6 class="mb-0"><i class="bi bi-clock me-2"></i>Jadwal Kerja & Lokasi Presensi</h6>
         </div>
         <div class="card-body">
-            <form action="{{ route('admin.attendances.update-schedule') }}" method="POST" class="row g-3 align-items-end">
+            <form action="{{ route('admin.attendances.update-schedule') }}" method="POST">
                 @csrf
                 @method('PUT')
-                <div class="col-md-2">
-                    <label class="form-label">Jam Masuk</label>
-                    <input type="time" name="work_start_time" class="form-control"
-                        value="{{ $schedule['work_start_time'] }}" required>
+
+                <h6 class="mb-3 fw-bold border-bottom pb-2">Jadwal Global (Default)</h6>
+                <div class="row g-3 align-items-end mb-4">
+                    <div class="col-md-3">
+                        <label class="form-label">Jam Masuk</label>
+                        <input type="time" name="work_start_time" class="form-control"
+                            value="{{ $schedule['work_start_time'] }}" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Jam Pulang</label>
+                        <input type="time" name="work_end_time" class="form-control"
+                            value="{{ $schedule['work_end_time'] }}" required>
+                    </div>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label">Jam Pulang</label>
-                    <input type="time" name="work_end_time" class="form-control" value="{{ $schedule['work_end_time'] }}"
-                        required>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Radius Presensi (meter)</label>
-                    <input type="number" name="attendance_radius_meters" class="form-control"
-                        value="{{ $schedule['attendance_radius_meters'] }}" min="1" max="100000" required>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Latitude</label>
-                    <input type="number" name="attendance_latitude" class="form-control" step="0.0000001"
-                        value="{{ $schedule['attendance_latitude'] }}" min="-90" max="90" required>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Longitude</label>
-                    <input type="number" name="attendance_longitude" class="form-control" step="0.0000001"
-                        value="{{ $schedule['attendance_longitude'] }}" min="-180" max="180" required>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-lg me-1"></i> Simpan Jadwal
-                    </button>
+
+                <h6 class="mb-3 fw-bold border-bottom pb-2">Jadwal Per Role (Opsional, timpa global)</h6>
+                @foreach ($roleSchedules as $role => $times)
+                    <div class="row g-3 align-items-end mb-3">
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">{{ $times['label'] }}</label>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="time" name="roles[{{ $role }}][start]" class="form-control"
+                                value="{{ $times['start'] }}" placeholder="Jam Masuk">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="time" name="roles[{{ $role }}][end]" class="form-control"
+                                value="{{ $times['end'] }}" placeholder="Jam Pulang">
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">Kosongkan jika mengikuti Global</small>
+                        </div>
+                    </div>
+                @endforeach
+
+                <h6 class="mb-3 mt-4 fw-bold border-bottom pb-2">Pengaturan Lokasi (Wajib)</h6>
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Radius Presensi (meter)</label>
+                        <input type="number" name="attendance_radius_meters" class="form-control"
+                            value="{{ $schedule['attendance_radius_meters'] }}" min="1" max="100000" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Latitude</label>
+                        <input type="number" name="attendance_latitude" class="form-control" step="0.0000001"
+                            value="{{ $schedule['attendance_latitude'] }}" min="-90" max="90" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Longitude</label>
+                        <input type="number" name="attendance_longitude" class="form-control" step="0.0000001"
+                            value="{{ $schedule['attendance_longitude'] }}" min="-180" max="180" required>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check-lg me-1"></i> Simpan Pengaturan
+                        </button>
+                    </div>
                 </div>
             </form>
+            <div class="mt-3 small text-muted">
+                <i class="bi bi-info-circle"></i> <strong>Note:</strong> Untuk mengatur jam fleksibel per masing-masing individu (timpa Role & Global), buka menu <strong>Staff</strong> dan edit pada user yang bersangkutan.
+            </div>
 
             <div class="mt-4">
                 <div class="d-flex justify-content-between align-items-center mb-2">

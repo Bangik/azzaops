@@ -810,8 +810,15 @@ Presensi harian staff (admin & teknisi).
 
 | Key             | Value | Group      | Deskripsi        |
 | --------------- | ----- | ---------- | ---------------- |
-| work_start_time | 08:00 | attendance | Jam masuk kerja  |
-| work_end_time   | 17:00 | attendance | Jam pulang kerja |
+| work_start_time | 08:00 | attendance | Jam masuk kerja (Global) |
+| work_end_time   | 17:00 | attendance | Jam pulang kerja (Global) |
+| role_{role}_start_time | 08:00 | attendance | Jam masuk khusus Role tertentu |
+| role_{role}_end_time | 17:00 | attendance | Jam pulang khusus Role tertentu |
+
+> **Fleksibilitas Jadwal (Hierarki):**
+> 1. Sistem akan mengecek kolom `work_start_time` dan `work_end_time` secara spesifik pada tabel `users`. Jika terisi, nilai ini yang digunakan.
+> 2. Jika di user kosong, sistem mengecek *Setting* berdasarkan role (contoh: `role_teknisi_start_time`).
+> 3. Jika setting role kosong, sistem akan menggunakan jadwal *Global* (`work_start_time`).
 
 ---
 

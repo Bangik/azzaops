@@ -25,7 +25,11 @@
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <small class="text-muted">Jadwal Kerja</small>
+                        <small class="text-muted">Jadwal Kerja 
+                            <span class="badge bg-light text-secondary border ms-1">
+                                {{ $schedule['type'] === 'staff' ? 'Individu' : ($schedule['type'] === 'role' ? 'Role ' . auth()->user()->role->label() : 'Global') }}
+                            </span>
+                        </small>
                         <div class="fw-semibold">{{ $schedule['work_start_time'] }} - {{ $schedule['work_end_time'] }}</div>
                     </div>
 

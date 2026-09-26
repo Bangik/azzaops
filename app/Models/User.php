@@ -22,6 +22,8 @@ class User extends Authenticatable
         'role',
         'is_active',
         'fcm_token',
+        'work_start_time',
+        'work_end_time',
         'avatar',
     ];
 

@@ -29,7 +29,18 @@ class AttendanceController extends Controller
         $staffList = User::active()->orderBy('name')->get();
         $schedule = $this->attendanceService->getWorkSchedule();
 
-        return view('admin.attendances.index', compact('attendances', 'staffList', 'from', 'to', 'userId', 'status', 'schedule'));
+        // Get Role schedules for view
+        $roles = \App\Enums\UserRole::cases();
+        $roleSchedules = [];
+        foreach ($roles as $role) {
+            $roleSchedules[$role->value] = [
+                'start' => \App\Models\Setting::get('role_' . $role->value . '_start_time'),
+                'end' => \App\Models\Setting::get('role_' . $role->value . '_end_time'),
+                'label' => $role->label(),
+            ];
+        }
+
+        return view('admin.attendances.index', compact('attendances', 'staffList', 'from', 'to', 'userId', 'status', 'schedule', 'roleSchedules'));
     }
 
     /**
@@ -56,7 +67,7 @@ class AttendanceController extends Controller
     {
         $user = auth()->user();
         $today = $this->attendanceService->getTodayAttendance($user->id);
-        $schedule = $this->attendanceService->getWorkSchedule();
+        $schedule = $this->attendanceService->getWorkSchedule($user);
         $logs = $this->attendanceService->getUserLog($user->id, null, null, 10);
 
         return view('admin.attendances.my-attendance', compact('today', 'schedule', 'logs'));
@@ -113,7 +124,7 @@ class AttendanceController extends Controller
     {
         $request->validate([
             'work_start_time' => 'required|date_format:H:i',
-            'work_end_time' => 'required|date_format:H:i|after:work_start_time',
+            'work_end_time' => 'required|date_format:H:i',
             'attendance_radius_meters' => 'required|integer|min:1|max:100000',
             'attendance_latitude' => 'required|numeric|between:-90,90',
             'attendance_longitude' => 'required|numeric|between:-180,180',
@@ -121,13 +132,32 @@ class AttendanceController extends Controller
 
         \App\Models\Setting::updateOrCreate(
             ['key' => 'work_start_time'],
-            ['value' => $request->work_start_time, 'group' => 'attendance', 'description' => 'Jam masuk kerja']
+            ['value' => $request->work_start_time, 'group' => 'attendance', 'description' => 'Jam masuk kerja (Global)']
         );
 
         \App\Models\Setting::updateOrCreate(
             ['key' => 'work_end_time'],
-            ['value' => $request->work_end_time, 'group' => 'attendance', 'description' => 'Jam pulang kerja']
+            ['value' => $request->work_end_time, 'group' => 'attendance', 'description' => 'Jam pulang kerja (Global)']
         );
+
+        // Update Role Schedules if present
+        if ($request->has('roles') && is_array($request->roles)) {
+            foreach ($request->roles as $role => $times) {
+                if (!empty($times['start']) && !empty($times['end'])) {
+                    \App\Models\Setting::updateOrCreate(
+                        ['key' => 'role_' . $role . '_start_time'],
+                        ['value' => $times['start'], 'group' => 'attendance', 'description' => 'Jam masuk kerja role ' . $role]
+                    );
+                    \App\Models\Setting::updateOrCreate(
+                        ['key' => 'role_' . $role . '_end_time'],
+                        ['value' => $times['end'], 'group' => 'attendance', 'description' => 'Jam pulang kerja role ' . $role]
+                    );
+                } else {
+                    \App\Models\Setting::where('key', 'role_' . $role . '_start_time')->delete();
+                    \App\Models\Setting::where('key', 'role_' . $role . '_end_time')->delete();
+                }
+            }
+        }
 
         \App\Models\Setting::updateOrCreate(
             ['key' => 'attendance_radius_meters'],

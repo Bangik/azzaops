@@ -21,6 +21,8 @@ class StoreStaffRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', new Enum(UserRole::class)],
+            'work_start_time' => ['nullable', 'date_format:H:i'],
+            'work_end_time' => ['nullable', 'date_format:H:i'],
         ];
     }
 

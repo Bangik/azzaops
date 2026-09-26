@@ -67,6 +67,26 @@
                     <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
                     <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
                 </div>
+
+                <div class="col-12 mt-3 mb-2">
+                    <h6 class="fw-bold border-bottom pb-2">Jadwal Presensi Individual (Opsional)</h6>
+                    <small class="text-muted d-block mb-3">Jika diisi, jadwal ini akan mengesampingkan jadwal Role dan Global.</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="work_start_time" class="form-label">Jam Masuk</label>
+                    <input type="time" class="form-control @error('work_start_time') is-invalid @enderror" id="work_start_time" name="work_start_time" value="{{ old('work_start_time', $staff->work_start_time ? \Carbon\Carbon::parse($staff->work_start_time)->format('H:i') : '') }}">
+                    @error('work_start_time')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="work_end_time" class="form-label">Jam Pulang</label>
+                    <input type="time" class="form-control @error('work_end_time') is-invalid @enderror" id="work_end_time" name="work_end_time" value="{{ old('work_end_time', $staff->work_end_time ? \Carbon\Carbon::parse($staff->work_end_time)->format('H:i') : '') }}">
+                    @error('work_end_time')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
             </div>
 
             <div class="mt-3">

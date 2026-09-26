@@ -10,11 +10,38 @@ use Illuminate\Validation\ValidationException;
 
 class AttendanceService
 {
-    public function getWorkSchedule(): array
+    public function getWorkSchedule(?\App\Models\User $user = null): array
     {
+        $globalStart = Setting::get('work_start_time', '08:00');
+        $globalEnd = Setting::get('work_end_time', '17:00');
+
+        $start = $globalStart;
+        $end = $globalEnd;
+        $type = 'global';
+
+        if ($user) {
+            // Role specific
+            $roleStart = Setting::get('role_' . $user->role->value . '_start_time');
+            $roleEnd = Setting::get('role_' . $user->role->value . '_end_time');
+
+            if ($roleStart && $roleEnd) {
+                $start = $roleStart;
+                $end = $roleEnd;
+                $type = 'role';
+            }
+
+            // Staff specific
+            if ($user->work_start_time && $user->work_end_time) {
+                $start = $user->work_start_time;
+                $end = $user->work_end_time;
+                $type = 'staff';
+            }
+        }
+
         return [
-            'work_start_time' => Setting::where('key', 'work_start_time')->value('value') ?? '08:00',
-            'work_end_time' => Setting::where('key', 'work_end_time')->value('value') ?? '17:00',
+            'work_start_time' => Carbon::parse($start)->format('H:i'),
+            'work_end_time' => Carbon::parse($end)->format('H:i'),
+            'type' => $type,
             'attendance_radius_meters' => (int) (Setting::get('attendance_radius_meters') ?? 100),
             'attendance_latitude' => Setting::get('attendance_latitude'),
             'attendance_longitude' => Setting::get('attendance_longitude'),
@@ -25,9 +52,10 @@ class AttendanceService
     {
         $this->ensureWithinAttendanceRadius($latitude, $longitude);
 
+        $user = \App\Models\User::find($userId);
         $today = Carbon::today()->toDateString();
         $now = Carbon::now()->format('H:i:s');
-        $schedule = $this->getWorkSchedule();
+        $schedule = $this->getWorkSchedule($user);
 
         $status = Carbon::parse($now)->gt(Carbon::parse($schedule['work_start_time']))
             ? AttendanceStatus::Late
