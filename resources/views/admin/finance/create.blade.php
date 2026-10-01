@@ -44,13 +44,14 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="financial_account_id" class="form-label">Akun Keuangan (Opsional)</label>
+                        <label for="financial_account_id" class="form-label">Akun Keuangan</label>
                         <select class="form-select @error('financial_account_id') is-invalid @enderror"
                             id="financial_account_id" name="financial_account_id">
                             <option value="">Tidak dikaitkan ke akun</option>
                             @foreach ($financialAccounts as $account)
                                 <option value="{{ $account->id }}" @selected(old('financial_account_id') == $account->id)>{{ $account->name }}
-                                    ({{ $account->code }})</option>
+                                    ({{ $account->code }})
+                                </option>
                             @endforeach
                         </select>
                         @error('financial_account_id')

@@ -17,7 +17,7 @@ class StoreExpenseRequest extends FormRequest
         return [
             'category_id' => ['required', 'exists:financial_categories,id'],
             'financial_account_id' => [
-                'nullable',
+                'required',
                 Rule::exists('financial_accounts', 'id')->where('is_active', true),
             ],
             'work_order_id' => ['nullable', 'exists:work_orders,id'],
