@@ -38,6 +38,10 @@ class StoreExpenseRequest extends FormRequest
             'amount.required' => 'Jumlah nominal pengeluaran wajib diisi',
             'amount.min' => 'Jumlah minimal adalah Rp 1',
             'expense_date.required' => 'Tanggal pengeluaran wajib diisi',
+            'financial_account_id' => [
+                'required' => 'Akun keuangan wajib dipilih',
+                'exists' => 'Akun keuangan tidak valid atau tidak aktif',
+            ],
         ];
     }
 }
