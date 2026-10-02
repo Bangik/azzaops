@@ -1,78 +1,358 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="utf-8">
-    <title>{{ $documentTitle ?? 'INVOICE & LAPORAN' }} @isset($invoiceNumber) {{ $invoiceNumber }} @endisset</title>
+    <title>{{ $documentTitle ?? 'INVOICE & LAPORAN' }} @isset($invoiceNumber)
+            {{ $invoiceNumber }}
+        @endisset
+    </title>
     <style>
-        @page { margin: 0; size: A4; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DejaVu Sans', sans-serif; font-size: 11px; color: #2b2b2b; }
-        table { border-collapse: collapse; width: 100%; }
-        .accent-bar { background-color: #a9cdd6; height: 14px; width: 100%; }
-        
+        @page {
+            margin: 0;
+            size: A4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DejaVu Sans', sans-serif;
+            font-size: 11px;
+            color: #2b2b2b;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .accent-bar {
+            background-color: #a9cdd6;
+            height: 14px;
+            width: 100%;
+        }
+
         /* HEADER */
-        .header { background-color: #414c6e; color: #ffffff; padding: 28px 40px 22px 40px; }
-        .logo-mark { width: 30px; height: 30px; background-color: #a9cdd6; }
-        .company-name { font-size: 17px; font-weight: bold; letter-spacing: 0.5px; }
-        .company-tagline { font-size: 9px; color: #cdd6e4; margin-top: 2px; }
-        .invoice-title { font-size: 42px; font-weight: bold; text-align: right; letter-spacing: 3px; }
-        .invoice-no { text-align: right; font-size: 11px; font-weight: bold; margin-top: 6px; }
-        .header-divider { border-top: 1px solid rgba(255, 255, 255, 0.35); margin: 20px 0 16px 0; }
-        .contact-heading { font-size: 12px; font-weight: bold; margin-bottom: 10px; }
-        .contact-label { font-size: 8px; font-weight: bold; color: #cdd6e4; text-transform: uppercase; margin-bottom: 3px; }
-        .contact-value { font-size: 10px; font-weight: bold; margin-bottom: 8px; }
-        .date-label { font-size: 11px; font-weight: bold; text-align: right; }
-        .date-value { font-size: 10px; text-align: right; margin-top: 2px; margin-bottom: 10px; }
-        
+        .header {
+            background-color: #414c6e;
+            color: #ffffff;
+            padding: 28px 40px 22px 40px;
+        }
+
+        .logo-mark {
+            width: 30px;
+            height: 30px;
+            background-color: #a9cdd6;
+        }
+
+        .company-name {
+            font-size: 17px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .company-tagline {
+            font-size: 9px;
+            color: #cdd6e4;
+            margin-top: 2px;
+        }
+
+        .invoice-title {
+            font-size: 42px;
+            font-weight: bold;
+            text-align: right;
+            letter-spacing: 3px;
+        }
+
+        .invoice-no {
+            text-align: right;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 6px;
+        }
+
+        .header-divider {
+            border-top: 1px solid rgba(255, 255, 255, 0.35);
+            margin: 20px 0 16px 0;
+        }
+
+        .contact-heading {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .contact-label {
+            font-size: 8px;
+            font-weight: bold;
+            color: #cdd6e4;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .contact-value {
+            font-size: 10px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .date-label {
+            font-size: 11px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .date-value {
+            font-size: 10px;
+            text-align: right;
+            margin-top: 2px;
+            margin-bottom: 10px;
+        }
+
         /* BILLING */
-        .billing-section { padding: 26px 40px 22px 40px; }
-        .kepada-label { font-size: 10px; font-weight: bold; letter-spacing: 0.5px; margin-bottom: 6px; }
-        .client-name { font-size: 15px; font-weight: bold; margin-bottom: 10px; }
-        .client-detail { font-size: 10px; margin-bottom: 4px; }
-        .amount-label { font-size: 10px; font-weight: bold; letter-spacing: 0.5px; text-align: right; margin-bottom: 6px; }
-        .amount-value { font-size: 26px; font-weight: bold; color: #414c6e; text-align: right; }
-        
+        .billing-section {
+            padding: 26px 40px 22px 40px;
+        }
+
+        .kepada-label {
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .client-name {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .client-detail {
+            font-size: 10px;
+            margin-bottom: 4px;
+        }
+
+        .amount-label {
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            text-align: right;
+            margin-bottom: 6px;
+        }
+
+        .amount-value {
+            font-size: 26px;
+            font-weight: bold;
+            color: #414c6e;
+            text-align: right;
+        }
+
         /* ITEMS */
-        .content-wrap { padding: 0 40px; }
-        .items-table thead { display: table-header-group; }
-        .items-table tbody { display: table-row-group; }
-        .items-table thead th { background-color: #414c6e; color: #ffffff; font-size: 10px; font-weight: bold; padding: 12px 14px; text-align: left; }
-        .items-table thead th.col-total { background-color: #a9cdd6; color: #414c6e; }
-        .items-table thead th.center, .items-table tbody td.center { text-align: center; }
-        .items-table tbody td { padding: 14px; font-size: 10px; border-bottom: 1px solid #e8ebf0; }
-        .items-table tbody tr:nth-child(even) td { background-color: #f4f6f9; }
-        .item-name { font-weight: bold; font-size: 11px; }
-        .item-desc { font-size: 9px; color: #8a8a8a; margin-top: 2px; }
-        
+        .content-wrap {
+            padding: 0 40px;
+        }
+
+        .items-table thead {
+            display: table-header-group;
+        }
+
+        .items-table tbody {
+            display: table-row-group;
+        }
+
+        .items-table thead th {
+            background-color: #414c6e;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 12px 14px;
+            text-align: left;
+        }
+
+        .items-table thead th.col-total {
+            background-color: #a9cdd6;
+            color: #414c6e;
+        }
+
+        .items-table thead th.center,
+        .items-table tbody td.center {
+            text-align: center;
+        }
+
+        .items-table tbody td {
+            padding: 14px;
+            font-size: 10px;
+            border-bottom: 1px solid #e8ebf0;
+        }
+
+        .items-table tbody tr:nth-child(even) td {
+            background-color: #f4f6f9;
+        }
+
+        .item-name {
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .item-desc {
+            font-size: 9px;
+            color: #8a8a8a;
+            margin-top: 2px;
+        }
+
         /* FOOTER */
-        .footer-section { padding: 24px 40px 16px 40px; }
-        .payment-heading { font-size: 11px; font-weight: bold; margin-bottom: 10px; }
-        .payment-label { font-size: 9px; font-weight: bold; }
-        .payment-value { font-size: 9px; margin-bottom: 8px; }
-        .signature-img { height: 45px; margin: 14px 0 4px 0; }
-        .signature-line { border-top: 1px solid #333333; width: 190px; margin-top: 42px; }
-        .signature-name { font-size: 11px; font-weight: bold; margin-top: 6px; }
-        .signature-position { font-size: 9px; color: #666666; }
-        
-        .summary-box td { font-size: 10px; color: #ffffff; background-color: #414c6e; padding: 9px 16px; }
-        .summary-box tr.total td { font-weight: bold; font-size: 12px; background-color: #333c58; border-top: 1px solid rgba(255, 255, 255, 0.35); }
-        .summary-label { text-align: left; }
-        .summary-value { text-align: right; font-weight: bold; }
-        .thanks { font-size: 12px; font-weight: bold; text-align: right; margin-top: 22px; }
-        .terms { font-size: 9px; font-style: italic; color: #555555; text-align: right; margin-top: 4px; }
-        
+        .footer-section {
+            padding: 24px 40px 16px 40px;
+        }
+
+        .payment-heading {
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .payment-label {
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        .payment-value {
+            font-size: 9px;
+            margin-bottom: 8px;
+        }
+
+        .signature-img {
+            height: 45px;
+            margin: 14px 0 4px 0;
+        }
+
+        .signature-line {
+            border-top: 1px solid #333333;
+            width: 190px;
+            margin-top: 42px;
+        }
+
+        .signature-name {
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 6px;
+        }
+
+        .signature-position {
+            font-size: 9px;
+            color: #666666;
+        }
+
+        .summary-box td {
+            font-size: 10px;
+            color: #ffffff;
+            background-color: #414c6e;
+            padding: 9px 16px;
+        }
+
+        .summary-box tr.total td {
+            font-weight: bold;
+            font-size: 12px;
+            background-color: #333c58;
+            border-top: 1px solid rgba(255, 255, 255, 0.35);
+        }
+
+        .summary-label {
+            text-align: left;
+        }
+
+        .summary-value {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .thanks {
+            font-size: 12px;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 22px;
+        }
+
+        .terms {
+            font-size: 9px;
+            font-style: italic;
+            color: #555555;
+            text-align: right;
+            margin-top: 4px;
+        }
+
         /* REPORT SECTION */
-        .report-card { margin-bottom: 20px; border: 1px solid #414c6e; border-radius: 4px; overflow: hidden; page-break-inside: avoid; }
-        .report-header { background-color: #414c6e; color: #ffffff; padding: 10px 15px; font-weight: bold; font-size: 11px; }
-        .report-header-date { float: right; font-weight: normal; color: #cdd6e4; }
-        .report-body { padding: 15px; }
-        .report-section-title { font-weight: bold; font-size: 10px; color: #414c6e; margin-bottom: 5px; }
-        .report-text { font-size: 10px; margin-bottom: 15px; line-height: 1.4; white-space: pre-line; }
-        .photo-wrap { display: inline-block; vertical-align: top; margin-right: 10px; margin-bottom: 10px; text-align: center; border: 1px solid #e8ebf0; padding: 5px; background: #fff; }
-        .photo-img { width: 140px; height: 140px; object-fit: cover; border-radius: 2px; }
-        .photo-caption { font-size: 9px; color: #666; margin-top: 4px; max-width: 140px; }
+        .report-card {
+            margin-bottom: 20px;
+            border: 1px solid #414c6e;
+            border-radius: 4px;
+            overflow: hidden;
+            page-break-inside: avoid;
+        }
+
+        .report-header {
+            background-color: #414c6e;
+            color: #ffffff;
+            padding: 10px 15px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .report-header-date {
+            float: right;
+            font-weight: normal;
+            color: #cdd6e4;
+        }
+
+        .report-body {
+            padding: 15px;
+        }
+
+        .report-section-title {
+            font-weight: bold;
+            font-size: 10px;
+            color: #414c6e;
+            margin-bottom: 5px;
+        }
+
+        .report-text {
+            font-size: 10px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            white-space: pre-line;
+        }
+
+        .photo-wrap {
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+            border: 1px solid #e8ebf0;
+            padding: 5px;
+            background: #fff;
+        }
+
+        .photo-img {
+            width: 140px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        .photo-caption {
+            font-size: 9px;
+            color: #666;
+            margin-top: 4px;
+            max-width: 140px;
+        }
     </style>
 </head>
+
 <body>
     @php
         $documentTitle = $documentTitle ?? 'INVOICE';
@@ -245,7 +525,8 @@
                         </tr>
                         @if ($discount > 0)
                             <tr>
-                                <td class="summary-label">Diskon{{ $discountLabel ? " ({$discountLabel})" : '' }} :</td>
+                                <td class="summary-label">Diskon{{ $discountLabel ? " ({$discountLabel})" : '' }} :
+                                </td>
                                 <td class="summary-value">-{{ $rupiah($discount) }}</td>
                             </tr>
                         @endif
@@ -314,10 +595,11 @@
                 </td>
                 <td style="width:40%; vertical-align:top;">
                     <div class="date-label">Tanggal Pelaksanaan</div>
-                    <div class="date-value">{{ $workOrder->scheduled_date ? $workOrder->scheduled_date->format('d/m/Y') : '-' }}</div>
+                    <div class="date-value">
+                        {{ $workOrder->scheduled_date ? $workOrder->scheduled_date->format('d/m/Y') : '-' }}</div>
                     <div class="date-label">Teknisi</div>
                     <div class="date-value" style="margin-bottom:0;">
-                        @foreach($workOrder->assignments as $assignment)
+                        @foreach ($workOrder->assignments as $assignment)
                             {{ $assignment->technician->name }}{{ !$loop->last ? ', ' : '' }}
                         @endforeach
                     </div>
@@ -325,7 +607,7 @@
             </tr>
         </table>
     </div>
-    
+
     <div class="accent-bar"></div>
 
     <div class="content-wrap" style="padding-top: 25px;">
@@ -342,20 +624,27 @@
                     <div class="report-section-title">Pekerjaan Yang Dilakukan (Work Done)</div>
                     <div class="report-text">{{ $report->work_done }}</div>
 
-                    @if($report->recommendations)
+                    @if ($report->recommendations)
                         <div class="report-section-title">Rekomendasi / Catatan Tambahan</div>
                         <div class="report-text">{{ $report->recommendations }}</div>
                     @endif
 
-                    @if($report->photos->count())
+                    @if ($report->materials_used)
+                        <div class="report-section-title">Material / Sparepart Yang Digunakan</div>
+                        <div class="report-text">{{ $report->materials_used }}</div>
+                    @endif
+
+                    @if ($report->photos->count())
                         <div class="report-section-title">Dokumentasi Foto</div>
                         <div style="margin-top: 5px; clear: both; display: block;">
-                            @foreach($report->photos as $photo)
+                            @foreach ($report->photos as $photo)
                                 <div class="photo-wrap">
                                     <img src="{{ public_path($photo->photo_path) }}" class="photo-img">
                                     <div class="photo-caption">
                                         [{{ strtoupper($photo->photo_type->value) }}]
-                                        @if($photo->caption)<br>{{ $photo->caption }}@endif
+                                        @if ($photo->caption)
+                                            <br>{{ $photo->caption }}
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach
@@ -371,4 +660,5 @@
     </div>
 
 </body>
+
 </html>
