@@ -124,7 +124,7 @@
                                 <label class="form-label">Jumlah Dibayar</label>
                                 <input type="number" name="paid_amount" class="form-control"
                                     value="{{ old('paid_amount', intval($invoice->total - $invoice->paid_amount)) }}"
-                                    min="1" max="{{ intval($invoice->total) }}" required>
+                                    min="0" max="{{ intval($invoice->total) }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Tanggal Bayar</label>

@@ -92,7 +92,7 @@ class InvoiceController extends Controller
     public function pay(Request $request, Invoice $invoice)
     {
         $data = $request->validate([
-            'paid_amount' => ['required', 'numeric', 'min:1', 'max:' . $invoice->total],
+            'paid_amount' => ['required', 'numeric', 'min:0', 'max:' . $invoice->total],
             'payment_date' => ['required', 'date'],
             'payment_method' => ['required', 'string', 'max:100'],
             'financial_account_id' => ['required', 'exists:financial_accounts,id'],
