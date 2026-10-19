@@ -90,13 +90,27 @@ class PdfService
         $settings = $this->getCompanySettings();
         $workOrders->loadMissing(['customer', 'items', 'assignments.technician', 'reports.technician', 'reports.photos', 'invoice']);
 
-        // Use invoice subtotal if available, else WO total
+        $subtotal = $workOrders->sum(function($workOrder) {
+            return $workOrder->invoice ? $workOrder->invoice->subtotal : $workOrder->total;
+        });
+
+        $discount = $workOrders->sum(function($workOrder) {
+            return $workOrder->invoice ? $workOrder->invoice->discount : 0;
+        });
+
+        $tax = $workOrders->sum(function($workOrder) {
+            return $workOrder->invoice ? $workOrder->invoice->tax_amount : 0;
+        });
+
         $total = $workOrders->sum(function($workOrder) {
             return $workOrder->invoice ? $workOrder->invoice->total : $workOrder->total;
         });
 
         return Pdf::loadView('pdf.combined_invoice', [
             'workOrders' => $workOrders,
+            'subtotal' => $subtotal,
+            'discount' => $discount,
+            'tax' => $tax,
             'total' => $total,
             'settings' => $settings,
         ])->setPaper('a4', 'portrait');

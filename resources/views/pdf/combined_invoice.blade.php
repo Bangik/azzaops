@@ -108,12 +108,27 @@
             width: 23%;
         }
 
+        .report-card p {
+            margin: 4px 0 6px;
+            line-height: 1.4;
+            clear: both;
+        }
+
+        .photos-container {
+            clear: both;
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 6px;
+        }
+
         .photo {
             width: 82px;
             height: 82px;
             object-fit: cover;
             margin: 4px;
             border: 1px solid #dfe4ec;
+            display: inline-block;
+            vertical-align: top;
         }
 
         .footer {
@@ -157,8 +172,26 @@
         </tr>
     </table>
     <table class="summary">
+        @if(isset($subtotal) && ($discount > 0 || $tax > 0))
+            <tr>
+                <td style="background: #f4f6f9; color: #414c6e; font-weight: bold; text-align: right; width: 75%;">Subtotal</td>
+                <td class="right" style="background: #f4f6f9; color: #414c6e; font-weight: bold;">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
+            </tr>
+            @if($discount > 0)
+                <tr>
+                    <td style="background: #f4f6f9; color: #414c6e; font-weight: bold; text-align: right; width: 75%;">Diskon</td>
+                    <td class="right" style="background: #f4f6f9; color: #414c6e; font-weight: bold;">-Rp {{ number_format($discount, 0, ',', '.') }}</td>
+                </tr>
+            @endif
+            @if($tax > 0)
+                <tr>
+                    <td style="background: #f4f6f9; color: #414c6e; font-weight: bold; text-align: right; width: 75%;">Pajak</td>
+                    <td class="right" style="background: #f4f6f9; color: #414c6e; font-weight: bold;">Rp {{ number_format($tax, 0, ',', '.') }}</td>
+                </tr>
+            @endif
+        @endif
         <tr>
-            <td>Total Tagihan</td>
+            <td style="text-align: right; width: 75%;">Total Tagihan</td>
             <td class="right total">Rp {{ number_format($total, 0, ',', '.') }}</td>
         </tr>
     </table>
@@ -193,6 +226,35 @@
                                 {{ number_format(($item->unit_price ?? 0) * $item->quantity, 0, ',', '.') }}</td>
                         </tr>
                     @endforeach
+                    @php
+                        $woSubtotal = $workOrder->invoice->subtotal;
+                        $woDiscount = $workOrder->invoice->discount;
+                        $woTax = $workOrder->invoice->tax_amount;
+                    @endphp
+                    @if($woDiscount > 0 || $woTax > 0)
+                        <tr>
+                            <td></td>
+                            <td style="text-align: right; font-style: italic; color: #687386;">Subtotal:</td>
+                            <td></td>
+                            <td class="right" style="font-style: italic; color: #687386;">Rp {{ number_format($woSubtotal, 0, ',', '.') }}</td>
+                        </tr>
+                        @if($woDiscount > 0)
+                        <tr>
+                            <td></td>
+                            <td style="text-align: right; font-style: italic; color: #687386;">Diskon:</td>
+                            <td></td>
+                            <td class="right" style="font-style: italic; color: #687386;">-Rp {{ number_format($woDiscount, 0, ',', '.') }}</td>
+                        </tr>
+                        @endif
+                        @if($woTax > 0)
+                        <tr>
+                            <td></td>
+                            <td style="text-align: right; font-style: italic; color: #687386;">Pajak:</td>
+                            <td></td>
+                            <td class="right" style="font-style: italic; color: #687386;">Rp {{ number_format($woTax, 0, ',', '.') }}</td>
+                        </tr>
+                        @endif
+                    @endif
                 @else
                     @foreach ($workOrder->items as $item)
                         <tr>
@@ -237,7 +299,7 @@
                         <p><strong>Rekomendasi:</strong> {{ $report->recommendations }}</p>
                     @endif
                     @if ($report->photos->count())
-                        <div>
+                        <div class="photos-container">
                             @foreach ($report->photos as $photo)
                                 <img class="photo" src="{{ public_path($photo->photo_path) }}">
                             @endforeach
