@@ -105,7 +105,7 @@ class InvoiceService
     {
         return DB::transaction(function () use ($invoice, $data, $recordedBy) {
             $paidAmount = (float) ($data['paid_amount'] ?? $invoice->total);
-            $paymentStatus = $paidAmount >= $invoice->total
+            $paymentStatus = floor($paidAmount) >= floor((float) $invoice->total)
                 ? PaymentStatus::Paid
                 : PaymentStatus::Partial;
 

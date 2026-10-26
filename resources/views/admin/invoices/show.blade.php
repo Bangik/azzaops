@@ -53,34 +53,34 @@
                                         <td>{{ $item->description }}</td>
                                         <td class="text-center">{{ $item->quantity }}</td>
                                         <td>{{ $item->unit ?: '-' }}</td>
-                                        <td class="text-end">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
-                                        <td class="text-end">Rp {{ number_format($item->total_price, 0, ',', '.') }}</td>
+                                        <td class="text-end">Rp {{ number_format(floor((float) $item->unit_price), 0, ',', '.') }}</td>
+                                        <td class="text-end">Rp {{ number_format(floor((float) $item->total_price), 0, ',', '.') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                             <tfoot class="table-light">
                                 <tr>
                                     <td colspan="4" class="text-end">Subtotal</td>
-                                    <td class="text-end">Rp {{ number_format($invoice->subtotal, 0, ',', '.') }}</td>
+                                    <td class="text-end">Rp {{ number_format(floor((float) $invoice->subtotal), 0, ',', '.') }}</td>
                                 </tr>
                                 @if ($invoice->discount_value > 0)
                                     <tr>
                                         <td colspan="4" class="text-end">Diskon
                                             ({{ $invoice->discount_type === 'percent' ? intval($invoice->discount_value) . '%' : 'Potongan Langsung' }})
                                         </td>
-                                        <td class="text-end">-Rp {{ number_format($invoice->discount, 0, ',', '.') }}</td>
+                                        <td class="text-end">-Rp {{ number_format(floor((float) $invoice->discount), 0, ',', '.') }}</td>
                                     </tr>
                                 @endif
                                 @if ($invoice->tax_percentage > 0)
                                     <tr>
                                         <td colspan="4" class="text-end">PPN ({{ intval($invoice->tax_percentage) }}%)
                                         </td>
-                                        <td class="text-end">Rp {{ number_format($invoice->tax_amount, 0, ',', '.') }}</td>
+                                        <td class="text-end">Rp {{ number_format(floor((float) $invoice->tax_amount), 0, ',', '.') }}</td>
                                     </tr>
                                 @endif
                                 <tr>
                                     <td colspan="4" class="text-end fw-bold">Grand Total</td>
-                                    <td class="text-end fw-bold">Rp {{ number_format($invoice->total, 0, ',', '.') }}</td>
+                                    <td class="text-end fw-bold">Rp {{ number_format(floor((float) $invoice->total), 0, ',', '.') }}</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -96,7 +96,7 @@
                 </div>
                 <div class="card-body">
                     <div class="mb-2"><span class="text-muted small">Sudah dibayar</span>
-                        <div class="fw-semibold">Rp {{ number_format($invoice->paid_amount, 0, ',', '.') }}</div>
+                        <div class="fw-semibold">Rp {{ number_format(floor((float) $invoice->paid_amount), 0, ',', '.') }}</div>
                     </div>
                     <div class="mb-2"><span class="text-muted small">Metode</span>
                         <div class="fw-semibold">{{ $invoice->payment_method ?: '-' }}</div>
@@ -123,8 +123,8 @@
                             <div class="mb-3">
                                 <label class="form-label">Jumlah Dibayar</label>
                                 <input type="number" name="paid_amount" class="form-control"
-                                    value="{{ old('paid_amount', intval($invoice->total - $invoice->paid_amount)) }}"
-                                    min="0" max="{{ intval($invoice->total) }}" required>
+                                    value="{{ old('paid_amount', max(0, floor($invoice->total - $invoice->paid_amount))) }}"
+                                    min="0" max="{{ floor((float) $invoice->total) }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Tanggal Bayar</label>
