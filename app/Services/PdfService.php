@@ -126,7 +126,15 @@ class PdfService
             'company_wa' => Setting::get('company_wa', '-'),
             'company_email' => Setting::get('company_email', '-'),
             'company_logo' => Setting::get('company_logo'),
+            'payment_bank_name' => Setting::get('payment_bank_name', 'BCA'),
+            'payment_bank_code' => Setting::get('payment_bank_code', '014'),
+            'payment_account_number' => Setting::get('payment_account_number', '-'),
+            'payment_account_holder' => Setting::get('payment_account_holder', 'PT. Azza Karunia Jaya'),
+            'payment_instructions' => Setting::get('payment_instructions', ''),
             'invoice_footer' => Setting::get('invoice_footer', 'Terima kasih atas kepercayaan Anda.'),
+            'invoice_terms' => Setting::get('invoice_terms', 'Pembayaran jatuh tempo sesuai tanggal yang tertera.'),
+            'invoice_signer_name' => Setting::get('invoice_signer_name', ''),
+            'invoice_signer_position' => Setting::get('invoice_signer_position', 'Kepala Operasional'),
         ];
     }
 
@@ -134,8 +142,20 @@ class PdfService
     {
         $logo = $settings['company_logo'];
         if ($logo && ! str_starts_with($logo, 'data:') && ! filter_var($logo, FILTER_VALIDATE_URL)) {
-            $logo = public_path(ltrim($logo, '/'));
+            $fullPath = public_path(ltrim($logo, '/'));
+            $logo = file_exists($fullPath) ? $fullPath : null;
         }
+
+        $bankName = $invoice->financialAccount?->name ?: $settings['payment_bank_name'];
+        $bankCode = $invoice->financialAccount?->code ?: $settings['payment_bank_code'];
+        $accountNumber = !empty($settings['payment_account_number']) && $settings['payment_account_number'] !== '-'
+            ? $settings['payment_account_number']
+            : ($invoice->financialAccount?->code ?? '-');
+        $accountHolder = $settings['payment_account_holder'] ?: $settings['company_name'];
+        $signerName = !empty($settings['invoice_signer_name'])
+            ? $settings['invoice_signer_name']
+            : ($invoice->issuer?->name ?? $settings['company_name']);
+        $signerPosition = $settings['invoice_signer_position'] ?: 'Penerbit Invoice';
 
         return [
             'documentTitle' => $isReceipt ? 'KWITANSI' : 'INVOICE',
@@ -149,6 +169,7 @@ class PdfService
                 'name' => $settings['company_name'],
                 'tagline' => $settings['company_tagline'],
                 'phone' => $settings['company_phone'],
+                'wa' => $settings['company_wa'],
                 'email' => $settings['company_email'],
                 'address' => $settings['company_address'],
                 'logo' => $logo,
@@ -173,17 +194,21 @@ class PdfService
             'tax' => (float) $invoice->tax_amount,
             'total' => $isReceipt ? (float) $invoice->paid_amount : (float) $invoice->total,
             'payment' => [
-                'bank_code' => $invoice->financialAccount?->code ?? '-',
-                'bank_name' => $invoice->financialAccount?->name ?? 'Akun Keuangan',
-                'account_number' => $invoice->financialAccount?->code ?? '-',
-                'method' => $invoice->payment_method ?? '-',
+                'bank_code' => $bankCode,
+                'bank_name' => $bankName,
+                'account_number' => $accountNumber,
+                'account_holder' => $accountHolder,
+                'instructions' => $settings['payment_instructions'],
+                'method' => $invoice->payment_method ?? ($isReceipt ? 'LUNAS' : '-'),
                 'email' => $settings['company_email'],
             ],
             'signature' => [
-                'name' => $invoice->issuer?->name ?? $settings['company_name'],
-                'position' => 'Penerbit Invoice',
+                'name' => $signerName,
+                'position' => $signerPosition,
                 'image' => null,
             ],
+            'terms' => $settings['invoice_terms'],
+            'footer' => $settings['invoice_footer'],
         ];
     }
 }

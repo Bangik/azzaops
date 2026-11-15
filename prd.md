@@ -78,7 +78,7 @@ PT. Azza Karunia Jaya adalah perusahaan jasa instalasi, perawatan, dan servis AC
 | ----- | -------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | SA-01 | Sebagai Super Admin, saya dapat menambah, mengedit, dan menonaktifkan user staff agar hanya orang yang berwenang yang mengakses sistem | Must     |
 | SA-02 | Sebagai Super Admin, saya dapat mengatur role dan permission setiap user                                                               | Must     |
-| SA-03 | Sebagai Super Admin, saya dapat mengonfigurasi setting aplikasi (nama perusahaan, logo, alamat, nomor WA, header/footer invoice)       | Must     |
+| SA-03 | Sebagai Super Admin, saya dapat mengonfigurasi setting aplikasi secara dinamis untuk invoice & tanda terima (upload logo, detail isian header perusahaan lengkap, detail metode pembayaran/rekening, penandatangan, footer & terms) | Must     |
 | SA-04 | Sebagai Super Admin, saya dapat melihat seluruh data dan dashboard yang sama dengan Admin                                              | Must     |
 | SA-05 | Sebagai Super Admin, saya dapat melihat audit log aktivitas user                                                                       | Should   |
 | SA-06 | Sebagai Super Admin, saya dapat mengelola kategori pengeluaran (tambah, edit, aktifkan/nonaktifkan, hapus) untuk pencatatan keuangan   | Must     |
@@ -714,21 +714,30 @@ Konfigurasi aplikasi (key-value store).
 
 **Seed data:**
 
-| Key                   | Value                 | Group   | Deskripsi                    |
-| --------------------- | --------------------- | ------- | ---------------------------- |
-| company_name          | PT. Azza Karunia Jaya | company | Nama perusahaan              |
-| company_address       | ...                   | company | Alamat                       |
-| company_phone         | ...                   | company | No. Telp                     |
-| company_wa            | ...                   | company | No. WhatsApp                 |
-| company_email         | ...                   | company | Email                        |
-| company_logo          | ...                   | company | Path logo                    |
-| invoice_prefix        | INV                   | invoice | Prefix nomor invoice         |
-| wo_prefix             | WO                    | invoice | Prefix nomor work order      |
-| rab_prefix            | RAB                   | invoice | Prefix nomor RAB             |
-| invoice_footer        | ...                   | invoice | Footer text di PDF invoice   |
-| tax_default           | 0                     | invoice | Default pajak (%)            |
-| max_photo_size        | 5242880               | upload  | Max ukuran foto (bytes, 5MB) |
-| max_photos_per_report | 10                    | upload  | Max jumlah foto per laporan  |
+| Key                   | Value                 | Group   | Deskripsi                                      |
+| --------------------- | --------------------- | ------- | ---------------------------------------------- |
+| company_name          | PT. Azza Karunia Jaya | company | Nama perusahaan                                |
+| company_tagline       | Solusi AC & Elekt...  | company | Tagline / sub judul perusahaan                 |
+| company_address       | ...                   | company | Alamat                                         |
+| company_phone         | ...                   | company | No. Telp                                       |
+| company_wa            | ...                   | company | No. WhatsApp                                   |
+| company_email         | ...                   | company | Email                                          |
+| company_logo          | ...                   | company | Path file logo perusahaan                      |
+| payment_bank_name     | BCA                   | payment | Nama bank tujuan pembayaran                    |
+| payment_bank_code     | 014                   | payment | Kode bank                                      |
+| payment_account_number| ...                   | payment | Nomor rekening                                 |
+| payment_account_holder| PT. Azza Karunia Jaya | payment | Nama pemilik rekening (A.N.)                   |
+| payment_instructions  | ...                   | payment | Catatan/instruksi pembayaran                   |
+| invoice_prefix        | INV                   | invoice | Prefix nomor invoice                           |
+| wo_prefix             | WO                    | invoice | Prefix nomor work order                        |
+| rab_prefix            | RAB                   | invoice | Prefix nomor RAB                               |
+| invoice_footer        | ...                   | invoice | Footer text di PDF invoice & kwitansi          |
+| invoice_terms         | ...                   | invoice | Terms & conditions text di PDF                 |
+| invoice_signer_name   | ...                   | invoice | Nama penandatangan invoice & tanda terima      |
+| invoice_signer_position| Kepala Operasional   | invoice | Jabatan penandatangan                          |
+| tax_default           | 0                     | invoice | Default pajak (%)                              |
+| max_photo_size        | 5242880               | upload  | Max ukuran foto (bytes, 5MB)                   |
+| max_photos_per_report | 10                    | upload  | Max jumlah foto per laporan                    |
 
 ---
 
@@ -1618,23 +1627,27 @@ Pagination {
 
 **Invoice PDF & Laporan Pekerjaan (V2):**
 
-- Menggunakan template desain baru yang lebih modern (invoicev2)
-- Header: logo + nama + alamat + kontak perusahaan
+- Menggunakan template desain modern (invoicev2) dengan data dinamis dari Pengaturan (Settings)
+- Header Dinamis: Logo perusahaan (upload file), nama perusahaan, tagline, alamat, nomor telepon/HP, WhatsApp, dan email
 - Info customer
 - Nomor invoice, tanggal, jatuh tempo
 - Tabel item (deskripsi, qty, unit, harga satuan, total)
 - Subtotal, diskon, pajak, grand total
-- Catatan/terms
-- Footer: text konfigurabel dari settings
+- Bagian Pembayaran Dinamis: Bank tujuan, kode bank, nomor rekening, atas nama pemilik rekening, email konfirmasi, dan catatan/instruksi pembayaran (atau fallback akun keuangan)
+- Penandatangan Dinamis: Nama penandatangan dan jabatan penandatangan dari Pengaturan / Issuer
+- Catatan & Ketentuan: Terms & condition dinamis dari settings
+- Footer: Text ucapan/footer konfigurabel dari settings
 - Laporan Pekerjaan digabung pada halaman kedua dengan desain template v2 yang konsisten (berlaku juga untuk download Laporan WO saja tanpa invoice)
 - Laporan berisi ringkasan klien, temuan, pengerjaan, rekomendasi, dan galeri foto dokumentasi teknisi
 
-**Kwitansi Pembayaran PDF:**
+**Kwitansi / Tanda Terima Pembayaran PDF:**
 
-- Menggunakan template dan tata letak yang sama dengan invoice PDF
-- Judul dokumen: "KWITANSI" dengan status "LUNAS"
+- Menggunakan template dan tata letak dinamis yang sama dengan invoice PDF
+- Judul dokumen: "KWITANSI" / "TANDA TERIMA" dengan status "LUNAS"
 - Hanya tersedia setelah invoice berstatus pembayaran `paid`
-- Menampilkan customer, nomor invoice sebagai referensi, tanggal pembayaran, metode pembayaran, akun keuangan, dan total pembayaran
+- Header, logo, dan rincian kontak dinamis sesuai pengaturan perusahaan
+- Rincian pembayaran: customer, nomor invoice referensi, tanggal bayar, metode bayar, rekening/bank tujuan, akun keuangan, dan total yang dibayarkan
+- Penandatangan & footer text dinamis dari settings
 - Dapat didownload dari daftar/detail invoice serta daftar/detail Work Order
 
 **Update Status Invoice:**
@@ -1738,11 +1751,30 @@ Pagination {
 - CRUD user, assign role
 - Aktivasi/nonaktifkan user
 
-#### Settings
+#### Settings (Pengaturan Sistem Dinamis)
 
-- Informasi perusahaan (nama, alamat, telepon, WhatsApp, email, logo)
-- Konfigurasi invoice (prefix nomor, footer text, default pajak)
-- Konfigurasi upload (max ukuran foto, max jumlah per laporan)
+- **Identitas & Header Perusahaan**:
+  - Input/Upload logo perusahaan (tampil di header invoice, kwitansi, RAB, laporan)
+  - Nama perusahaan
+  - Tagline perusahaan
+  - Alamat lengkap perusahaan
+  - Nomor telepon/HP perusahaan
+  - Nomor WhatsApp perusahaan
+  - Email perusahaan
+- **Detail Metode Pembayaran (Invoice & Tanda Terima)**:
+  - Nama Bank tujuan pembayaran (misal: BCA, Mandiri, BRI)
+  - Kode Bank
+  - Nomor Rekening
+  - Atas Nama Pemilik Rekening (A.N.)
+  - Catatan / Instruksi Pembayaran
+- **Template Dokumen & Penandatangan**:
+  - Prefix nomor (Invoice, WO, RAB)
+  - Pajak default (%)
+  - Nama & jabatan penandatangan (Signer Name & Position)
+  - Footer text invoice & kwitansi
+  - Terms & Condition text
+- **Konfigurasi Upload**:
+  - Max ukuran foto & max jumlah foto per laporan
 
 #### Presensi (Web)
 

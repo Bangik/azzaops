@@ -377,14 +377,14 @@
                 <td style="width:60%; vertical-align:middle;">
                     <table>
                         <tr>
-                            <td style="width:34px; vertical-align:middle;">
+                            <td style="vertical-align:middle; width:1%; padding-right:10px;">
                                 @if (!empty($company['logo']))
-                                    <img src="{{ $company['logo'] }}" style="width:30px; height:30px;">
+                                    <img src="{{ $company['logo'] }}" style="max-height:42px; max-width:140px; vertical-align:middle;">
                                 @else
                                     <div class="logo-mark"></div>
                                 @endif
                             </td>
-                            <td style="vertical-align:middle; padding-left:10px;">
+                            <td style="vertical-align:middle;">
                                 <div class="company-name">{{ strtoupper($company['name']) }}</div>
                                 <div class="company-tagline">{{ $company['tagline'] }}</div>
                             </td>
@@ -410,16 +410,16 @@
                     <table>
                         <tr>
                             <td style="width:33%; vertical-align:top;">
-                                <div class="contact-label">Phone</div>
-                                <div class="contact-value">{{ $company['phone'] }}</div>
+                                <div class="contact-label">Phone / WA</div>
+                                <div class="contact-value">{{ $company['phone'] ?? '-' }}@if(!empty($company['wa']) && $company['wa'] !== ($company['phone'] ?? ''))<br><span style="font-weight:normal; font-size:9px;">WA: {{ $company['wa'] }}</span>@endif</div>
                             </td>
                             <td style="width:33%; vertical-align:top;">
                                 <div class="contact-label">Email</div>
-                                <div class="contact-value">{{ $company['email'] }}</div>
+                                <div class="contact-value">{{ $company['email'] ?? '-' }}</div>
                             </td>
                             <td style="width:34%; vertical-align:top;">
                                 <div class="contact-label">Address</div>
-                                <div class="contact-value">{{ $company['address'] }}</div>
+                                <div class="contact-value">{{ $company['address'] ?? '-' }}</div>
                             </td>
                         </tr>
                     </table>
@@ -489,25 +489,35 @@
                 <td style="width:55%; vertical-align:top;">
                     <div class="payment-heading">Metode Pembayaran</div>
                     @if (!empty($payment['method']))
-                        <div class="payment-label">METODE:</div>
+                        <div class="payment-label">STATUS / METODE:</div>
                         <div class="payment-value">{{ strtoupper($payment['method']) }}</div>
                     @endif
                     <table>
                         <tr>
                             <td style="width:50%; vertical-align:top;">
-                                <div class="payment-label">KODE BANK:</div>
-                                <div class="payment-value">{{ $payment['bank_code'] }}</div>
+                                <div class="payment-label">BANK:</div>
+                                <div class="payment-value">{{ $payment['bank_name'] }}</div>
                                 <div class="payment-label">No. Rek:</div>
                                 <div class="payment-value">{{ $payment['account_number'] }}</div>
                             </td>
                             <td style="width:50%; vertical-align:top;">
-                                <div class="payment-label">BANK:</div>
-                                <div class="payment-value">{{ $payment['bank_name'] }}</div>
-                                <div class="payment-label">Email:</div>
-                                <div class="payment-value">{{ $payment['email'] }}</div>
+                                <div class="payment-label">KODE BANK:</div>
+                                <div class="payment-value">{{ $payment['bank_code'] }}</div>
+                                @if (!empty($payment['account_holder']))
+                                    <div class="payment-label">A.N. REKENING:</div>
+                                    <div class="payment-value">{{ $payment['account_holder'] }}</div>
+                                @else
+                                    <div class="payment-label">Email:</div>
+                                    <div class="payment-value">{{ $payment['email'] }}</div>
+                                @endif
                             </td>
                         </tr>
                     </table>
+                    @if (!empty($payment['instructions']))
+                        <div style="font-size: 8.5px; color: #555555; margin-top: 6px; font-style: italic;">
+                            * {{ $payment['instructions'] }}
+                        </div>
+                    @endif
 
                     @if (!empty($signature['image']))
                         <img src="{{ $signature['image'] }}" class="signature-img">
@@ -542,8 +552,8 @@
                         </tr>
                     </table>
 
-                    <div class="thanks">TERIMA KASIH</div>
-                    <div class="terms">Term &amp; Condition</div>
+                    <div class="thanks">{{ strtoupper($footer ?? 'TERIMA KASIH') }}</div>
+                    <div class="terms">{{ $terms ?? 'Term & Condition' }}</div>
                 </td>
             </tr>
         </table>
@@ -561,14 +571,14 @@
                 <td style="width:60%; vertical-align:middle;">
                     <table>
                         <tr>
-                            <td style="width:34px; vertical-align:middle;">
+                            <td style="vertical-align:middle; width:1%; padding-right:10px;">
                                 @if (!empty($company['logo']))
-                                    <img src="{{ $company['logo'] }}" style="width:30px; height:30px;">
+                                    <img src="{{ $company['logo'] }}" style="max-height:42px; max-width:140px; vertical-align:middle;">
                                 @else
                                     <div class="logo-mark"></div>
                                 @endif
                             </td>
-                            <td style="vertical-align:middle; padding-left:10px;">
+                            <td style="vertical-align:middle;">
                                 <div class="company-name">{{ strtoupper($company['name']) }}</div>
                                 <div class="company-tagline">{{ $company['tagline'] }}</div>
                             </td>
