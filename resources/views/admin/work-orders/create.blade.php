@@ -3,6 +3,11 @@
 @section('title', 'Buat Work Order')
 @section('page-title', 'Buat Work Order Baru')
 
+@push('styles')
+    <link href="{{ asset('vendor/select2/select2.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('vendor/select2/select2-bootstrap-5-theme.min.css') }}" rel="stylesheet">
+@endpush
+
 @section('content')
     <div class="card">
         <div class="card-body">
@@ -242,8 +247,16 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('vendor/select2/select2.min.js') }}"></script>
     <script>
         $(function() {
+            $('#customer_id').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Pilih Customer',
+                allowClear: true,
+                width: '100%'
+            });
+
             let itemIndex = $('#items-container tr').length;
 
             $('#btn-add-item').on('click', function() {

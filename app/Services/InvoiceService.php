@@ -30,15 +30,18 @@ class InvoiceService
             $discountValue = (float) ($data['discount_value'] ?? 0);
             $discountType = $data['discount_type'] ?? 'fixed';
             if ($discountType === 'percent') {
-                $discount = round($subtotal * $discountValue / 100, 2);
+                $discount = $discountValue > 0 ? round($subtotal * $discountValue / 100, 2) : 0;
             } else {
-                $discount = $discountValue;
+                $discount = max(0, $discountValue);
             }
             $discount = min($subtotal, $discount);
 
             // Calculate Tax (PPN ditambahkan ke total pokok, dihitung dari subtotal sebelum dikurangi diskon)
-            $taxPercentage = (float) ($data['tax_percentage'] ?? Setting::get('tax_default', 0));
-            $taxAmount = round($subtotal * $taxPercentage / 100, 2);
+            $taxPercentage = array_key_exists('tax_percentage', $data)
+                ? (float) ($data['tax_percentage'] ?? 0)
+                : (float) Setting::get('tax_default', 0);
+            $taxPercentage = max(0, $taxPercentage);
+            $taxAmount = $taxPercentage > 0 ? round($subtotal * $taxPercentage / 100, 2) : 0;
             $total = max(0, $subtotal + $taxAmount - $discount);
 
             $invoiceData = [

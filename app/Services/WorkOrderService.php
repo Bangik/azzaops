@@ -66,8 +66,8 @@ class WorkOrderService
             // Auto create invoice draft
             $subtotal = $workOrder->items->sum('total_price');
             $discount = 0;
-            $taxPercentage = \App\Models\Setting::get('tax_default', 0);
-            $taxAmount = round($subtotal * $taxPercentage / 100, 2);
+            $taxPercentage = (float) \App\Models\Setting::get('tax_default', 0);
+            $taxAmount = $taxPercentage > 0 ? round($subtotal * $taxPercentage / 100, 2) : 0;
             $total = max(0, $subtotal + $taxAmount - $discount); // PPN dihitung dari subtotal sebelum diskon, lalu ditambahkan ke total akhir setelah dikurangi diskon
 
             // Nomor urut invoice disamakan dengan nomor urut WO (hanya beda prefix) agar selalu sinkron
@@ -179,8 +179,8 @@ class WorkOrderService
                 }
                 $discount = min($subtotal, $discount);
 
-                $taxPercentage = $invoice->tax_percentage;
-                $taxAmount = round($subtotal * $taxPercentage / 100, 2);
+                $taxPercentage = (float) $invoice->tax_percentage;
+                $taxAmount = $taxPercentage > 0 ? round($subtotal * $taxPercentage / 100, 2) : 0;
                 $total = max(0, $subtotal + $taxAmount - $discount);
 
                 $invoice->update([

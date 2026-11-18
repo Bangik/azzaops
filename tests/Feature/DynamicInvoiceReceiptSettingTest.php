@@ -182,4 +182,124 @@ class DynamicInvoiceReceiptSettingTest extends TestCase
         $receiptOutput = $receiptPdf->output();
         $this->assertNotEmpty($receiptOutput);
     }
+
+    public function test_invoice_pdf_view_hides_tax_and_discount_when_zero(): void
+    {
+        $customer = Customer::create([
+            'name' => 'Bapak Budi',
+            'phone' => '0812345678',
+            'address' => 'Jl. Sudirman No. 1',
+            'type' => 'individual',
+        ]);
+
+        $user = User::factory()->create();
+
+        $type = WorkOrderType::create([
+            'name' => 'Perbaikan',
+            'code' => 'PBK2',
+            'is_active' => true,
+        ]);
+
+        $category = \App\Models\ServiceCategory::create([
+            'name' => 'AC Split',
+            'is_active' => true,
+        ]);
+
+        $workOrder = WorkOrder::create([
+            'customer_id' => $customer->id,
+            'work_order_type_id' => $type->id,
+            'service_category_id' => $category->id,
+            'wo_number' => 'WO-TEST-002',
+            'title' => 'Servis AC Kantor',
+            'location' => 'Jakarta Selatan',
+            'status' => WorkOrderStatus::Completed,
+            'description' => 'Servis AC Kantor',
+            'scheduled_date' => now(),
+            'created_by' => $user->id,
+        ]);
+
+        $invoiceZero = Invoice::create([
+            'work_order_id' => $workOrder->id,
+            'customer_id' => $customer->id,
+            'invoice_number' => 'INV-TEST-ZERO',
+            'subtotal' => 300000,
+            'discount' => 0,
+            'discount_type' => 'fixed',
+            'discount_value' => 0,
+            'tax_percentage' => 0,
+            'tax_amount' => 0,
+            'total' => 300000,
+            'payment_status' => PaymentStatus::Unpaid,
+            'status' => InvoiceStatus::Draft,
+            'issued_by' => $user->id,
+        ]);
+
+        InvoiceItem::create([
+            'invoice_id' => $invoiceZero->id,
+            'description' => 'Jasa Cuci AC',
+            'quantity' => 1,
+            'unit' => 'unit',
+            'unit_price' => 300000,
+            'total_price' => 300000,
+        ]);
+
+        $pdfService = app(PdfService::class);
+        $reflection = new \ReflectionClass($pdfService);
+        $method = $reflection->getMethod('getInvoiceV2Data');
+        $method->setAccessible(true);
+        $settingsMethod = $reflection->getMethod('getCompanySettings');
+        $settingsMethod->setAccessible(true);
+        $settings = $settingsMethod->invoke($pdfService);
+
+        $dataZero = $method->invoke($pdfService, $invoiceZero, $settings);
+        $htmlZero = view('pdf.invoicev2', $dataZero)->render();
+
+        $this->assertStringNotContainsString('Pajak', $htmlZero);
+        $this->assertStringNotContainsString('Diskon', $htmlZero);
+
+        $workOrder2 = WorkOrder::create([
+            'customer_id' => $customer->id,
+            'work_order_type_id' => $type->id,
+            'service_category_id' => $category->id,
+            'wo_number' => 'WO-TEST-003',
+            'title' => 'Perbaikan Kompresor',
+            'location' => 'Jakarta Selatan',
+            'status' => WorkOrderStatus::Completed,
+            'description' => 'Perbaikan Kompresor',
+            'scheduled_date' => now(),
+            'created_by' => $user->id,
+        ]);
+
+        // When tax and discount are non-zero
+        $invoiceWithValues = Invoice::create([
+            'work_order_id' => $workOrder2->id,
+            'customer_id' => $customer->id,
+            'invoice_number' => 'INV-TEST-VALUES',
+            'subtotal' => 1000000,
+            'discount' => 50000,
+            'discount_type' => 'fixed',
+            'discount_value' => 50000,
+            'tax_percentage' => 11,
+            'tax_amount' => 110000,
+            'total' => 1060000,
+            'payment_status' => PaymentStatus::Unpaid,
+            'status' => InvoiceStatus::Draft,
+            'issued_by' => $user->id,
+        ]);
+
+        InvoiceItem::create([
+            'invoice_id' => $invoiceWithValues->id,
+            'description' => 'Penggantian Kompresor',
+            'quantity' => 1,
+            'unit' => 'unit',
+            'unit_price' => 1000000,
+            'total_price' => 1000000,
+        ]);
+
+        $dataValues = $method->invoke($pdfService, $invoiceWithValues, $settings);
+        $htmlValues = view('pdf.invoicev2', $dataValues)->render();
+
+        $this->assertStringContainsString('Pajak (11%)', $htmlValues);
+        $this->assertStringContainsString('Diskon', $htmlValues);
+    }
 }

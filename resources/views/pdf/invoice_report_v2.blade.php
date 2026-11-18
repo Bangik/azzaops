@@ -542,7 +542,7 @@
                         @endif
                         @if ($tax > 0)
                             <tr>
-                                <td class="summary-label">Pajak :</td>
+                                <td class="summary-label">Pajak{{ !empty($taxPercentage) && $taxPercentage > 0 ? ' (' . intval($taxPercentage) . '%)' : '' }} :</td>
                                 <td class="summary-value">{{ $rupiah($tax) }}</td>
                             </tr>
                         @endif

@@ -528,10 +528,12 @@
                                 <td class="summary-value">-{{ $rupiah($discount) }}</td>
                             </tr>
                         @endif
-                        <tr>
-                            <td class="summary-label">Pajak :</td>
-                            <td class="summary-value">{{ $rupiah($tax) }}</td>
-                        </tr>
+                        @if ($tax > 0)
+                            <tr>
+                                <td class="summary-label">Pajak{{ !empty($taxPercentage) && $taxPercentage > 0 ? ' (' . intval($taxPercentage) . '%)' : '' }} :</td>
+                                <td class="summary-value">{{ $rupiah($tax) }}</td>
+                            </tr>
+                        @endif
                         <tr class="total">
                             <td class="summary-label">Total :</td>
                             <td class="summary-value">{{ $rupiah($total) }}</td>

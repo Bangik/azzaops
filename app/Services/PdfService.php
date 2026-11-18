@@ -192,6 +192,7 @@ class PdfService
                 ? intval($invoice->discount_value) . '%'
                 : null,
             'tax' => (float) $invoice->tax_amount,
+            'taxPercentage' => (float) $invoice->tax_percentage,
             'total' => $isReceipt ? (float) $invoice->paid_amount : (float) $invoice->total,
             'payment' => [
                 'bank_code' => $bankCode,
