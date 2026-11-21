@@ -36,7 +36,7 @@ class DynamicInvoiceReceiptSettingTest extends TestCase
         $response->assertSee('Detail Metode Pembayaran', false);
     }
 
-    public function test_admin_cannot_access_settings_page(): void
+    public function test_admin_can_access_settings_page(): void
     {
         $admin = User::factory()->create([
             'role' => UserRole::Admin,
@@ -44,7 +44,7 @@ class DynamicInvoiceReceiptSettingTest extends TestCase
 
         $response = $this->actingAs($admin)->get(route('admin.settings.index'));
 
-        $response->assertStatus(403);
+        $response->assertOk();
     }
 
     public function test_super_admin_can_update_settings_dynamically_with_logo_and_payment(): void

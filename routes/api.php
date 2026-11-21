@@ -17,7 +17,7 @@ Route::prefix('v1')->name('api.')->group(function () {
     // Public App Version Check
     Route::get('app-version/latest', [\App\Http\Controllers\Api\AppVersionController::class, 'latest'])->name('app-version.latest');
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('auth/me', [AuthController::class, 'me'])->name('me');
 

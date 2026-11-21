@@ -10,9 +10,11 @@
         <p class="text-muted mb-0">Kelola pelanggan perorangan dan perusahaan dengan tampilan yang lebih rapi.</p>
     </div>
     <div class="d-flex gap-2">
+        @if (auth()->user()->role === App\Enums\UserRole::SuperAdmin)
         <a href="{{ route('admin.reports.index', ['type' => 'customers']) }}" class="btn btn-outline-primary">
             <i class="bi bi-file-earmark-spreadsheet me-1"></i> Laporan Customer
         </a>
+        @endif
         <a href="{{ route('admin.customers.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-lg me-1"></i> Tambah Customer
         </a>

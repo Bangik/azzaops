@@ -220,7 +220,7 @@
                                                     class="btn btn-sm btn-primary">
                                                     <i class="bi bi-person-plus me-1"></i> Assign Teknisi
                                                 </a>
-                                            @elseif($action->status === App\Enums\WorkOrderStatus::Reported)
+                                            @elseif($action->status === App\Enums\WorkOrderStatus::Reported && auth()->user()->role !== App\Enums\UserRole::Supervisor)
                                                 <a href="{{ route('admin.invoices.create', ['work_order_id' => $action->id]) }}"
                                                     class="btn btn-sm btn-success">
                                                     <i class="bi bi-receipt me-1"></i> Bikin Invoice

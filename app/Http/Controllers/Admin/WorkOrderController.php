@@ -200,7 +200,7 @@ class WorkOrderController extends Controller
     public function assign(AssignWorkOrderRequest $request, WorkOrder $workOrder)
     {
         $user = $request->user();
-        if (! in_array($user->role, [UserRole::SuperAdmin, UserRole::Admin, UserRole::KepalaTeknisi], true)) {
+        if (! in_array($user->role, [UserRole::SuperAdmin, UserRole::Admin, UserRole::Supervisor], true)) {
             abort(403, 'Anda tidak memiliki akses untuk menugaskan teknisi');
         }
 

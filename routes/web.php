@@ -29,76 +29,80 @@ Route::post('logout', [LoginController::class, 'logout'])->middleware('auth')->n
 Route::get('/', fn() => redirect()->route('admin.dashboard'));
 
 // Admin routes
-Route::middleware(['auth', 'role:super_admin,admin,kepala_teknisi'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'active', 'role:super_admin,admin,supervisor'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('customers', CustomerController::class);
     Route::resource('service-categories', ServiceCategoryController::class);
     Route::resource('work-order-types', \App\Http\Controllers\Admin\WorkOrderTypeController::class);
     Route::resource('work-orders', WorkOrderController::class);
     Route::resource('vendors', VendorController::class)->except(['show']);
-    Route::get('vendor-invoices/create', [VendorInvoiceController::class, 'create'])->name('vendor-invoices.create');
-    Route::post('vendor-invoices/download', [VendorInvoiceController::class, 'download'])->name('vendor-invoices.download');
-    
-    Route::get('combined-invoices/create', [CombinedInvoiceController::class, 'create'])->name('combined-invoices.create');
-    Route::post('combined-invoices/download', [CombinedInvoiceController::class, 'download'])->name('combined-invoices.download');
-    
+    Route::middleware('role:super_admin,admin')->group(function () {
+        Route::get('vendor-invoices/create', [VendorInvoiceController::class, 'create'])->name('vendor-invoices.create');
+        Route::post('vendor-invoices/download', [VendorInvoiceController::class, 'download'])->name('vendor-invoices.download');
+        Route::get('combined-invoices/create', [CombinedInvoiceController::class, 'create'])->name('combined-invoices.create');
+        Route::post('combined-invoices/download', [CombinedInvoiceController::class, 'download'])->name('combined-invoices.download');
+    });
+
     Route::post('work-orders/{workOrder}/assign', [WorkOrderController::class, 'assign'])->name('work-orders.assign');
     Route::get('work-orders/{workOrder}/continue', [WorkOrderController::class, 'continue'])->name('work-orders.continue');
     Route::post('work-orders/{workOrder}/continue', [WorkOrderController::class, 'storeContinue'])->name('work-orders.store-continue');
     Route::put('work-orders/{workOrder}/reports/{report}', [WorkOrderController::class, 'updateReport'])->name('work-orders.update-report');
     Route::get('work-orders/{workOrder}/report/pdf', [WorkOrderController::class, 'downloadReportPdf'])->name('work-orders.report-pdf');
-    Route::get('work-orders/{workOrder}/invoice-report/pdf', [WorkOrderController::class, 'downloadInvoiceReportPdf'])->name('work-orders.invoice-report-pdf');
-    Route::resource('invoices', InvoiceController::class);
-    Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
-    Route::get('invoices/{invoice}/preview', [InvoiceController::class, 'previewPdf'])->name('invoices.preview');
-    Route::get('invoices/{invoice}/receipt', [InvoiceController::class, 'receiptPdf'])->name('invoices.receipt');
-    Route::put('invoices/{invoice}/pay', [InvoiceController::class, 'pay'])->name('invoices.pay');
+    Route::middleware('role:super_admin,admin')->group(function () {
+        Route::get('work-orders/{workOrder}/invoice-report/pdf', [WorkOrderController::class, 'downloadInvoiceReportPdf'])->name('work-orders.invoice-report-pdf');
+        Route::resource('invoices', InvoiceController::class);
+        Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
+        Route::get('invoices/{invoice}/preview', [InvoiceController::class, 'previewPdf'])->name('invoices.preview');
+        Route::get('invoices/{invoice}/receipt', [InvoiceController::class, 'receiptPdf'])->name('invoices.receipt');
+        Route::put('invoices/{invoice}/pay', [InvoiceController::class, 'pay'])->name('invoices.pay');
 
-    Route::resource('rab', RabController::class);
-    Route::get('rab/{rab}/pdf', [RabController::class, 'downloadPdf'])->name('rab.pdf');
-    Route::get('rab/{rab}/preview', [RabController::class, 'previewPdf'])->name('rab.preview');
-    Route::put('rab/{rab}/approve', [RabController::class, 'approve'])->name('rab.approve');
-    Route::put('rab/{rab}/send', [RabController::class, 'send'])->name('rab.send');
-    Route::get('reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
-    Route::get('reports/export', [\App\Http\Controllers\Admin\ReportController::class, 'export'])->name('reports.export');
+        Route::resource('rab', RabController::class);
+        Route::get('rab/{rab}/pdf', [RabController::class, 'downloadPdf'])->name('rab.pdf');
+        Route::get('rab/{rab}/preview', [RabController::class, 'previewPdf'])->name('rab.preview');
+        Route::put('rab/{rab}/approve', [RabController::class, 'approve'])->name('rab.approve');
+        Route::put('rab/{rab}/send', [RabController::class, 'send'])->name('rab.send');
+    });
 
     // Presensi - semua staff bisa akses presensi sendiri
     Route::get('attendances/my', [AttendanceController::class, 'myAttendance'])->name('attendances.my');
     Route::post('attendances/check-in', [AttendanceController::class, 'checkIn'])->name('attendances.check-in');
     Route::post('attendances/check-out', [AttendanceController::class, 'checkOut'])->name('attendances.check-out');
 
-    Route::get('finance', [FinanceController::class, 'index'])->name('finance.index');
-    Route::get('finance/incomes/create', [FinanceController::class, 'createIncome'])->name('incomes.create');
-    Route::post('finance/incomes', [FinanceController::class, 'storeIncome'])->name('incomes.store');
     Route::middleware('role:super_admin,admin')->group(function () {
+        Route::get('finance', [FinanceController::class, 'index'])->name('finance.index');
+        Route::get('finance/incomes/create', [FinanceController::class, 'createIncome'])->name('incomes.create');
+        Route::post('finance/incomes', [FinanceController::class, 'storeIncome'])->name('incomes.store');
         Route::get('finance/incomes/{financialTransaction}/edit', [FinanceController::class, 'editIncome'])->name('incomes.edit');
         Route::put('finance/incomes/{financialTransaction}', [FinanceController::class, 'updateIncome'])->name('incomes.update');
+        Route::delete('finance/incomes/{financialTransaction}', [FinanceController::class, 'destroyIncome'])
+            ->middleware('role:super_admin')
+            ->name('incomes.destroy');
+        Route::resource('finance/expenses', FinanceController::class)->names('expenses')->only(['create', 'store', 'edit', 'update', 'destroy']);
     });
-    Route::delete('finance/incomes/{financialTransaction}', [FinanceController::class, 'destroyIncome'])
-        ->middleware('role:super_admin')
-        ->name('incomes.destroy');
-    Route::resource('finance/expenses', FinanceController::class)->names('expenses')->only(['create', 'store', 'edit', 'update', 'destroy']);
 
-    // Super Admin only (Admin no longer has access to staff and devices as requested)
-    Route::middleware('role:super_admin')->group(function () {
-        Route::resource('staff', StaffController::class);
+    Route::middleware('role:super_admin,supervisor')->group(function () {
+        Route::resource('staff', StaffController::class)->except(['show']);
         Route::get('devices', [\App\Http\Controllers\Admin\UserDeviceController::class, 'index'])->name('devices.index');
+        Route::get('attendances', [AttendanceController::class, 'index'])->name('attendances.index');
+        Route::get('attendances/export', [AttendanceController::class, 'export'])->name('attendances.export');
+        Route::resource('app-versions', \App\Http\Controllers\Admin\AppVersionController::class)->only(['index', 'store', 'destroy']);
     });
 
     // Super Admin only
     Route::middleware('role:super_admin')->group(function () {
-        Route::get('attendances', [AttendanceController::class, 'index'])->name('attendances.index');
-        Route::get('attendances/export', [AttendanceController::class, 'export'])->name('attendances.export');
+        Route::get('reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+        Route::get('reports/export', [\App\Http\Controllers\Admin\ReportController::class, 'export'])->name('reports.export');
         Route::put('attendances/schedule', [AttendanceController::class, 'updateSchedule'])->name('attendances.update-schedule');
         Route::resource('financial-accounts', \App\Http\Controllers\Admin\FinancialAccountController::class);
         Route::resource('financial-categories', FinancialCategoryController::class)->except(['show']);
         Route::resource('income-categories', FinancialCategoryController::class)
             ->parameters(['income-categories' => 'financialCategory'])
             ->except(['show']);
+    });
+    Route::middleware('role:super_admin,admin')->group(function () {
         Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
-        Route::resource('app-versions', \App\Http\Controllers\Admin\AppVersionController::class)->only(['index', 'store', 'destroy']);
-        Route::get('google-sheet-sync', [GoogleSheetSyncController::class, 'index'])->name('google-sheet-sync.index');
-        Route::post('google-sheet-sync', [GoogleSheetSyncController::class, 'sync'])->name('google-sheet-sync.sync');
     });
+    Route::get('google-sheet-sync', [GoogleSheetSyncController::class, 'index'])->name('google-sheet-sync.index');
+    Route::post('google-sheet-sync', [GoogleSheetSyncController::class, 'sync'])->name('google-sheet-sync.sync');
 });

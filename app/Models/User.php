@@ -101,6 +101,13 @@ class User extends Authenticatable
         return $query->whereIn('role', [UserRole::Teknisi, UserRole::KepalaTeknisi])->where('is_active', true);
     }
 
+    public function canManageStaff(User $staff): bool
+    {
+        return $this->role === UserRole::SuperAdmin
+            || ($this->role === UserRole::Supervisor
+                && ! in_array($staff->role, [UserRole::SuperAdmin, UserRole::Admin], true));
+    }
+
     // === Accessors ===
 
     public function getAvatarUrlAttribute(): ?string

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreStaffRequest;
 use App\Http\Requests\Admin\UpdateStaffRequest;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class StaffController extends Controller
@@ -37,6 +38,7 @@ class StaffController extends Controller
 
     public function edit(User $staff)
     {
+        abort_unless(auth()->user()->canManageStaff($staff), 403);
         return view('admin.staff.edit', compact('staff'));
     }
 
@@ -59,7 +61,11 @@ class StaffController extends Controller
 
     public function destroy(User $staff)
     {
-        $staff->update(['is_active' => false]);
+        abort_unless(auth()->user()->canManageStaff($staff), 403);
+        DB::transaction(function () use ($staff) {
+            $staff->update(['is_active' => false]);
+            $staff->tokens()->delete();
+        });
 
         return redirect()
             ->route('admin.staff.index')

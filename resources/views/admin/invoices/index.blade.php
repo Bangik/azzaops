@@ -9,9 +9,11 @@
             <h1 class="page-title">Invoice</h1>
             <p class="text-muted mb-0">Kelola tagihan pelanggan dari work order.</p>
         </div>
+        @if (auth()->user()->role === App\Enums\UserRole::SuperAdmin)
         <a href="{{ route('admin.reports.index', ['type' => 'invoices']) }}" class="btn btn-outline-primary">
             <i class="bi bi-file-earmark-spreadsheet me-1"></i> Laporan Invoice
         </a>
+        @endif
     </div>
 
     <div class="filter-bar">

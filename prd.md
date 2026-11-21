@@ -62,11 +62,18 @@ PT. Azza Karunia Jaya adalah perusahaan jasa instalasi, perawatan, dan servis AC
 
 | Role               | Deskripsi                                                                                                                                            | Platform     |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| Super Admin        | Full access, manage users & konfigurasi sistem. Dapat menghapus WO secara permanen.                                                                  | Web          |
-| Admin/CS           | Operasional harian: work order, invoice, RAB, keuangan. Sembunyikan menu administrasi. Tidak bisa edit customer di WO. Tidak bisa batalkan/hapus WO. | Web          |
-| Kepala Teknisi     | Terima/ambil langsung work order, bisa di-assign oleh Admin, monitor progress                                                                        | Web + Mobile |
+| Super Admin        | Full access, manage users & konfigurasi sistem. Dapat menghapus WO secara permanen.                                                                  | Web + Mobile |
+| Admin/CS           | Operasional, transaksi, sync spreadsheet dan settings; tidak bisa edit customer di WO atau batalkan/hapus WO.                                          | Web + Mobile |
+| Supervisor         | Operasional, staff, perangkat, log presensi, sync spreadsheet dan versi aplikasi; tanpa menu transaksi atau settings.                                  | Web          |
+| Kepala Teknisi     | Terima/ambil langsung work order, bisa di-assign oleh Admin, monitor progress                                                                        | Mobile       |
 | Teknisi            | Terima pekerjaan, submit laporan & foto                                                                                                              | Mobile       |
 | Finance _(future)_ | Akses khusus modul keuangan                                                                                                                          | Web          |
+
+**Akses web:** Super Admin memiliki seluruh akses. Admin dan Supervisor dapat mengakses Dashboard, Work Order, Customer, Kategori Jasa, Tipe Pekerjaan, Vendor, Presensi sendiri, dan Sync Spreadsheet. Admin juga dapat mengakses Invoice, RAB, Keuangan, Invoice Vendor, Invoice Gabungan, dan Settings. Supervisor juga dapat mengakses Staff, Device Staff, Log Presensi (termasuk ekspor), dan App Version. Laporan terpadu, pengaturan jadwal/lokasi presensi, akun dan kategori keuangan tetap khusus Super Admin. Supervisor hanya dapat melihat akun Admin dan Super Admin, tidak dapat membuat atau mengubah keduanya, serta tidak dapat menetapkan role tersebut kepada staff mana pun termasuk dirinya sendiri. Sync Spreadsheet untuk Admin dan Supervisor mencakup juga sinkronisasi Keuangan. Dashboard dan Work Order tetap menampilkan informasi yang sudah tersedia pada halaman tersebut.
+
+Kepala Teknisi dan Teknisi hanya menggunakan mobile. Perubahan akses web tidak mengubah endpoint atau hak akses role mobile yang sudah ada.
+
+Saat akun dinonaktifkan, semua token mobile dicabut dan sesi web maupun token yang masih ada ditolak pada setiap permintaan terautentikasi. Logout web tetap tersedia.
 
 ---
 
@@ -109,7 +116,7 @@ PT. Azza Karunia Jaya adalah perusahaan jasa instalasi, perawatan, dan servis AC
 | AD-05 | Sebagai Admin, saya dapat melihat daftar semua work order dengan filter berdasarkan status, tanggal, customer, dan teknisi            | Must     |
 | AD-06 | Sebagai Admin, saya dapat melihat detail work order termasuk timeline perubahan status                                                | Must     |
 | AD-07 | Sebagai Admin, saya dapat mengedit work order yang belum selesai                                                                      | Must     |
-| AD-08 | Sebagai Admin, saya dapat membatalkan work order                                                                                      | Must     |
+| AD-08 | Pembatalan work order tidak tersedia untuk Admin; Super Admin dan Supervisor dapat membatalkan work order                              | Must     |
 | AD-09 | Sebagai Admin, saya dapat melihat laporan & foto dari teknisi setelah pekerjaan selesai                                               | Must     |
 
 **Invoice & RAB:**
@@ -268,7 +275,7 @@ Staff internal perusahaan.
 | email             | VARCHAR(255)                                           | NO       |                   | UNIQUE, untuk login               |
 | phone             | VARCHAR(20)                                            | YES      | NULL              | Nomor HP                          |
 | password          | VARCHAR(255)                                           | NO       |                   | Hashed password                   |
-| role              | ENUM('super_admin','admin','kepala_teknisi','teknisi') | NO       | 'teknisi'         | Role user                         |
+| role              | VARCHAR(20): 'super_admin','admin','supervisor','kepala_teknisi','teknisi' | NO | 'teknisi' | Role user |
 | is_active         | BOOLEAN                                                | NO       | TRUE              | Status aktif/nonaktif             |
 | fcm_token         | VARCHAR(255)                                           | YES      | NULL              | Token FCM untuk push notification |
 | avatar            | VARCHAR(255)                                           | YES      | NULL              | Path foto profil                  |
@@ -811,8 +818,8 @@ Presensi harian staff (admin & teknisi).
 - Status `present` jika check_in sebelum/tepat `work_start_time`
 - Presensi masuk dan pulang wajib dilakukan dalam radius lokasi presensi yang dikonfigurasi Super Admin berdasarkan latitude, longitude, dan radius meter
 - Web mengambil koordinat dari browser, sedangkan mobile mengirim latitude dan longitude pada request presensi; server menolak presensi di luar radius
-- Admin presensi via web, teknisi presensi via mobile app
-- Log presensi & export hanya bisa diakses Super Admin
+- Admin dan Supervisor presensi via web, teknisi dan kepala teknisi via mobile app
+- Log presensi & export dapat diakses Super Admin dan Supervisor
 - Semua staff bisa melihat riwayat presensi sendiri
 
 **Settings terkait:**
@@ -964,7 +971,7 @@ Customer ──WA──▶ Admin/CS
     - Status otomatis: `pending`
     - Sistem mengirim notifikasi ke Kepala Teknisi (FCM + in-app)
 
-3. **Kepala Teknisi membuka app mobile/web**, melihat WO baru di daftar, lalu:
+3. **Kepala Teknisi membuka app mobile**, melihat WO baru di daftar, lalu:
     - Pilih teknisi yang tersedia (bisa 1 atau lebih)
     - Klik "Assign"
     - Status WO berubah: `assigned`
@@ -1407,7 +1414,7 @@ User {
   name: string
   email: string
   phone: string | null
-  role: 'super_admin' | 'admin' | 'kepala_teknisi' | 'teknisi'
+  role: 'super_admin' | 'admin' | 'supervisor' | 'kepala_teknisi' | 'teknisi'
   is_active: boolean
   avatar: string | null
 }
@@ -1680,7 +1687,7 @@ Pagination {
 
 #### Laporan & Dokumentasi
 
-**Sync Google Spreadsheet (Super Admin):**
+**Sync Google Spreadsheet (Super Admin, Admin, Supervisor):**
 - Modul khusus untuk mem-push data secara langsung ke Google Spreadsheet via API Service Account
 - Target spreadsheet dikonfigurasi melalui `.env` (`GOOGLE_SPREADSHEET_ID` dan `GOOGLE_CREDENTIALS_PATH`)
 - Tab 1: **Work Orders** (Replace seluruh data WO beserta relasi customer, teknisi, invoice, laporan, RAB)
@@ -1747,7 +1754,7 @@ Pagination {
 
 #### Manajemen User & Role
 
-- Dikelola oleh Super Admin
+- Dikelola oleh Super Admin dan Supervisor (Supervisor hanya dapat melihat Admin dan Super Admin, serta tidak dapat menetapkan kedua role tersebut)
 - CRUD user, assign role
 - Aktivasi/nonaktifkan user
 
@@ -1786,11 +1793,11 @@ Pagination {
 - Riwayat presensi terakhir (tabel 10 data terbaru)
 - Catatan opsional saat presensi
 
-**Log Presensi (Super Admin only):**
+**Log Presensi (Super Admin dan Supervisor):**
 
 - Tabel log presensi seluruh staff
 - Filter: rentang tanggal, staff, status (hadir/terlambat/tidak hadir)
-- Setting jadwal kerja (jam masuk & jam pulang)
+- Setting jadwal kerja (jam masuk & jam pulang) khusus Super Admin
 - Ekspor ke Excel (.xlsx) dan CSV
 - Integrasi dengan modul Laporan (tab Presensi)
 
@@ -1901,7 +1908,7 @@ Pagination {
 - **API:** Laravel Sanctum token-based authentication
 - **Password:** Bcrypt hashing (Laravel default)
 - **File upload:** Validasi tipe file (jpeg, png, jpg), max size 5MB
-- **Authorization:** Middleware role-based (SuperAdmin, Admin, KepalaTeknisi, Teknisi)
+- **Authorization:** Middleware role-based (SuperAdmin, Admin, Supervisor, KepalaTeknisi, Teknisi)
 - **SQL Injection:** Eloquent ORM (parameterized queries)
 - **XSS:** Blade template escaping ({{ }})
 - **Rate limiting:** API rate limit 60 request/menit per user

@@ -10,7 +10,7 @@
             <p class="text-muted mb-0">{{ $workOrder->title }}</p>
         </div>
         <div class="d-flex gap-2">
-            @if ($workOrder->status === App\Enums\WorkOrderStatus::Reported)
+            @if (auth()->user()->role !== App\Enums\UserRole::Supervisor && $workOrder->status === App\Enums\WorkOrderStatus::Reported)
                 <a href="{{ route('admin.invoices.create', ['work_order_id' => $workOrder->id]) }}" class="btn btn-success">
                     <i class="bi bi-receipt me-1"></i> Bikin Invoice
                 </a>
@@ -431,6 +431,7 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
+                        @if (auth()->user()->role !== App\Enums\UserRole::Supervisor)
                         @if ($workOrder->invoice)
                             <a href="{{ route('admin.invoices.show', $workOrder->invoice) }}"
                                 class="btn btn-outline-primary btn-sm text-start">
@@ -456,6 +457,7 @@
                                 <i class="bi bi-receipt me-1"></i> Generate Invoice Baru
                             </a>
                         @endif
+                        @endif
 
                         @if ($workOrder->reports->count())
                             <a href="{{ route('admin.work-orders.report-pdf', $workOrder) }}"
@@ -464,6 +466,7 @@
                             </a>
                         @endif
 
+                        @if (auth()->user()->role !== App\Enums\UserRole::Supervisor)
                         @if ($workOrder->rab)
                             <a href="{{ route('admin.rab.show', $workOrder->rab) }}"
                                 class="btn btn-outline-primary btn-sm text-start">
@@ -473,6 +476,7 @@
                             <button class="btn btn-outline-secondary btn-sm text-start" disabled>
                                 <i class="bi bi-calculator me-1"></i> Belum ada RAB
                             </button>
+                        @endif
                         @endif
 
                         @if ($workOrder->parentWorkOrder)

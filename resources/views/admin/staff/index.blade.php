@@ -10,9 +10,11 @@
         <p class="text-muted mb-0">Kelola akun internal dan hak akses pengguna.</p>
     </div>
     <div class="d-flex gap-2">
+        @if (auth()->user()->role === App\Enums\UserRole::SuperAdmin)
         <a href="{{ route('admin.reports.index', ['type' => 'staff']) }}" class="btn btn-outline-primary">
             <i class="bi bi-file-earmark-spreadsheet me-1"></i> Laporan Kinerja
         </a>
+        @endif
         <a href="{{ route('admin.staff.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-lg me-1"></i> Tambah Staff
         </a>
@@ -50,6 +52,7 @@
                             <span class="badge bg-{{ match($user->role->value) {
                                 'super_admin' => 'danger',
                                 'admin' => 'warning',
+                                'supervisor' => 'primary',
                                 'kepala_teknisi' => 'info',
                                 'teknisi' => 'success',
                                 default => 'secondary'
@@ -66,6 +69,7 @@
                         </td>
                         <td>
                             <div class="d-flex gap-1">
+                                @if (auth()->user()->canManageStaff($user))
                                 <a href="{{ route('admin.staff.edit', $user) }}" class="btn btn-sm btn-warning btn-action" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </a>
@@ -76,6 +80,7 @@
                                         <i class="bi bi-power"></i>
                                     </button>
                                 </form>
+                                @endif
                             </div>
                         </td>
                     </tr>

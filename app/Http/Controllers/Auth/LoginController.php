@@ -41,12 +41,12 @@ class LoginController extends Controller
                 ->withErrors(['email' => 'Akun Anda nonaktif. Hubungi administrator.']);
         }
 
-        if ($user->role === UserRole::Teknisi) {
+        if (in_array($user->role, [UserRole::Teknisi, UserRole::KepalaTeknisi], true)) {
             Auth::logout();
 
             return back()
                 ->withInput($request->only('email'))
-                ->withErrors(['email' => 'Teknisi hanya dapat mengakses aplikasi mobile.']);
+                ->withErrors(['email' => 'Kepala teknisi dan teknisi hanya dapat mengakses aplikasi mobile.']);
         }
 
         $request->session()->regenerate();

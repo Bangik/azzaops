@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\UserRole;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateSettingRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->role?->value === 'super_admin';
+        return in_array($this->user()?->role, [UserRole::SuperAdmin, UserRole::Admin], true);
     }
 
     public function rules(): array

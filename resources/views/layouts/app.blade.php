@@ -81,6 +81,7 @@
                     <i class="bi bi-calendar-check me-2"></i>Presensi
                 </a>
             </li>
+            @if (auth()->user()->role !== App\Enums\UserRole::Supervisor)
             <li class="nav-section-label">Transaksi</li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.invoices.*') ? 'active' : '' }}"
@@ -112,8 +113,9 @@
                     <i class="bi bi-files me-2"></i>Invoice Gabungan
                 </a>
             </li>
+            @endif
 
-            @if (auth()->user()->role->value === 'super_admin')
+            @if (in_array(auth()->user()->role, [App\Enums\UserRole::SuperAdmin, App\Enums\UserRole::Supervisor], true))
                 <li class="nav-section-label">Administrasi</li>
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}"
@@ -133,6 +135,8 @@
                         <i class="bi bi-clipboard-data me-2"></i>Log Presensi
                     </a>
                 </li>
+            @endif
+            @if (auth()->user()->role === App\Enums\UserRole::SuperAdmin)
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.financial-accounts.*') ? 'active' : '' }}"
                         href="{{ route('admin.financial-accounts.index') }}">
@@ -153,19 +157,21 @@
                 </li>
             @endif
 
-            @if (auth()->user()->role->value === 'super_admin')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.google-sheet-sync.*') ? 'active' : '' }}"
                         href="{{ route('admin.google-sheet-sync.index') }}">
                         <i class="bi bi-cloud-arrow-up me-2"></i>Sync Spreadsheet
                     </a>
                 </li>
+            @if (auth()->user()->role !== App\Enums\UserRole::Supervisor)
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}"
                         href="{{ route('admin.settings.index') }}">
                         <i class="bi bi-gear me-2"></i>Settings
                     </a>
                 </li>
+            @endif
+            @if (in_array(auth()->user()->role, [App\Enums\UserRole::SuperAdmin, App\Enums\UserRole::Supervisor], true))
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.app-versions.*') ? 'active' : '' }}"
                         href="{{ route('admin.app-versions.index') }}">

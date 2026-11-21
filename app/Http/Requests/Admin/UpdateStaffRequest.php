@@ -11,7 +11,7 @@ class UpdateStaffRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->canManageStaff($this->route('staff'));
     }
 
     public function rules(): array
@@ -23,7 +23,10 @@ class UpdateStaffRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($staff->id)],
             'phone' => ['nullable', 'string', 'max:255'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-            'role' => ['required', new Enum(UserRole::class)],
+            'role' => ['required', (new Enum(UserRole::class))->when(
+                $this->user()->role === UserRole::Supervisor,
+                fn (Enum $rule) => $rule->except([UserRole::SuperAdmin, UserRole::Admin])
+            )],
             'work_start_time' => ['nullable', 'date_format:H:i'],
             'work_end_time' => ['nullable', 'date_format:H:i'],
         ];

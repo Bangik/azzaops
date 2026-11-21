@@ -10,9 +10,11 @@
             <p class="text-muted mb-0">Kelola perintah kerja operasional lapangan.</p>
         </div>
         <div class="d-flex gap-2">
+            @if (auth()->user()->role === App\Enums\UserRole::SuperAdmin)
             <a href="{{ route('admin.reports.index', ['type' => 'wo']) }}" class="btn btn-outline-primary">
                 <i class="bi bi-file-earmark-spreadsheet me-1"></i> Laporan WO
             </a>
+            @endif
             <a href="{{ route('admin.work-orders.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-1"></i> Buat Work Order
             </a>
@@ -126,13 +128,13 @@
                                             class="btn btn-sm btn-info text-white btn-action" title="Detail">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        @if ($wo->status === App\Enums\WorkOrderStatus::Reported)
+                                        @if (auth()->user()->role !== App\Enums\UserRole::Supervisor && $wo->status === App\Enums\WorkOrderStatus::Reported)
                                             <a href="{{ route('admin.invoices.create', ['work_order_id' => $wo->id]) }}"
                                                 class="btn btn-sm btn-success btn-action" title="Bikin Invoice">
                                                 <i class="bi bi-receipt"></i>
                                             </a>
                                         @endif
-                                        @if ($wo->invoice)
+                                        @if (auth()->user()->role !== App\Enums\UserRole::Supervisor && $wo->invoice)
                                             <a href="{{ route('admin.invoices.pdf', $wo->invoice) }}"
                                                 class="btn btn-sm btn-danger btn-action" title="Download Invoice">
                                                 <i class="bi bi-file-pdf"></i>

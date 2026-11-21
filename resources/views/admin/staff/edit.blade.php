@@ -35,6 +35,7 @@
                     <label for="role" class="form-label">Role</label>
                     <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
                         @foreach(App\Enums\UserRole::cases() as $role)
+                            @continue(auth()->user()->role === App\Enums\UserRole::Supervisor && in_array($role, [App\Enums\UserRole::SuperAdmin, App\Enums\UserRole::Admin], true))
                             <option value="{{ $role->value }}" {{ old('role', $staff->role->value) == $role->value ? 'selected' : '' }}>
                                 {{ $role->label() }}
                             </option>
